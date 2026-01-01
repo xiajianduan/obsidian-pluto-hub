@@ -26,7 +26,7 @@ export interface PlutoSettings {
 	backupFolderName: string
     usePako: boolean;
     columns: number;
-    modules: MiniModule[];
+    modules: string[];
 }
 // 默认设置：动态获取 configDir
 export const DEFAULT_SETTINGS: PlutoSettings  = {

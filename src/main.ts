@@ -10,6 +10,10 @@ export default class PlutoHubPlugin extends Plugin {
 
     async onload() {
         await this.loadSettings();
+        
+        // 从存储路径加载所有模块
+        await ModStorage.loadAllModulesFromStorage(this);
+        
         await this.initializePlugin();
 
         this.i18n();
@@ -44,10 +48,10 @@ export default class PlutoHubPlugin extends Plugin {
             config: {}, // 用于存储 JSON 配置
             modules: {}, // 用于存储模块输出
             // 依赖映射
-            dv: null, // Dataview
+            dva: null, // Dataview
             react: null, // React Components
             qa: null, // QuickAdd
-            
+            templater: null, // Templater
             // 提供模块管理 API
             getModule: (name: string) => (window as any).pluto.modules[name],
             registerModule: (name: string, exports: any) => {
@@ -67,9 +71,10 @@ export default class PlutoHubPlugin extends Plugin {
         }
         
         const pluginMappings: { [key: string]: { prop: string, getter: () => any } } = {
-            'dataview': { prop: 'dv', getter: () => (this.app as any).plugins.plugins['dataview'] },
-            'react-components': { prop: 'react', getter: () => (this.app as any).plugins.plugins['react-components'] },
-            'quickadd': { prop: 'qa', getter: () => (window as any).quickAddApi || null }
+            'dataview': { prop: 'dva', getter: () => (this.app as any).plugins.plugins['dataview']?.api },
+            'react-components': { prop: 'react', getter: () => (this.app as any).plugins.plugins['obsidian-react-components'] },
+            'quickadd': { prop: 'qa', getter: () => (window as any).quickAddApi || null },
+            'templater-obsidian': { prop: 'templater', getter: () => (this.app as any).plugins.plugins['templater-obsidian'] }
         };
 
         for (const [pluginId, mapping] of Object.entries(pluginMappings)) {
@@ -122,7 +127,7 @@ export default class PlutoHubPlugin extends Plugin {
     }
 
     // 运行单个模块包
-    runBundle(bundle: ModuleBundle) {
+    runBundle(bundle: ModuleBundle, moduleName?: string) {
         const pluto = (window as any).pluto;
         
         // 1. 注入所有 CSS 文件
@@ -135,10 +140,8 @@ export default class PlutoHubPlugin extends Plugin {
             try {
                 const config = JSON.parse(jsonFile.content);
                 // 将配置挂载到 pluto.config[模块名]
-                const mod = this.settings.modules.find((m: MiniModule) => m.id === bundle.id);
-                if (mod) {
-                    pluto.config[mod.name] = config;
-                }
+                const name = moduleName || bundle.id;
+                pluto.config[name] = config;
             } catch (e) {
                 console.error(`Error parsing JSON file ${jsonFile.name}:`, e);
             }
@@ -146,14 +149,14 @@ export default class PlutoHubPlugin extends Plugin {
 
         // 3. 执行所有 JS 文件
         const jsFiles = bundle.files.filter(f => f.type === 'js');
-        // 获取当前模块的MiniModule对象
-        const mod = this.settings.modules.find((m: MiniModule) => m.id === bundle.id);
+        // 获取当前模块的名称
+        const modName = moduleName || bundle.id;
         jsFiles.forEach(jsFile => {
             try {
                 const context = {
                     app: this.app,
                     pluto: pluto,
-                    mod: mod, // 将MiniModule对象暴露给脚本
+                    mod: { name: modName, id: bundle.id }, // 将模块信息暴露给脚本
                     // 允许 JS 访问同模块下的其他文件
                     getFile: (name: string) => bundle.files.find(f => f.name === name)?.content
                 };
@@ -163,8 +166,8 @@ export default class PlutoHubPlugin extends Plugin {
                 const result = runner(context);
                 
                 // 如果模块返回了值，将其挂载到 pluto.modules
-                if (mod && result) {
-                    pluto.modules[mod.name] = result;
+                if (result) {
+                    pluto.modules[modName] = result;
                 }
             } catch (e) {
                 console.error(`Error in ${jsFile.name}:`, e);
@@ -177,16 +180,17 @@ export default class PlutoHubPlugin extends Plugin {
         // 清理所有 Pluto 注入的旧样式，防止重复累积
         document.querySelectorAll('[id^="pluto-css-"]').forEach(el => el.remove());
 
-        if (this.settings.modules) {
-            for (const mod of this.settings.modules) {
-                if (mod.enabled) {
-                    try {
-                        // 读取模块包
-                        const bundle = await ModStorage.loadBundle(this, mod.id);
-                        this.runBundle(bundle);
-                    } catch (e) {
-                        console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
-                    }
+        // 从存储中加载所有模块
+        const modules = await ModStorage.loadAllModulesFromStorage(this);
+        
+        for (const mod of modules) {
+            if (mod.enabled) {
+                try {
+                    // 读取模块包
+                    const bundle = await ModStorage.loadBundle(this, mod.id);
+                    this.runBundle(bundle, mod.name);
+                } catch (e) {
+                    console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
                 }
             }
         }

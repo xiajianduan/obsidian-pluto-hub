@@ -10,7 +10,7 @@ import { bracketMatching, indentOnInput, syntaxHighlighting, defaultHighlightSty
 import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
 import { javascript } from '@codemirror/lang-javascript';
 import { css } from '@codemirror/lang-css';
-// 由于 @codemirror/lang-
+import { markdown } from '@codemirror/lang-markdown';
 
 export const PLUTO_VIEW_TYPE = "pluto-dashboard-view";
 
@@ -58,31 +58,56 @@ export class PlutoView extends ItemView {
 
 
 
-    // --- 1. 商店界面 (基于 MiniModule 索引) ---
+    // --- 1. 商店界面 (基于 MiniModule 索引) ---    
     renderDashboard(el: HTMLElement) {
         const header = el.createDiv({ cls: 'pluto-header' });
+        
+        // 标题
         header.createEl('h2', { text: t('pluto.hub.dashboard.title'), cls: 'pluto-title' });
 
         // 添加模块按钮
         new ButtonComponent(header)
             .setButtonText(t('pluto.hub.dashboard.add-module'))
-            .setClass('grad_button')
-            .onClick(() => this.addNewModule());
+            .setClass('btn_nob')
+            .onClick(async () => await this.addNewModule());
 
         // 导入导出按钮
         new ButtonComponent(header)
             .setButtonText(t('pluto.hub.dashboard.import'))
-            .setClass('grad_button')
+            .setClass('btn_nob')
             .onClick(() => this.showImportDialog());
 
         new ButtonComponent(header)
             .setButtonText(t('pluto.hub.dashboard.export-all'))
-            .setClass('grad_button')
-            .onClick(() => this.showExportAllDialog());
+            .setClass('btn_nob')
+            .onClick(async () => await this.showExportAllDialog());
+        
+        // 搜索框 - 放在最右侧
+        const searchContainer = header.createDiv({ cls: 'pluto-search-container' });
+        const searchInput = searchContainer.createEl('input', {
+            type: 'text',
+            placeholder: t('pluto.hub.dashboard.search-placeholder'),
+            cls: 'pluto-search-input'
+        });
 
         const grid = el.createDiv({ cls: 'pluto-grid' });
-
-        this.plugin.settings.modules.forEach((mod: MiniModule) => {
+        
+        // 渲染模块的函数
+        const renderModules = async (filter?: string) => {
+            grid.empty();
+            
+            // 从存储中加载所有模块
+            const allModules = await ModStorage.loadAllModulesFromStorage(this.plugin);
+            let filteredModules = allModules;
+            
+            if (filter) {
+                const lowerFilter = filter.toLowerCase();
+                filteredModules = allModules.filter((mod: MiniModule) => 
+                    mod.name.toLowerCase().includes(lowerFilter)
+                );
+            }
+            
+            filteredModules.forEach((mod: MiniModule) => {
             const card = grid.createDiv({ cls: 'pluto-card' });
             card.style.background = mod.bgColor || 'var(--background-secondary-alt)';
 
@@ -100,8 +125,33 @@ export class PlutoView extends ItemView {
             toggle.onclick = async (e) => {
                 e.stopPropagation(); // 防止点击开关时触发进入编辑器
                 mod.enabled = toggle.checked;
-                await this.plugin.saveSettings();
-                this.plugin.runAllEnabled(); // 刷新运行状态
+                
+                // 加载模块包并更新保存状态
+                try {
+                    const bundle = await ModStorage.loadBundle(this.plugin, mod.id);
+                    await ModStorage.saveBundle(this.plugin, bundle, mod.name, mod.enabled, mod.bgColor);
+                } catch (e) {
+                    console.error(`[Pluto Hub] Failed to update module ${mod.name}:`, e);
+                }
+                
+                if (mod.enabled) {
+                    // 如果模块被启用，运行该模块
+                    try {
+                        const bundle = await ModStorage.loadBundle(this.plugin, mod.id);
+                        this.plugin.runBundle(bundle);
+                    } catch (e) {
+                        console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
+                    }
+                } else {
+                    // 如果模块被禁用，移除该模块的所有样式
+                    document.querySelectorAll(`[id^="pluto-css-${mod.id}-"]`).forEach(el => el.remove());
+                    // 从pluto.modules中移除该模块的导出
+                    if ((window as any).pluto && (window as any).pluto.modules) {
+                        delete (window as any).pluto.modules[mod.name];
+                    }
+                }
+                
+                this.render(); // 重新渲染界面，更新状态标签
             };
 
             // 模块名称
@@ -128,11 +178,25 @@ export class PlutoView extends ItemView {
                 this.render();
             });
         });
-    }
+    };
+    
+    // 初始渲染所有模块
+    renderModules();
+    
+    // 搜索框事件监听器
+    searchInput.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        renderModules(target.value.trim());
+    });
+}
 
     // --- 2. 编辑器界面 (基于 ModuleBundle 内容) ---
     async renderEditor(el: HTMLElement) {
-        const mod = this.plugin.settings.modules.find(m => m.id === this.currentModId);
+        if (!this.currentModId) return;
+        
+        // 从存储中加载所有模块，查找当前模块
+        const allModules = await ModStorage.loadAllModulesFromStorage(this.plugin);
+        const mod = allModules.find(m => m.id === this.currentModId);
         if (!mod) return;
 
         // 1. 创建导航栏
@@ -149,8 +213,8 @@ export class PlutoView extends ItemView {
                 this.render();
             });
             
-        // 模块名称
-        nav.createEl('h3', { text: mod.name, cls: 'editor-title' });
+        // 模块名称（居中）
+        nav.createEl('h3', { text: mod.name, cls: 'editor-title centered-title' });
 
         // 2. 异步加载模块内容
         const bundle: ModuleBundle = await ModStorage.loadBundle(this.plugin, mod.id);
@@ -168,6 +232,28 @@ export class PlutoView extends ItemView {
         
         // CodeMirror 编辑器容器
         const editorContainer = editorLayout.createDiv({ cls: 'pluto-cm-editor' });
+        
+        // 导入文件按钮（移到导航栏）
+        new ButtonComponent(nav)
+            .setButtonText(t('pluto.hub.editor.import-file'))
+            .onClick(() => this.importFileToModule(bundle, editorContainer));
+            
+        // 导出文件按钮（移到导航栏）
+        new ButtonComponent(nav)
+            .setButtonText(t('pluto.hub.editor.export-files'))
+            .onClick(() => this.exportFilesToFolder(bundle));
+            
+        // 新建文件按钮（移到导航栏）
+        new ButtonComponent(nav)
+            .setButtonText(t('pluto.hub.add-file'))
+            .onClick(async () => {
+                const name = await this.promptUser(t('pluto.hub.file-name-prompt'));
+                if (name) {
+                    const type = name.split('.').pop() || 'txt';
+                    bundle.files.push({ name, type, content: "" });
+                    this.renderFileSidebar(fileSidebar, bundle, editorContainer);
+                }
+            });
 
         // 4. 渲染文件侧边栏
         this.renderFileSidebar(fileSidebar, bundle, editorContainer);
@@ -226,8 +312,8 @@ export class PlutoView extends ItemView {
                 cls: 'delete-file-btn'
             });
             
-            // 文件点击事件
-            fileName.onclick = async () => {
+            // 文件点击事件（绑定到整个item元素）
+            item.onclick = async () => {
                 // 保存当前文件内容
                 const currentFile = this.getCurrentFile(bundle);
                 if (this.currentEditor && currentFile) {
@@ -240,6 +326,7 @@ export class PlutoView extends ItemView {
                 
                 // 重新渲染编辑器
                 this.currentEditor?.destroy();
+                this.currentEditor = null; // 清除当前编辑器引用，避免影响图片预览
                 this.renderCodeMirror(editorContainer, file);
             };
             
@@ -289,41 +376,83 @@ export class PlutoView extends ItemView {
                 }
             };
         });
-        
-        // 添加新文件按钮
-        new ButtonComponent(sidebarEl)
-            .setButtonText(t('pluto.hub.add-file'))
-            .setClass('add-file-btn')
-            .onClick(async () => {
-                const name = await this.promptUser(t('pluto.hub.file-name-prompt'));
-                if (name) {
-                    const type = name.split('.').pop() || 'txt';
-                    bundle.files.push({ name, type, content: "" });
-                    this.renderFileSidebar(sidebarEl, bundle, editorContainer);
-                }
-            });
     }
 
-    // 渲染 CodeMirror 6 编辑器
+    // 渲染 CodeMirror 6 编辑器或图片预览
     renderCodeMirror(containerEl: HTMLElement, file: ModFile) {
         containerEl.empty();
         
-        // 根据文件类型选择语言支持
-        let languageExtension;
-        switch (file.type) {
-            case 'js':
-            case 'javascript':
-                languageExtension = javascript();
-                break;
-            case 'css':
-                languageExtension = css();
-                break;
-            case 'json':
-                languageExtension = javascript(); // JSON 语法高亮暂时用 js 扩展替代
-                break;
-            default:
-                languageExtension = [];
+        // 检查是否为图片文件，添加预览功能
+        const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (imageTypes.includes(file.type.toLowerCase())) {
+            // 使用 Blob URL 替代 base64 显示图片，避免 URL 格式错误
+            try {
+                // 先尝试直接使用 atob 解码，不做预验证
+                // 清除可能的空白字符和换行符
+                const cleanBase64 = file.content.replace(/\s/g, '');
+                
+                // 将 base64 转换为 Uint8Array
+                const binaryString = atob(cleanBase64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // 创建 Blob 对象
+                const blob = new Blob([bytes], { type: `image/${file.type}` });
+                
+                // 创建 Blob URL
+                const blobUrl = URL.createObjectURL(blob);
+                
+                // 显示图片预览
+                const imgEl = containerEl.createEl('img', {
+                    attr: {
+                        src: blobUrl,
+                        alt: file.name
+                    },
+                    cls: 'pluto-image-preview'
+                });
+                imgEl.style.maxWidth = '100%';
+                imgEl.style.maxHeight = '100%';
+                imgEl.style.objectFit = 'contain';
+                
+                // 当组件销毁时释放 Blob URL
+                imgEl.onload = () => {
+                    URL.revokeObjectURL(blobUrl);
+                };
+                
+                // 错误处理
+                imgEl.onerror = () => {
+                    console.error('Failed to load image from blob URL');
+                    URL.revokeObjectURL(blobUrl);
+                };
+                
+                // 当成功显示图片预览时，将 currentEditor 设置为 null
+                // 这样切换文件时就不会错误地保存内容到图片的base64字段中
+                this.currentEditor = null;
+                
+                return;
+            } catch (e) {
+                console.error('Failed to create blob URL for image:', e);
+                // 输出实际的 file.content 以便诊断问题
+                console.log('Actual file content:', file.content);
+                // 如果无法显示图片，使用文本编辑器显示base64内容
+                // 这是一个 fallback 机制，确保用户仍然可以访问文件内容
+            }
         }
+        
+        // 根据文件类型选择语言支持，使用更简洁的对象映射替代switch语句
+        const languageMap: Record<string, any> = {
+            'js': javascript(),
+            'javascript': javascript(),
+            'css': css(),
+            'json': javascript(), // JSON 语法高亮暂时用 js 扩展替代
+            'md': markdown(),     // 使用 markdown 扩展支持 Markdown
+            'markdown': markdown()
+        };
+        
+        const languageExtension = languageMap[file.type] || [];
         
         // 创建编辑器状态
         const startState = EditorState.create({
@@ -399,8 +528,15 @@ export class PlutoView extends ItemView {
             currentFile.content = this.currentEditor.state.doc.toString();
         }
         
+        // 从存储中获取模块信息以获取模块名称
+        const allModules = await ModStorage.loadAllModulesFromStorage(this.plugin);
+        const currentModule = allModules.find(mod => mod.id === bundle.id);
+        if (!currentModule) {
+            throw new Error(`Module not found: ${bundle.id}`);
+        }
+        
         // 保存到磁盘
-        await ModStorage.saveBundle(this.plugin, bundle);
+        await ModStorage.saveBundle(this.plugin, bundle, currentModule.name, currentModule.enabled, currentModule.bgColor);
         
         // 重新加载模块
         // this.plugin.runAllEnabled();
@@ -449,13 +585,24 @@ export class PlutoView extends ItemView {
     }
 
     async showExportAllDialog() {
-        // 使用 window.pluto.qa.inputPrompt 获取保存路径
-        const result = await window.pluto.qa.inputPrompt(
-            t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename'));
+        // 优先使用 QuickAdd 的 inputPrompt 方法获取保存路径
+        const result = await new Promise<string | null>((resolve) => {
+            if ((window as any).pluto?.qa?.inputPrompt) {
+                (window as any).pluto.qa.inputPrompt(t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename')).then(resolve);
+            } else {
+                // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
+                const input = prompt(t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename'));
+                resolve(input);
+            }
+        });
         
         if (result) {
             try {
-                await ModStorage.backupAllModules(this.plugin, result);
+                // 使用配置中的备份目录
+                const backupFolder = this.plugin.settings.backupFolderName;
+                const configDir = this.plugin.app.vault.configDir;
+                const backupFile = `${configDir}/${backupFolder}/${result}.ops`;
+                await ModStorage.backupAllModules(this.plugin, backupFile);
                 new Notice(t('pluto.hub.export.all-success'));
             } catch (e) {
                 console.error("Failed to export modules:", e);
@@ -465,7 +612,9 @@ export class PlutoView extends ItemView {
     }
 
     async exportModule(moduleId: string) {
-        const mod = this.plugin.settings.modules.find(m => m.id === moduleId);
+        // 从存储中加载所有模块，查找当前模块
+        const allModules = await ModStorage.loadAllModulesFromStorage(this.plugin);
+        const mod = allModules.find(m => m.id === moduleId);
         if (!mod) return;
         
         // 使用 window.pluto.qa.inputPrompt 获取保存路径
@@ -483,6 +632,82 @@ export class PlutoView extends ItemView {
         }
     }
 
+    // 导出模块中的所有文件到配置的备份目录
+    async exportFilesToFolder(bundle: ModuleBundle) {
+        try {
+            // 获取模块信息
+            const allModules = await ModStorage.loadAllModulesFromStorage(this.plugin);
+            const mod = allModules.find(m => m.id === bundle.id);
+            if (!mod) return;
+
+            // 使用配置中的备份目录作为导出路径
+            const backupFolder = this.plugin.settings.backupFolderName;
+            const configDir = this.plugin.app.vault.configDir;
+            const folder = `${configDir}/${backupFolder}/${mod.name}`;
+            const adapter = this.plugin.app.vault.adapter;
+            
+            // 创建目录（如果不存在）
+            if (!(await adapter.exists(folder))) {
+                // 递归创建目录
+                const createDirRecursive = async (dirPath: string) => {
+                    if (await adapter.exists(dirPath)) return;
+                    
+                    const parentDir = dirPath.substring(0, dirPath.lastIndexOf('/'));
+                    if (parentDir && parentDir !== dirPath) {
+                        await createDirRecursive(parentDir);
+                    }
+                    
+                    await adapter.mkdir(dirPath);
+                };
+                
+                await createDirRecursive(folder);
+            }
+
+            // 保存当前文件内容
+            const currentFile = this.getCurrentFile(bundle);
+            if (this.currentEditor && currentFile) {
+                currentFile.content = this.currentEditor.state.doc.toString();
+            }
+
+            // 导出每个文件
+            for (const file of bundle.files) {
+                const filePath = `${folder}/${file.name}`;
+                const adapter = this.plugin.app.vault.adapter;
+
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(file.type.toLowerCase())) {
+                    // 处理图片文件
+                    try {
+                        // 清除可能的空白字符
+                        const cleanBase64 = file.content.replace(/\s/g, '');
+                        const binaryString = atob(cleanBase64);
+                        const len = binaryString.length;
+                        const bytes = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        await adapter.writeBinary(filePath, bytes.buffer);
+                    } catch (e) {
+                        console.error(`Failed to export image file ${file.name}:`, e);
+                        new Notice(t('pluto.hub.export.file-failure').replace('{filename}', file.name));
+                    }
+                } else {
+                    // 处理文本文件
+                    try {
+                        await adapter.write(filePath, file.content);
+                    } catch (e) {
+                        console.error(`Failed to export text file ${file.name}:`, e);
+                        new Notice(t('pluto.hub.export.file-failure').replace('{filename}', file.name));
+                    }
+                }
+            }
+
+            new Notice(t('pluto.hub.export.all-files-success').replace('{modname}', mod.name));
+        } catch (e) {
+            console.error("Failed to export files:", e);
+            new Notice(t('pluto.hub.export.all-files-failure'));
+        }
+    }
+
     // --- 4. 辅助逻辑 ---
     async addNewModule() {
         const name = await this.promptUser(t('pluto.hub.module-name-prompt'));
@@ -496,32 +721,31 @@ export class PlutoView extends ItemView {
             bgColor: this.generateRandomGradient()
         };
 
-        // 1. 保存索引
-        this.plugin.settings.modules.push(newMod);
-        await this.plugin.saveSettings();
-
-        // 2. 初始化一个空的二进制包
+        // 初始化一个空的二进制包
         const initialBundle: ModuleBundle = {
             id: newId,
             files: [{ name: 'main.js', type: 'js', content: 'new Notice(mod.name);' }]
         };
-        await ModStorage.saveBundle(this.plugin, initialBundle);
+        
+        // 保存到磁盘
+        await ModStorage.saveBundle(this.plugin, initialBundle, name, true, newMod.bgColor);
 
         this.render();
     }
 
     async deleteModule(id: string) {
-        // 1. 从设置中移除索引
-        const mod = this.plugin.settings.modules.find(m => m.id === id);
+        // 1. 从存储中加载所有模块，查找要删除的模块
+        const allModules = await ModStorage.loadAllModulesFromStorage(this.plugin);
+        const mod = allModules.find(m => m.id === id);
+        
         if (mod) {
-            this.plugin.settings.modules = this.plugin.settings.modules.filter(m => m.id !== id);
-            await this.plugin.saveSettings();
-
             // 2. 从磁盘移除文件
             const path = ModStorage.getModulePath(this.plugin, mod.name);
             if (await this.app.vault.adapter.exists(path)) {
                 await this.app.vault.adapter.remove(path);
             }
+
+            this.render();
         }
     }
 
@@ -546,8 +770,14 @@ export class PlutoView extends ItemView {
     // 用户输入提示
     async promptUser(message: string): Promise<string | null> {
         return new Promise((resolve) => {
-            const input = window.pluto.qa.inputPrompt(message);
-            resolve(input);
+            // 优先使用 QuickAdd 的 inputPrompt 方法
+            if ((window as any).pluto?.qa?.inputPrompt) {
+                (window as any).pluto.qa.inputPrompt(message).then(resolve);
+            } else {
+                // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
+                const input = prompt(message);
+                resolve(input);
+            }
         });
     }
 
@@ -559,5 +789,106 @@ export class PlutoView extends ItemView {
             reader.onerror = reject;
             reader.readAsArrayBuffer(file);
         });
+    }
+
+    // 导入文件到当前模块
+    importFileToModule(bundle: ModuleBundle, editorContainer: HTMLElement) {
+        // 创建文件选择对话框，支持多选，不限文件格式
+        const input = document.createElement('input');
+        input.type = 'file';
+        // 移除文件格式限制，支持所有文件类型
+        input.multiple = true; // 允许选择多个文件
+        
+        input.onchange = async (e: Event) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files && target.files.length > 0) {
+                const files = Array.from(target.files);
+                let importedCount = 0;
+                let failedCount = 0;
+                
+                // 遍历所有选中的文件
+                for (const file of files) {
+                    try {
+                        // 确定文件类型
+                        let type: string;
+                        const lastDotIndex = file.name.lastIndexOf('.');
+                        if (lastDotIndex > 0) {
+                            type = file.name.substring(lastDotIndex + 1).toLowerCase();
+                        } else {
+                            // 如果没有扩展名，使用默认类型
+                            type = 'text';
+                        }
+                        
+                        // 根据文件类型选择读取方式
+                        let content: string;
+                        const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        if (imageTypes.includes(type)) {
+                            // 图片文件使用 base64 编码
+                            content = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                    // 提取 base64 部分，去掉 data:image/xxx;base64, 前缀
+                                    const result = reader.result as string;
+                                    const commaIndex = result.indexOf(',');
+                                    // 确保有逗号分隔符，否则使用空字符串
+                                    const base64Part: string = commaIndex !== -1 ? result.substring(commaIndex + 1) : '';
+                                    resolve(base64Part);
+                                };
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                            });
+                        } else {
+                            // 文本文件使用普通文本读取
+                            content = await new Promise<string>((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result as string);
+                                reader.onerror = reject;
+                                reader.readAsText(file);
+                            });
+                        }
+                        
+                        // 检查文件名是否已存在
+                        if (bundle.files.some(f => f.name === file.name)) {
+                            failedCount++;
+                            continue; // 跳过已存在的文件
+                        }
+                        
+                        // 创建新文件并添加到bundle
+                        const newFile: ModFile = {
+                            name: file.name,
+                            type: type,
+                            content: content
+                        };
+                        bundle.files.push(newFile);
+                        importedCount++;
+                    } catch (error) {
+                        failedCount++;
+                        console.error('File import failed:', error);
+                    }
+                }
+                
+                if (importedCount > 0) {
+                    // 保存更改
+                    await this.saveCurrentBundle(bundle);
+                    
+                    // 重新渲染文件侧边栏和编辑器
+                    this.currentFileIndex = bundle.files.length - 1;
+                    this.renderFileSidebar(this.contentEl.querySelector('.pluto-file-sidebar')!, bundle, editorContainer);
+                    
+                    // 重新渲染编辑器并选中最后导入的文件
+                    this.currentEditor?.destroy();
+                    const lastFile = bundle.files[this.currentFileIndex];
+                    if (lastFile) {
+                        this.renderCodeMirror(editorContainer, lastFile);
+                    }
+                    
+                    new Notice(`${importedCount} ${t('pluto.hub.editor.files-imported')}${failedCount > 0 ? `, ${failedCount} ${t('pluto.hub.editor.files-failed')}` : ''}`);
+                } else {
+                    new Notice(t('pluto.hub.editor.no-files-imported'));
+                }
+            }
+        };
+        
+        input.click();
     }
 }

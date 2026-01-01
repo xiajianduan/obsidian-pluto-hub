@@ -6,6 +6,59 @@
     flex-direction: column;
 }
 
+/* Dashboard Header */
+.pluto-header {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    margin-bottom: 20px;
+}
+
+.pluto-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Search Box */
+.pluto-search-container {
+    margin-left: auto;
+}
+
+.pluto-search-input {
+    padding: 6px 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+    font-size: 14px;
+    width: 200px;
+}
+
+.pluto-search-input:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+}
+
+/* 编辑器导航栏 */
+.pluto-editor-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* 居中标题 */
+.centered-title {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
 /* 商店网格布局 */
 .pluto-grid {
     display: grid;
@@ -14,9 +67,9 @@
 }
 
 .pluto-card {
-    min-height: 140px;
+    min-height: 120px;
     border-radius: 12px;
-    padding: 16px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -47,7 +100,7 @@
 }
 
 .pluto-card .card-title {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
     margin-top: auto;
 }
@@ -190,6 +243,53 @@
     justify-content: flex-end;
     gap: 8px;
     margin-top: 16px;
+}
+/* CTA 按钮 */
+button.mod-cta {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    font-weight: 500;
+    padding: 8px 16px;
+}
+
+button.mod-cta:hover {
+    background-color: var(--interactive-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 警告按钮 */
+button.mod-warning {
+    background-color: var(--background-danger);
+    color: var(--text-on-accent);
+    font-weight: 500;
+    padding: 8px 16px;
+}
+
+button.mod-warning:hover {
+    background-color: var(--background-danger-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 82, 82, 0.2);
+}
+
+/* 图标按钮 */
+button.button-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* 模块导出按钮 */
+button.mod-export-btn {
+    background-color: transparent;
+    color: var(--text-muted);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+button.mod-export-btn:hover {
+    background-color: var(--background-modifier-hover);
+    color: var(--text-normal);
+    transform: none;
 }
 
 /* 确保变量定义 */

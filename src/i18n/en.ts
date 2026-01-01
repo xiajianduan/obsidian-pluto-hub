@@ -24,7 +24,16 @@ export default {
 	'pluto.hub.dashboard.active': 'Active',
 	'pluto.hub.dashboard.disabled': 'Disabled',
 	'pluto.hub.dashboard.export-tooltip': 'Export module',
+	'pluto.hub.dashboard.search-placeholder': 'Search modules...',
+	'pluto.hub.editor.unsupported-file-type': 'Unsupported file type',
+	'pluto.hub.editor.file-already-exists': 'File already exists',
+	'pluto.hub.editor.file-imported': 'File imported successfully',
+	'pluto.hub.editor.files-imported': 'files imported successfully',
+	'pluto.hub.editor.files-failed': 'files failed to import',
+	'pluto.hub.editor.no-files-imported': 'No files imported successfully',
+	'pluto.hub.editor.import-failure': 'Failed to import file',
 	'pluto.hub.editor.back-to-dashboard': 'Back to dashboard',
+	'pluto.hub.editor.import-file': 'Import File',
 	'pluto.hub.editor.save-changes': 'Save all changes',
 	'pluto.hub.editor.delete-module': 'Delete module',
 	'pluto.hub.editor.cannot-delete-last-file': 'Cannot delete the last file!',
@@ -36,5 +45,10 @@ export default {
 	'pluto.hub.export.all-failure': 'Failed to export modules',
 	'pluto.hub.export.module-title': 'Export Module',
 	'pluto.hub.export.module-success': 'Module exported successfully',
-	'pluto.hub.export.module-failure': 'Failed to export module'
+	'pluto.hub.export.module-failure': 'Failed to export module',
+	'pluto.hub.editor.export-files': 'Export Files',
+	'pluto.hub.export.select-folder': 'Select Export Folder',
+	'pluto.hub.export.file-failure': 'Failed to export file {filename}',
+	'pluto.hub.export.all-files-success': 'All files from module {modname} have been exported successfully',
+	'pluto.hub.export.all-files-failure': 'Failed to export files'
 };

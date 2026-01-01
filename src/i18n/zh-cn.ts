@@ -25,7 +25,16 @@ export default {
 	'pluto.hub.dashboard.active': '已激活',
 	'pluto.hub.dashboard.disabled': '已禁用',
 	'pluto.hub.dashboard.export-tooltip': '导出模块',
+	'pluto.hub.dashboard.search-placeholder': '搜索模块...',
+	'pluto.hub.editor.unsupported-file-type': '不支持的文件类型',
+	'pluto.hub.editor.file-already-exists': '文件已存在',
+	'pluto.hub.editor.file-imported': '文件导入成功',
+	'pluto.hub.editor.files-imported': '个文件导入成功',
+	'pluto.hub.editor.files-failed': '个文件导入失败',
+	'pluto.hub.editor.no-files-imported': '没有文件导入成功',
+	'pluto.hub.editor.import-failure': '文件导入失败',
 	'pluto.hub.editor.back-to-dashboard': '返回仪表盘',
+	'pluto.hub.editor.import-file': '导入文件',
 	'pluto.hub.editor.save-changes': '保存所有更改',
 	'pluto.hub.editor.delete-module': '删除模块',
 	'pluto.hub.editor.cannot-delete-last-file': '不能删除最后一个文件！',
@@ -37,5 +46,10 @@ export default {
 	'pluto.hub.export.all-failure': '导出模块失败',
 	'pluto.hub.export.module-title': '导出模块',
 	'pluto.hub.export.module-success': '模块导出成功',
-	'pluto.hub.export.module-failure': '导出模块失败'
+	'pluto.hub.export.module-failure': '导出模块失败',
+	'pluto.hub.editor.export-files': '导出文件',
+	'pluto.hub.export.select-folder': '选择导出文件夹',
+	'pluto.hub.export.file-failure': '文件 {filename} 导出失败',
+	'pluto.hub.export.all-files-success': '模块 {modname} 的所有文件已导出成功',
+	'pluto.hub.export.all-files-failure': '导出文件失败'
 };

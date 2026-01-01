@@ -134,6 +134,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
 }
 
 .file-item:hover {
@@ -143,4 +144,56 @@
 .file-item.is-active {
     background: var(--interactive-accent);
     color: var(--text-on-accent);
+}
+
+/* 删除按钮样式 */
+.delete-file-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    opacity: 1;
+}
+
+.delete-file-btn:hover {
+    color: var(--text-error);
+    background: rgba(255, 82, 82, 0.1);
+}
+
+/* CodeMirror 编辑器样式 */
+.pluto-cm-editor {
+    flex: 1;
+    background-color: var(--background-secondary);
+    border-radius: var(--pluto-card-border-radius);
+    overflow: hidden;
+}
+
+.pluto-cm-editor .cm-scroller {
+    font-family: var(--font-monospace);
+    font-size: 14px;
+}
+
+/* 编辑器底部按钮栏 */
+.pluto-editor-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+/* 确保变量定义 */
+:root {
+    --pluto-card-padding: 16px;
+    --pluto-card-border-radius: 8px;
 }

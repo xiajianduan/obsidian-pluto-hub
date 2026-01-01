@@ -1,5 +1,41 @@
 // 中文
 
 export default {
-	'pluto.hub': 'Pluto 中心'
-}
+	'pluto.hub': 'Pluto 中心',
+	'pluto.hub.display-text': 'Pluto 中心',
+	'pluto.hub.add-file': '+ 文件',
+	'pluto.hub.file-name-prompt': '文件名 (例如 config.json):',
+	'pluto.hub.import-success': '模块导入成功',
+	'pluto.hub.import-failure': '模块导入失败',
+	'pluto.hub.module-name-prompt': '模块名称:',
+	'pluto.hub.settings-title': 'Pluto 中心',
+	'pluto.hub.settings.module-storage': '模块存储与显示',
+	'pluto.hub.settings.storage-path': '存储路径',
+	'pluto.hub.settings.storage-path-desc': '模块文件存储在中的位置(建议保留在.obsidian目录下以隐藏)',
+	'pluto.hub.settings.enable-pako': '启用 Pako 压缩',
+	'pluto.hub.settings.enable-pako-desc': '开启后，代码将以二进制压缩格式存储，节省空间并防止直接误删',
+	'pluto.hub.settings.columns': '商店列数',
+	'pluto.hub.settings.columns-desc': 'Dashboard 界面每行显示的模块个数',
+	'pluto.hub.settings.backup-path': '备份路径 (TODO)',
+	'pluto.hub.settings.backup-path-desc': '手动备份或自动导出模块的文件夹路径',
+	'pluto.hub.dashboard.title': 'Pluto 模块',
+	'pluto.hub.dashboard.add-module': '添加模块',
+	'pluto.hub.dashboard.import': '导入',
+	'pluto.hub.dashboard.export-all': '导出全部',
+	'pluto.hub.dashboard.active': '已激活',
+	'pluto.hub.dashboard.disabled': '已禁用',
+	'pluto.hub.dashboard.export-tooltip': '导出模块',
+	'pluto.hub.editor.back-to-dashboard': '返回仪表盘',
+	'pluto.hub.editor.save-changes': '保存所有更改',
+	'pluto.hub.editor.delete-module': '删除模块',
+	'pluto.hub.editor.cannot-delete-last-file': '不能删除最后一个文件！',
+	'pluto.hub.editor.confirm-delete-file': '确定要删除 {filename} 吗？',
+	'pluto.hub.editor.module-saved': '模块已保存',
+	'pluto.hub.export.all-title': '导出所有模块',
+	'pluto.hub.export.all-default-filename': 'pluto-modules-backup.ops',
+	'pluto.hub.export.all-success': '所有模块导出成功',
+	'pluto.hub.export.all-failure': '导出模块失败',
+	'pluto.hub.export.module-title': '导出模块',
+	'pluto.hub.export.module-success': '模块导出成功',
+	'pluto.hub.export.module-failure': '导出模块失败'
+};

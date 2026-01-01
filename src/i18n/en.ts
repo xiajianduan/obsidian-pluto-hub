@@ -1,5 +1,40 @@
-// English
-
+// 英文
 export default {
-	'pluto.hub': 'Pluto Hub'
+	'pluto.hub': 'Pluto Hub',
+	'pluto.hub.display-text': 'Pluto hub',
+	'pluto.hub.add-file': '+ File',
+	'pluto.hub.file-name-prompt': 'File name (e.g. config.json):',
+	'pluto.hub.import-success': 'Module imported successfully',
+	'pluto.hub.import-failure': 'Failed to import module',
+	'pluto.hub.module-name-prompt': 'Module name:',
+	'pluto.hub.settings-title': 'Pluto Hub',
+	'pluto.hub.settings.module-storage': 'Module Storage & Display',
+	'pluto.hub.settings.storage-path': 'Storage Path',
+	'pluto.hub.settings.storage-path-desc': 'Location where module files are stored (recommended to keep in .obsidian directory to hide)',
+	'pluto.hub.settings.enable-pako': 'Enable Pako Compression',
+	'pluto.hub.settings.enable-pako-desc': 'When enabled, code will be stored in binary compressed format, saving space and preventing accidental deletion',
+	'pluto.hub.settings.columns': 'Store Columns',
+	'pluto.hub.settings.columns-desc': 'Number of modules displayed per row in Dashboard view',
+	'pluto.hub.settings.backup-path': 'Backup Path (TODO)',
+	'pluto.hub.settings.backup-path-desc': 'Folder path for manual backup or automatic export of modules',
+	'pluto.hub.dashboard.title': 'Pluto Modules',
+	'pluto.hub.dashboard.add-module': 'Add Module',
+	'pluto.hub.dashboard.import': 'Import',
+	'pluto.hub.dashboard.export-all': 'Export All',
+	'pluto.hub.dashboard.active': 'Active',
+	'pluto.hub.dashboard.disabled': 'Disabled',
+	'pluto.hub.dashboard.export-tooltip': 'Export module',
+	'pluto.hub.editor.back-to-dashboard': 'Back to dashboard',
+	'pluto.hub.editor.save-changes': 'Save all changes',
+	'pluto.hub.editor.delete-module': 'Delete module',
+	'pluto.hub.editor.cannot-delete-last-file': 'Cannot delete the last file!',
+	'pluto.hub.editor.confirm-delete-file': 'Are you sure you want to delete {filename}?',
+	'pluto.hub.editor.module-saved': 'Module bundle saved',
+	'pluto.hub.export.all-title': 'Export All Modules',
+	'pluto.hub.export.all-default-filename': 'pluto-modules-backup.ops',
+	'pluto.hub.export.all-success': 'All modules exported successfully',
+	'pluto.hub.export.all-failure': 'Failed to export modules',
+	'pluto.hub.export.module-title': 'Export Module',
+	'pluto.hub.export.module-success': 'Module exported successfully',
+	'pluto.hub.export.module-failure': 'Failed to export module'
 };

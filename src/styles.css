@@ -1,0 +1,146 @@
+/* 主容器 */
+.pluto-main-container {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 商店网格布局 */
+.pluto-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--pluto-cols, 3), 1fr);
+    gap: 16px;
+}
+
+.pluto-card {
+    min-height: 140px;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--background-modifier-border);
+    position: relative;
+    color: white;
+}
+
+.pluto-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.pluto-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pluto-card .badge {
+    font-size: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.pluto-card .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: auto;
+}
+
+/* 编辑器区域 */
+.pluto-editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pluto-textarea {
+    background-color: #1e1e1e; /* 经典的暗色背景 */
+    color: #d4d4d4;           /* 标准代码文本色 */
+    font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    line-height: 1.5;
+    tab-size: 4;
+    caret-color: var(--interactive-accent); /* 光标使用主题色 */
+    border: none;
+    padding: 20px;
+    selection-background-color: rgba(255, 255, 255, 0.1);
+}
+/* 模拟关键字颜色的简单伪装（针对特定文件） */
+.pluto-textarea[data-type="js"] {
+    border-top: 2px solid #f1c40f;
+}
+
+.pluto-tab-group {
+    display: flex;
+    gap: 10px;
+    margin-left: 20px;
+}
+
+.tab-btn {
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.tab-btn.is-active {
+    background: var(--interactive-accent);
+    color: white;
+    border-color: var(--interactive-accent);
+}
+
+.pluto-editor-nav {
+    display: flex;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* 编辑器布局：左右分布 */
+.pluto-editor-layout {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    overflow: hidden;
+    margin-top: 15px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+}
+
+/* 侧边文件列表 */
+.pluto-file-sidebar {
+    width: 200px;
+    background: var(--background-secondary);
+    border-right: 1px solid var(--background-modifier-border);
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    overflow-y: auto;
+}
+
+.file-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.file-item.is-active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}

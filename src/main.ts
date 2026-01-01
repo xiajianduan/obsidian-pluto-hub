@@ -1,99 +1,151 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
-import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
+import { Plugin } from 'obsidian';
+import { PlutoView, PLUTO_VIEW_TYPE } from './view';
+import { ModStorage } from './storage';
+import { DEFAULT_SETTINGS, MiniModule, ModuleBundle, PlutoSettings, PlutoSettingTab } from 'settings';
+import { t } from 'utils/translation';
 
-// Remember to rename these classes and interfaces!
+export default class PlutoHubPlugin extends Plugin {
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+    settings: PlutoSettings;
 
-	async onload() {
-		await this.loadSettings();
+    async onload() {
+        await this.loadSettings();
+        await this.initializePlugin();
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+        this.i18n();
+        // This adds a settings tab so the user can configure various aspects of the plugin
+        this.addSettingTab(new PlutoSettingTab(this.app, this));
+    }
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+    i18n() {
+        const t = (key: string, vars?: Record<string, unknown>): string => {
+            // @ts-ignore - Obsidian's i18n isn't in the official types
+            return this.app.i18n.t(key, vars);
+        };
+    }
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample editor command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+    async initializePlugin() {
+        this.addCustomRibbonIcon();
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			}
-		});
+        // 挂载全局 Pluto 对象
+        (window as any).pluto = {
+            dv: null, // TODO: 挂载 Dataview
+            rc: null, // TODO: 挂载 React Components
+            qa: null,
+            modules: {}
+        };
+        this.bindPlugin("qa", () => { return window.quickAddApi });
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+        this.registerView(PLUTO_VIEW_TYPE, (leaf) => new PlutoView(leaf, this));
+        this.app.workspace.onLayoutReady(() => this.runAllEnabled());
+    }
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			new Notice("Click");
-		});
+    bindPlugin(prop: string, script: Function) {
+        // 尝试绑定的函数
+        const tryBind = () => {
+            const api = script();
+            if (api) {
+                (window as any).pluto[prop] = api;
+                console.log(`[Pluto Hub] ${prop} API successfully bound to pluto.${prop}`);
+                return true;
+            }
+            return false;
+        };
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+        // 如果已经加载了，直接绑定
+        if (tryBind()) return;
 
-	}
+        // 如果没加载，利用 Obsidian 的事件钩子轮询
+        const timer = setInterval(() => {
+            if (tryBind()) {
+                clearInterval(timer); // 绑定成功后停止轮询
+            }
+        }, 1000);
 
-	onunload() {
-	}
+        // 设置一个超时保护，防止无限轮询（可选，比如 30 秒后停止）
+        setTimeout(() => clearInterval(timer), 30000);
+    }
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MyPluginSettings>);
-	}
+    addCustomRibbonIcon() {
+        this.addRibbonIcon('layout-grid', t("pluto.hub"), () => {
+            this.activateView();
+        });
+    }
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
+    injectStyle(id: string, code: string) {
+        let el = document.getElementById(`pluto-css-${id}`);
+        if (!el) {
+            el = document.createElement('style');
+            el.id = `pluto-css-${id}`;
+            document.head.appendChild(el);
+        }
+        el.textContent = code;
+    }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+    runBundle(bundle: ModuleBundle) {
+        // 1. 注入所有 CSS 文件
+        bundle.files.filter(f => f.type === 'css').forEach(cssFile => {
+            let el = document.getElementById(`pluto-css-${bundle.id}-${cssFile.name}`);
+            if (!el) {
+                el = document.createElement('style');
+                el.id = `pluto-css-${bundle.id}-${cssFile.name}`;
+                document.head.appendChild(el);
+            }
+            el.textContent = cssFile.content;
+        });
 
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
+        // 2. 执行所有 JS 文件 (或只执行入口 main.js)
+        const jsFiles = bundle.files.filter(f => f.type === 'js');
+        const jsonFiles = bundle.files.filter(f => f.type === 'json');
 
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
+        jsFiles.forEach(jsFile => {
+            try {
+                const context = {
+                    app: this.app,
+                    pluto: (window as any).pluto,
+                    // 允许 JS 访问同模块下的其他 JSON
+                    getFile: (name: string) => bundle.files.find(f => f.name === name)?.content
+                };
+                const runner = new Function('ctx', `with(ctx) { ${jsFile.content} }`);
+                runner(context);
+            } catch (e) {
+                console.error(`Error in ${jsFile.name}:`, e);
+            }
+        });
+    }
+
+    async runAllEnabled() {
+        // 清理所有 Pluto 注入的旧样式，防止重复累积
+        document.querySelectorAll('[id^="pluto-css-"]').forEach(el => el.remove());
+
+        for (const mod of this.settings.modules) {
+            if (mod.enabled) {
+                try {
+                    // 读取整个二进制包
+                    const bundle = await ModStorage.loadBundle(this, mod.id);
+                    this.runBundle(bundle);
+                } catch (e) {
+                    console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
+                }
+            }
+        }
+    }
+
+    async activateView() {
+        const { workspace } = this.app;
+        let leaf = workspace.getLeavesOfType(PLUTO_VIEW_TYPE)[0];
+        if (!leaf) {
+            leaf = workspace.getLeaf('tab');
+            await leaf.setViewState({ type: PLUTO_VIEW_TYPE, active: true });
+        }
+        void workspace.revealLeaf(leaf);
+    }
+
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
 }

@@ -1,6 +1,6 @@
 # Changes Log
 
-## [Unreleased]
+## [1.1.0] - 2023-12-20
 
 ### Added
 - 实现了完整的国际化支持，包括按钮文字和settings页签

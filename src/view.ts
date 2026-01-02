@@ -20,10 +20,12 @@ export class PlutoView extends ItemView {
     currentModId: string | null = null;
     currentEditor: EditorView | null = null;
     currentFileIndex: number = 0;
+    headerEl: HTMLElement;
 
     constructor(leaf: WorkspaceLeaf, plugin: PlutoHubPlugin) {
         super(leaf);
         this.plugin = plugin;
+        this.headerEl.remove();
     }
 
     getViewType() { return PLUTO_VIEW_TYPE; }

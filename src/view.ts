@@ -585,29 +585,27 @@ export class PlutoView extends ItemView {
     }
 
     async showExportAllDialog() {
-        // 优先使用 QuickAdd 的 inputPrompt 方法获取保存路径
-        const result = await new Promise<string | null>((resolve) => {
+        try {
+            // 优先使用 QuickAdd 的 inputPrompt 方法获取保存路径
+            let result: string | null;
             if ((window as any).pluto?.qa?.inputPrompt) {
-                (window as any).pluto.qa.inputPrompt(t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename')).then(resolve);
+                result = await (window as any).pluto.qa.inputPrompt(t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename'));
             } else {
                 // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
-                const input = prompt(t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename'));
-                resolve(input);
+                result = prompt(t('pluto.hub.export.all-title'), t('pluto.hub.export.all-default-filename'));
             }
-        });
-        
-        if (result) {
-            try {
+            
+            if (result) {
                 // 使用配置中的备份目录
                 const backupFolder = this.plugin.settings.backupFolderName;
                 const configDir = this.plugin.app.vault.configDir;
                 const backupFile = `${configDir}/${backupFolder}/${result}.ops`;
                 await ModStorage.backupAllModules(this.plugin, backupFile);
                 new Notice(t('pluto.hub.export.all-success'));
-            } catch (e) {
-                console.error("Failed to export modules:", e);
-                new Notice(t('pluto.hub.export.all-failure'));
             }
+        } catch (e) {
+            console.error("Failed to export modules:", e);
+            new Notice(t('pluto.hub.export.all-failure'));
         }
     }
 
@@ -617,18 +615,12 @@ export class PlutoView extends ItemView {
         const mod = allModules.find(m => m.id === moduleId);
         if (!mod) return;
         
-        // 使用 window.pluto.qa.inputPrompt 获取保存路径
-        const result = await window.pluto.qa.inputPrompt(
-            t('pluto.hub.export.module-title'), `${mod.name}.ops`);
-        
-        if (result) {
-            try {
-                await ModStorage.exportModule(this.plugin, moduleId, result);
-                new Notice(t('pluto.hub.export.module-success'));
-            } catch (e) {
-                console.error("Failed to export module:", e);
-                new Notice(t('pluto.hub.export.module-failure'));
-            }
+        try {
+            await ModStorage.exportModule(this.plugin, moduleId, `${mod.name}.ops`);
+            new Notice(t('pluto.hub.export.module-success'));
+        } catch (e) {
+            console.error("Failed to export module:", e);
+            new Notice(t('pluto.hub.export.module-failure'));
         }
     }
 

@@ -8,16 +8,12 @@ export interface MiniModule {
     name: string;
     enabled: boolean;
     bgColor?: string; // 用于存储随机渐变色或图片 URL
+    files: ModFile[]; // 直接在MiniModule中包含文件数组
 }
 export interface ModFile {
     name: string;
     type: string;
     content: string;
-}
-
-export interface ModuleBundle {
-    id: string;
-    files: ModFile[];
 }
 
 // 定义插件设置接口

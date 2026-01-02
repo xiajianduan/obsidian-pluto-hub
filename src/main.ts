@@ -1,7 +1,7 @@
 import { Plugin } from 'obsidian';
 import { PlutoView, PLUTO_VIEW_TYPE } from './view';
 import { ModStorage } from './storage';
-import { DEFAULT_SETTINGS, MiniModule, ModuleBundle, PlutoSettings, PlutoSettingTab } from 'settings';
+import { DEFAULT_SETTINGS, MiniModule, PlutoSettings, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
 
 export default class PlutoHubPlugin extends Plugin {
@@ -127,47 +127,65 @@ export default class PlutoHubPlugin extends Plugin {
     }
 
     // 运行单个模块包
-    runBundle(bundle: ModuleBundle, moduleName?: string) {
+    runBundle(module: MiniModule) {
         const pluto = (window as any).pluto;
         
         // 1. 注入所有 CSS 文件
-        bundle.files.filter(f => f.type === 'css').forEach(cssFile => {
-            this.injectStyle(`${bundle.id}-${cssFile.name}`, cssFile.content);
+        module.files.filter(f => f.type === 'css').forEach(cssFile => {
+            this.injectStyle(`${module.id}-${cssFile.name}`, cssFile.content);
         });
 
         // 2. 解析并挂载所有 JSON 配置文件
-        bundle.files.filter(f => f.type === 'json').forEach(jsonFile => {
+        module.files.filter(f => f.type === 'json').forEach(jsonFile => {
             try {
                 const config = JSON.parse(jsonFile.content);
                 // 将配置挂载到 pluto.config[模块名]
-                const name = moduleName || bundle.id;
-                pluto.config[name] = config;
+                pluto.config[module.name] = config;
             } catch (e) {
                 console.error(`Error parsing JSON file ${jsonFile.name}:`, e);
             }
         });
 
         // 3. 执行所有 JS 文件
-        const jsFiles = bundle.files.filter(f => f.type === 'js');
-        // 获取当前模块的名称
-        const modName = moduleName || bundle.id;
+        const jsFiles = module.files.filter(f => f.type === 'js');
         jsFiles.forEach(jsFile => {
             try {
+                // 创建模块导出对象
+                const moduleExports: Record<string, any> = {};
+                const exports = moduleExports;
+                
                 const context = {
                     app: this.app,
                     pluto: pluto,
-                    mod: { name: modName, id: bundle.id }, // 将模块信息暴露给脚本
+                    mod: module, // 将模块信息暴露给脚本
                     // 允许 JS 访问同模块下的其他文件
-                    getFile: (name: string) => bundle.files.find(f => f.name === name)?.content
+                    getFile: (name: string) => module.files.find(f => f.name === name)?.content,
+                    // 添加 CommonJS 模块导出支持
+                    module: { exports: moduleExports },
+                    exports: exports,
+                    // 添加 ES 模块导出支持
+                    export: function(name: string, value: any) {
+                        moduleExports[name] = value;
+                    }
                 };
                 
                 // 使用 new Function 执行代码，提供安全的执行上下文
                 const runner = new Function('ctx', `with(ctx) { ${jsFile.content} }`);
                 const result = runner(context);
                 
-                // 如果模块返回了值，将其挂载到 pluto.modules
+                // 处理模块导出
+                let moduleResult;
                 if (result) {
-                    pluto.modules[modName] = result;
+                    // 优先使用 return 的结果
+                    moduleResult = result;
+                } else if (Object.keys(moduleExports).length > 0) {
+                    // 其次使用 module.exports 或 exports
+                    moduleResult = moduleExports;
+                }
+                
+                // 如果有模块导出结果，将其挂载到 pluto.modules
+                if (moduleResult) {
+                    pluto.modules[module.name] = moduleResult;
                 }
             } catch (e) {
                 console.error(`Error in ${jsFile.name}:`, e);
@@ -186,9 +204,7 @@ export default class PlutoHubPlugin extends Plugin {
         for (const mod of modules) {
             if (mod.enabled) {
                 try {
-                    // 读取模块包
-                    const bundle = await ModStorage.loadBundle(this, mod.id);
-                    this.runBundle(bundle, mod.name);
+                    this.runBundle(mod);
                 } catch (e) {
                     console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
                 }

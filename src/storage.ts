@@ -220,7 +220,7 @@ export class ModStorage {
         return loadedModules;
     }
 
-    // 导入功能：支持单个模块或全量导入
+    // 导入功能：支持单个模块或全量备份
     static async importModule(plugin: PlutoHubPlugin, sourcePath: string): Promise<void> {
         if (!(await plugin.app.vault.adapter.exists(sourcePath))) {
             throw new Error(`File not found: ${sourcePath}`);
@@ -229,32 +229,26 @@ export class ModStorage {
         const buffer = await plugin.app.vault.adapter.readBinary(sourcePath);
         const uint8 = new Uint8Array(buffer);
         const jsonStr = pako.inflate(uint8, { to: 'string' });
-        const data = JSON.parse(jsonStr);
+        let data = JSON.parse(jsonStr);
+
+        // 检查是否是嵌套格式 {module: {...}}，如果是则提取内部模块对象
+        if (data.module && (data.module.id || data.module.name) && data.module.files) {
+            data = data.module;
+        }
 
         // 检查是单个模块还是全量备份
-        if (data.id && data.files) {
+        if ((data.id || data.name) && data.files) {
             // 单个模块导入
             const bundle = data as ModuleBundle;
             
-            // 优先使用 QuickAdd 的 inputPrompt 方法获取模块名称
-            const moduleName = await new Promise<string | null>((resolve) => {
-                if ((window as any).pluto?.qa?.inputPrompt) {
-                    (window as any).pluto.qa.inputPrompt("请输入模块名称:", bundle.id).then(resolve);
-                } else {
-                    // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
-                    const input = prompt("请输入模块名称:", bundle.id);
-                    resolve(input);
-                }
-            });
-            
-            // 如果用户取消了输入，直接返回
-            if (!moduleName) return;
-            
-            // 生成随机背景色
+            // 生成随机背景色（仅当原始模块没有颜色时使用）
             const bgColor = this.generateRandomGradient();
             
-            // 保存ModuleBundle到磁盘
-            await this.saveBundle(plugin, bundle, moduleName, true, bgColor);
+            // 使用文件中包含的模块名称，不再需要用户输入
+            const moduleName = data.name || `模块${Date.now()}`;
+            
+            // 保存ModuleBundle到磁盘，保留原始模块的背景颜色（如果有）
+            await this.saveBundle(plugin, bundle, moduleName, true, data.bgColor || bgColor);
         } else if (data.modules && data.bundles) {
             // 全量备份导入
             const importedModules = data.modules as MiniModule[];
@@ -268,7 +262,7 @@ export class ModStorage {
                 }
             }
         } else {
-            throw new Error("Invalid import file format");
+            throw new Error(`Invalid import file format. Expected id+files, name+files, modules array, or {module: {...}} format.`);
         }
     }
 }

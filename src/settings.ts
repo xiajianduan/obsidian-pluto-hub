@@ -7,7 +7,8 @@ export interface MiniModule {
     id: string;
     name: string;
     enabled: boolean;
-    bgColor?: string; // 用于存储随机渐变色或图片 URL
+    bgColor?: string; // 用于存储随机渐变色
+    bgUrl?: string; // 用于存储图片 URL
     files: ModFile[]; // 直接在MiniModule中包含文件数组
 }
 export interface ModFile {

@@ -126,7 +126,17 @@ export class PlutoView extends ItemView {
         
         filteredModules.forEach((mod: MiniModule) => {
             const card = grid.createDiv({ cls: 'pluto-card' });
-            card.style.background = mod.bgColor || 'var(--background-secondary-alt)';
+            
+            // 检查bgUrl是否存在
+            if (mod.bgUrl) {
+                // 对于图片，使用背景图片样式
+                const bgLayer = card.createDiv({ cls: 'card-bg' });
+                bgLayer.style.backgroundImage = `url(${mod.bgUrl})`;
+                card.style.backgroundColor = 'transparent';
+            } else {
+                // 对于渐变或纯色，使用普通背景
+                card.style.background = mod.bgColor || 'var(--background-secondary-alt)';
+            }
 
             const cardHeader = card.createDiv({ cls: 'card-header' });
             // 根据启用状态添加灰度滤镜样式
@@ -813,12 +823,27 @@ export class PlutoView extends ItemView {
         }
 
         const newId = Date.now().toString();
+        let bgColor = ModStorage.generateRandomGradient();
+        let moduleFiles: { name: string; type: string; content: string }[] = [{ name: 'main.js', type: 'js', content: 'new Notice(mod.name);' }];
+
+        // 检查pluto.skin.path是否存在
+        const pluto = (window as any).pluto;
+        if (pluto && pluto.skin && pluto.skin.path) {
+            const skinPath = pluto.skin.path;
+            // 下载图片并转换为base64
+            const imageBase64 = await ModStorage.downloadImageToBase64(skinPath);
+            if (imageBase64) {
+                const base64Parts = imageBase64.split(',');
+                moduleFiles = [{ name: 'logo.webp', type: 'webp', content: base64Parts[1]! }];
+            }
+        }
+
         const newMod: MiniModule = {
             id: newId,
             name: name,
             enabled: true,
-            bgColor: this.generateRandomGradient(),
-            files: [{ name: 'main.js', type: 'js', content: 'new Notice(mod.name);' }]
+            bgColor: bgColor,
+            files: moduleFiles
         };
         
         // 保存到磁盘
@@ -843,23 +868,7 @@ export class PlutoView extends ItemView {
         }
     }
 
-    // 生成随机渐变色
-    generateRandomGradient(): string {
-        const colors = [
-            ['#667eea', '#764ba2'],
-            ['#f093fb', '#f5576c'],
-            ['#4facfe', '#00f2fe'],
-            ['#43e97b', '#38f9d7'],
-            ['#fa709a', '#fee140'],
-            ['#30cfd0', '#330867'],
-            ['#a8edea', '#fed6e3'],
-            ['#ff9a9e', '#fad0c4']
-        ];
-        
-        // 确保 randomPair 不为 undefined (类型安全)
-        const randomPair = colors[Math.floor(Math.random() * colors.length)] ?? ['#667eea', '#764ba2'];
-        return `linear-gradient(135deg, ${randomPair[0]} 0%, ${randomPair[1]} 100%)`;
-    }
+
 
     // 用户输入提示
     async promptUser(message: string): Promise<string | null> {

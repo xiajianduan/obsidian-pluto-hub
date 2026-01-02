@@ -4,15 +4,8 @@ import { App } from "obsidian";
 declare global {
 
   export interface Window {
-    pluto: Pluto;
+    pluto: any;
     quickAddApi: any;
-  }
-
-  export interface Pluto {
-    dv: null;
-    rc: null;
-    modules: object;
-    qa: any;
   }
 }
 

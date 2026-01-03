@@ -11,6 +11,7 @@ import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
 import { javascript } from '@codemirror/lang-javascript';
 import { css } from '@codemirror/lang-css';
 import { markdown } from '@codemirror/lang-markdown';
+import { base64ToBlob, base64ToBlobUrl, downloadImageToBase64, isImageFile } from 'utils/helper';
 
 export const PLUTO_VIEW_TYPE = "pluto-dashboard-view";
 
@@ -49,34 +50,6 @@ export class PlutoView extends ItemView {
      */
     async loadAllModules(): Promise<MiniModule[]> {
         return await ModStorage.loadAllModulesFromStorage(this.plugin);
-    }
-
-    /**
-     * 判断文件是否为图片类型
-     */
-    isImageFile(fileType: string): boolean {
-        const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        return imageTypes.includes(fileType.toLowerCase());
-    }
-
-    /**
-     * 将base64字符串转换为Blob对象
-     */
-    base64ToBlob(base64: string, fileType: string): Blob | null {
-        try {
-            // 清除可能的空白字符和换行符
-            const cleanBase64 = base64.replace(/\s/g, '');
-            const binaryString = atob(cleanBase64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return new Blob([bytes], { type: `image/${fileType}` });
-        } catch (e) {
-            console.error('Failed to convert base64 to blob:', e);
-            return null;
-        }
     }
 
     /**
@@ -503,17 +476,11 @@ export class PlutoView extends ItemView {
         containerEl.empty();
         
         // 检查是否为图片文件，添加预览功能
-        if (this.isImageFile(file.type)) {
+        if (isImageFile(file.type)) {
             // 使用 Blob URL 替代 base64 显示图片，避免 URL 格式错误
-            try {
-                const blob = this.base64ToBlob(file.content, file.type);
-                if (!blob) {
-                    throw new Error('Failed to convert base64 to blob');
-                }
-                
-                // 创建 Blob URL
-                const blobUrl = URL.createObjectURL(blob);
-                
+            try {debugger
+                // 使用公共方法将base64转换为Blob URL
+                const blobUrl = base64ToBlobUrl(file.content, file.type);
                 // 显示图片预览
                 const imgEl = containerEl.createEl('img', {
                     attr: {
@@ -776,10 +743,10 @@ export class PlutoView extends ItemView {
                 const filePath = `${folder}/${file.name}`;
                 const adapter = this.plugin.app.vault.adapter;
 
-                if (this.isImageFile(file.type)) {
+                if (isImageFile(file.type)) {
                     // 处理图片文件
                     try {
-                        const blob = this.base64ToBlob(file.content, file.type);
+                        const blob = base64ToBlob(file.content, file.type);
                         if (blob) {
                             await adapter.writeBinary(filePath, await blob.arrayBuffer());
                         } else {
@@ -831,7 +798,7 @@ export class PlutoView extends ItemView {
         if (pluto && pluto.skin && pluto.skin.path) {
             const skinPath = pluto.skin.path;
             // 下载图片并转换为base64
-            const imageBase64 = await ModStorage.downloadImageToBase64(skinPath);
+            const imageBase64 = await downloadImageToBase64(skinPath);
             if (imageBase64) {
                 const base64Parts = imageBase64.split(',');
                 moduleFiles = [{ name: 'logo.webp', type: 'webp', content: base64Parts[1]! }];
@@ -924,7 +891,7 @@ export class PlutoView extends ItemView {
                         
                         // 根据文件类型选择读取方式
                         let content: string;
-                        if (this.isImageFile(type)) {
+                        if (isImageFile(type)) {
                             // 图片文件使用 base64 编码
                             content = await new Promise<string>((resolve, reject) => {
                                 const reader = new FileReader();

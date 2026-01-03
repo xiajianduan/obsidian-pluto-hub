@@ -9,6 +9,7 @@
 - 修复了导入模块时背景颜色总是变化的问题，现在会保留原始模块的颜色
 - 修复了加载模块时没有把背景设为logo.jpg的问题
 - 修复了opacity: 0.5导致文字变暗的问题
+- 修复了main.ts中根据prop创建ThirdComponent实例的问题
 
 ### Improved
 - 重构了renderDashboard方法，优化了错误处理逻辑
@@ -18,12 +19,24 @@
 - 支持根据pluto.skin.path自动设置模块背景图片
 - 实现了图片背景样式设置，包括background-size: cover和居中显示
 - 实现了module创建第一次bgColor保存到文件，后面更新module不再保存bgColor的功能
+- 添加了ThirdFactory类，用于根据prop动态创建相应的组件实例
+- 优化了插件绑定逻辑，提高了代码的可维护性
+- 提取了base64ToBlobUrl公共方法，简化了图片预览功能代码
+- 新增了helper.ts文件，提供了更多工具函数
+
+### Added
+- `src/third/third.ts` - 添加了ThirdFactory和其他组件类
+- `src/utils/helper.ts` - 新增了辅助工具函数
 
 ### Files Modified
-- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题
+- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例
+- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题，简化图片预览功能代码
 - `src/i18n/en.ts` - 添加验证相关的英文翻译，删除不再使用的翻译条目
 - `src/i18n/zh-cn.ts` - 添加验证相关的中文翻译，删除不再使用的翻译条目
 - `src/storage.ts` - 修复导入模块时背景颜色总是变化的问题，优化模块导入逻辑，添加图片下载和base64转换功能，优化bgColor保存逻辑
+- `src/styles.css` - 更新了样式文件
+- `src/types/global.d.ts` - 修改了ThirdComponent和Pluto接口定义
+- `src/utils/utils.ts` - 添加了base64ToBlobUrl公共方法
 
 ## [1.1.3] - 2026-01-01
 

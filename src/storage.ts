@@ -1,6 +1,7 @@
 import PlutoHubPlugin from 'main';
 import * as pako from 'pako';
 import { MiniModule } from 'settings';
+import { base64ToBlobUrl } from 'utils/helper';
 
 export class ModStorage {
     // 获取模块存储目录路径
@@ -33,30 +34,6 @@ export class ModStorage {
         // 确保 randomPair 不为 undefined (类型安全)
         const randomPair = colors[Math.floor(Math.random() * colors.length)] ?? ['#667eea', '#764ba2'];
         return `linear-gradient(135deg, ${randomPair[0]} 0%, ${randomPair[1]} 100%)`;
-    }
-
-    // 下载图片并转换为base64
-    static async downloadImageToBase64(url: string): Promise<string | null> {
-        try {
-            const response = await window.pluto.web?.download(url);
-            if (response.status !== 200) {
-                throw new Error(`Failed to download image: ${response.status}`);
-            }
-            const buffer = response.arrayBuffer;
-            const blob = await window.pluto.images?.convertJpgToWebp(buffer, 90);
-            return new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const result = reader.result as string;
-                    resolve(result);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        } catch (error) {
-            console.error('Error downloading image:', error);
-            return null;
-        }
     }
 
     // 保存单个模块
@@ -108,22 +85,7 @@ export class ModStorage {
             // 检查模块中是否有logo.webp文件，如果有则将其转换为blob URL并设置到bgColor属性
             const logoFile = module.files.find((file: any) => file.name === 'logo.webp' && file.type === 'webp');
             if (logoFile && logoFile.content) {
-                try {
-                    // 将base64转换为Blob
-                    const binaryString = atob(logoFile.content);
-                    const len = binaryString.length;
-                    const bytes = new Uint8Array(len);
-                    for (let i = 0; i < len; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
-                    const blob = new Blob([bytes], { type: 'image/webp' });
-                    // 创建blob URL
-                    const blobUrl = URL.createObjectURL(blob);
-                    // 设置为bgUrl
-                    module.bgUrl = blobUrl;
-                } catch (error) {
-                    console.error('Error converting logo.webp to blob URL:', error);
-                }
+                module.bgUrl = base64ToBlobUrl(logoFile.content, 'webp');
             }
             
             return module;

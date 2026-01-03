@@ -245,7 +245,7 @@
 
 .pluto-cm-editor .cm-scroller {
     font-family: var(--font-monospace);
-    font-size: 14px;
+    font-size: 8px;
 }
 
 /* 编辑器底部按钮栏 */

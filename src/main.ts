@@ -1,10 +1,11 @@
 import { getFrontMatterInfo, parseYaml, Plugin } from 'obsidian';
 import { PlutoView, PLUTO_VIEW_TYPE } from './view';
 import { ModStorage } from './storage';
-import { DEFAULT_SETTINGS, MiniModule, PlutoSettings, PlutoSettingTab } from 'settings';
+import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
 import { ThirdFactory } from './third/third';
-import { isImageFile } from 'utils/helper';
+import { base64ToBlobUrl, isImageFile } from 'utils/helper';
+import { MiniModule, PlutoSettings } from 'types/pluto';
 
 export default class PlutoHubPlugin extends Plugin {
 
@@ -48,16 +49,19 @@ export default class PlutoHubPlugin extends Plugin {
         (window as any).pluto = {
             app: this.app,
             config: {}, // 用于存储 JSON 配置
-            modules: {}, // 用于存储模块输出
             // 依赖映射
-            dva: ThirdFactory.create('dva'), // Dataview
-            react: ThirdFactory.create('react'), // React Components
-            qa: ThirdFactory.create('qa'), // QuickAdd
-            templater: ThirdFactory.create('templater'), // Templater
+            third: {
+                assets: {},
+                modules: {},
+                dva: ThirdFactory.create('dva'), // Dataview
+                react: ThirdFactory.create('react'), // React Components
+                qa: ThirdFactory.create('qa'), // QuickAdd
+                templater: ThirdFactory.create('templater'), // Templater
+            },
             // 提供模块管理 API
-            getModule: (name: string) => (window as any).pluto.modules[name],
+            getModule: (name: string) => (window as any).pluto.third.modules[name],
             registerModule: (name: string, exports: any) => {
-                (window as any).pluto.modules[name] = exports;
+                (window as any).pluto.third.modules[name] = exports;
             }
         };
 
@@ -80,29 +84,30 @@ export default class PlutoHubPlugin extends Plugin {
         };
 
         for (const [pluginId, mapping] of Object.entries(pluginMappings)) {
-            this.bindPlugin(mapping.prop, mapping.getter);
+            this.bindPlugin(mapping.prop as PlutoProps, mapping.getter);
         }
     }
 
     // 绑定单个插件依赖
-    bindPlugin(prop: string, getter: () => any) {
+    async bindPlugin(prop: PlutoProps, getter: () => any) {
         // 尝试绑定的函数
-        const tryBind = () => {
+        const tryBind = async () => {
             const op = getter();
             if (op) {
-                const third = window.pluto[prop];
-                third.bind(op, prop).execute();
+                await sleep(1000); // 等待 1 秒，确保插件完全加载
+                const third = window.pluto.third[prop];
+                third.bind(op, prop).executeAll();
                 return true;
             }
             return false;
         };
 
         // 如果已经加载了，直接绑定
-        if (tryBind()) return;
+        if (await tryBind()) return;
 
         // 如果没加载，利用 Obsidian 的事件钩子轮询
-        const timer = setInterval(() => {
-            if (tryBind()) {
+        const timer = setInterval(async () => {
+            if (await tryBind()) {
                 clearInterval(timer); // 绑定成功后停止轮询
             }
         }, 1000);
@@ -129,9 +134,13 @@ export default class PlutoHubPlugin extends Plugin {
     }
 
     // 运行单个模块包
-    runBundle(module: MiniModule) {
+    runBundle(module: MiniModule, started: boolean) {
         const pluto = window.pluto;
-        
+        const entry = {
+            json: new Map(),
+            images: new Map(),
+        };
+        pluto.third.assets[module.name] = entry;
         // 1. 注入所有 CSS 文件
         module.files.filter(f => f.type === 'css').forEach(file => {
             this.injectStyle(`${module.id}-${file.name}`, file.content);
@@ -141,8 +150,8 @@ export default class PlutoHubPlugin extends Plugin {
         module.files.filter(f => f.type === 'json').forEach(file => {
             try {
                 const config = JSON.parse(file.content);
-                // 将配置挂载到 pluto.config[模块名]
-                pluto.config[module.name] = config;
+                // 将配置挂载到 pluto.assets[模块名]
+                entry.json.set(file.name, config);
             } catch (e) {
                 console.error(`Error parsing JSON file ${file.name}:`, e);
             }
@@ -150,8 +159,10 @@ export default class PlutoHubPlugin extends Plugin {
         // 2. 解析并挂载所有 图片 配置文件
         module.files.filter(f => isImageFile(f.type)).forEach(file => {
             try {
-                // 将配置挂载到 pluto.config[模块名]
-                pluto.config[module.name] = null;
+                // 将配置挂载到 pluto.assets[模块名]
+                const blobUrl = base64ToBlobUrl(file.content, file.type);
+                file.blobUrl = blobUrl;
+                entry.images.set(file.name, blobUrl);
             } catch (e) {
                 console.error(`Error parsing image file ${file.name}:`, e);
             }
@@ -162,16 +173,22 @@ export default class PlutoHubPlugin extends Plugin {
                 const info = getFrontMatterInfo(file.content);
                 const yaml = parseYaml(info.frontmatter);
                 const definesReactComponents = yaml['defines-react-components'] || false;
+                const suppressComponentRefresh = yaml['suppress-component-refresh'] || true;
                 if(definesReactComponents) {
+                    const prefix = `const name = "${module.name}";\n`;
                     const matches = /^\s*?```jsx:component:(.*)\n((.|\n)*?)\n^\s*?```$/gm.exec(file.content)
                     if(matches && matches.length === 4) {
                         const namespace = yaml['react-components-namespace'] || 'Global';
-                        pluto.react.register({
-                            code: matches[2],
-                            name: matches[1],
+                        const name = matches[1] || module.name;
+                        const block = {
+                            code: prefix + matches[2],
+                            name: name,
                             namespace: namespace,
-                            suppressRefresh: true
-                        });
+                            suppressRefresh: suppressComponentRefresh
+                        };
+                        pluto.third.react.register(name, block);
+                        // 运行代码
+                        if(started) pluto.third.react.execute(block);
                     }
                 }
             } catch (e) {
@@ -217,7 +234,7 @@ export default class PlutoHubPlugin extends Plugin {
                 
                 // 如果有模块导出结果，将其挂载到 pluto.modules
                 if (moduleResult) {
-                    pluto.modules[module.name] = moduleResult;
+                    pluto.third.modules[module.name] = moduleResult;
                 }
             } catch (e) {
                 console.error(`Error in ${file.name}:`, e);
@@ -236,7 +253,7 @@ export default class PlutoHubPlugin extends Plugin {
         for (const mod of modules) {
             if (mod.enabled) {
                 try {
-                    this.runBundle(mod);
+                    this.runBundle(mod, false);
                 } catch (e) {
                     console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
                 }

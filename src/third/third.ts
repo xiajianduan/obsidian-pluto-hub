@@ -3,26 +3,32 @@ export class SimpleThirdComponent implements ThirdComponent {
     
     op: any;
     api: any;
-    codes: any[] = [];
+    codes: Map<string, any> = new Map();
 
-    register(code: any) {
-        this.codes.push(code);
+    register(key: string, code: any) {
+        this.codes.set(key, code);
     }
 
-    bind(op: any, prop: string): ThirdComponent {
+    bind(op: any, prop: PlutoProps): ThirdComponent {
         this.op = op;
         this.api = op.api;
-        window.pluto[prop] = this;
-        console.log(`[Pluto Hub] ${prop} successfully bound to pluto.${prop}`);
+        window.pluto.third[prop] = this;
+        console.log(`[Pluto Hub] ${prop} successfully bound to pluto.third.${prop}`);
         return this;
     }
 
-    execute(){ }
+    execute(block: any){ }
+
+    executeAll(): void { }
 }
 
 export class ReactComponent extends SimpleThirdComponent {
 
-    execute(){
+    execute(block: any){
+        this.op.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
+    }
+
+    executeAll(): void {
         this.codes.forEach(t => {
             this.op.registerComponent(t.code, t.name, t.namespace, t.suppressRefresh);
         });

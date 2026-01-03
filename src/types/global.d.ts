@@ -1,5 +1,5 @@
 export {}; // 使文件成为模块
-import { App } from "obsidian";
+import { ModFile } from "./pluto";
 
 declare global {
 
@@ -7,26 +7,32 @@ declare global {
     pluto: Pluto;
   }
 
+  type PlutoProps = "dva" | "react" | "qa" | "templater";
   export interface Pluto {
-    config: any;
-    modules: any;
     web: any;
     images: any;
+    third: Third;
+  }
+  export interface Third {
+    assets: any;
+    modules: any;
+    dva: ThirdComponent;
     react: ThirdComponent;
-    dv: ThirdComponent;
-    // 添加索引签名，允许使用字符串索引访问属性
-    [key: string]: any;
+    qa: ThirdComponent;
+    templater: ThirdComponent;
   }
 
   export interface ThirdComponent {
     op: any;
     api: any;
-    codes: any[];
+    codes: Map<string, any>;
+    
     /**
-     * 注册组件配置
-     * @param config 组件配置对象，包含组件代码、名称、命名空间等
+     * 注册组件
+     * @param key 组件的唯一键名
+     * @param code 组件的代码配置对象
      */
-    register(config: any): void;
+    register(key: string, code: any): void;
     /**
      * 绑定组件到 Pluto 实例
      * @param op 操作对象，通常是 Pluto 实例
@@ -36,8 +42,14 @@ declare global {
     bind(op: any, prop: string): ThirdComponent;
     /**
      * 执行组件注册
+     * @param block 组件代码块对象
      */
-    execute(): void;
+    execute(block: any): void;
+
+    /**
+     * 执行所有注册的组件
+     */
+    executeAll(): void;
   }
 }
 

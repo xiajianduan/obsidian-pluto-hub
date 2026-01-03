@@ -1,7 +1,7 @@
 import PlutoHubPlugin from 'main';
 import * as pako from 'pako';
-import { MiniModule } from 'settings';
-import { base64ToBlobUrl } from 'utils/helper';
+import { MiniModule } from './types/pluto';
+import { base64ToBlobUrl, promptMessage } from 'utils/helper';
 
 export class ModStorage {
     // 获取模块存储目录路径
@@ -37,7 +37,7 @@ export class ModStorage {
     }
 
     // 保存单个模块
-    static async saveBundle(plugin: PlutoHubPlugin, module: MiniModule): Promise<void> {
+    static async saveModule(plugin: PlutoHubPlugin, module: MiniModule): Promise<void> {
         const path = this.getModulePath(plugin, module.name);
         const adapter = plugin.app.vault.adapter;
         const dir = path.substring(0, path.lastIndexOf('/'));
@@ -45,24 +45,13 @@ export class ModStorage {
         if (!(await adapter.exists(dir))) await adapter.mkdir(dir);
         // 移除bgUrl字段，因为它不应该被序列化
         delete module.bgUrl;
+        // 移除files数组中的blobUrl字段，因为它不应该被序列化
+        module.files.filter(f => f.blobUrl).forEach(file => delete file.blobUrl);
         const jsonStr = JSON.stringify(module);
         const binary = plugin.settings.usePako 
             ? pako.deflate(jsonStr) 
             : new TextEncoder().encode(jsonStr);
         await adapter.writeBinary(path, binary.buffer);
-        
-        // 更新settings中的modules字段（只存储模块名称字符串数组）
-        if (module.enabled) {
-            // 如果模块被启用，确保它的名称在modules数组中
-            if (!plugin.settings.modules.includes(module.name)) {
-                plugin.settings.modules.push(module.name);
-            }
-        } else {
-            // 如果模块被禁用，确保它的名称从modules数组中移除
-            plugin.settings.modules = plugin.settings.modules.filter(mod => mod !== module.name);
-        }
-        
-        await plugin.saveSettings();
     }
 
     // 加载单个模块
@@ -125,15 +114,6 @@ export class ModStorage {
         const modulesDir = this.getModulesDir(plugin);
         const adapter = plugin.app.vault.adapter;
         
-        // 检查存储目录是否存在
-        if (!(await adapter.exists(modulesDir))) {
-            await adapter.mkdir(modulesDir);
-            // 更新settings中的modules字段
-            plugin.settings.modules = [];
-            await plugin.saveSettings();
-            return [];
-        }
-        
         // 获取目录下的所有文件
         const files = await adapter.list(modulesDir);
         const moduleFiles = files.files.filter(file => file.endsWith('.ops'));
@@ -143,7 +123,6 @@ export class ModStorage {
         
         for (const fileName of moduleFiles) {
             const module = await this.loadModule(plugin, fileName);
-            module.enabled = plugin.settings.modules.includes(module.name);
             loadedModules.push(module);
         }
         
@@ -152,12 +131,7 @@ export class ModStorage {
     }
 
     // 导入功能：支持单个模块或全量导入
-    static async importModule(plugin: PlutoHubPlugin, sourcePath: string): Promise<void> {
-        if (!(await plugin.app.vault.adapter.exists(sourcePath))) {
-            throw new Error(`File not found: ${sourcePath}`);
-        }
-
-        const buffer = await plugin.app.vault.adapter.readBinary(sourcePath);
+    static async importModule(plugin: PlutoHubPlugin, buffer: ArrayBuffer): Promise<void> {
         const uint8 = new Uint8Array(buffer);
         const jsonStr = pako.inflate(uint8, { to: 'string' });
         const data = JSON.parse(jsonStr);
@@ -168,28 +142,20 @@ export class ModStorage {
             const module = data as MiniModule;
             
             // 优先使用 QuickAdd 的 inputPrompt 方法获取模块名称
-            const moduleName = await new Promise<string | null>((resolve) => {
-                if ((window as any).pluto?.qa?.inputPrompt) {
-                    (window as any).pluto.qa.inputPrompt("请输入模块名称:", module.id).then(resolve);
-                } else {
-                    // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
-                    const input = prompt("请输入模块名称:", module.id);
-                    resolve(input);
-                }
-            });
+            const moduleName = await promptMessage("请输入模块名称:", module.id);
             
             // 如果用户取消了输入，直接返回
             if (!moduleName) return;
             
             // 保存ModuleBundle到磁盘
-            await this.saveBundle(plugin, module);
-        } else if (data.modules && data.bundles) {
+            await this.saveModule(plugin, module);
+        } else if (data.length) {
             // 全量备份导入
-            const importedModules = data.modules as MiniModule[];
+            const importedModules = data as MiniModule[];
             
             // 保存所有MiniModule
             for (const importedModule of importedModules) {
-                await this.saveBundle(plugin, importedModule);
+                await this.saveModule(plugin, importedModule);
             }
         } else {
             throw new Error("Invalid import file format");

@@ -105,7 +105,6 @@ export class PlutoView extends ItemView {
                 // 对于图片，使用背景图片样式
                 const bgLayer = card.createDiv({ cls: 'card-bg' });
                 bgLayer.style.backgroundImage = `url(${mod.bgUrl})`;
-                card.style.backgroundColor = 'transparent';
             } else {
                 // 对于渐变或纯色，使用普通背景
                 card.style.background = mod.bgColor || 'var(--background-secondary-alt)';
@@ -196,10 +195,6 @@ export class PlutoView extends ItemView {
      */
     renderDashboard(el: HTMLElement) {
         const header = el.createDiv({ cls: 'pluto-header' });
-        
-        // 标题
-        header.createEl('h2', { text: t('pluto.hub.dashboard.title'), cls: 'pluto-title' });
-
         // 添加模块按钮
         const addModuleBtn = new ButtonComponent(header)
             .setButtonText(t('pluto.hub.dashboard.add-module'))
@@ -294,7 +289,7 @@ export class PlutoView extends ItemView {
         const fileSidebar = editorLayout.createDiv({ cls: 'pluto-file-sidebar' });
         
         // CodeMirror 编辑器容器
-        const editorContainer = editorLayout.createDiv({ cls: 'pluto-cm-editor' });
+        const editorContainer = editorLayout.createDiv({ cls: 'pluto-cm-editor markdown-source-view cm-s-obsidian mod-cm6 node-insert-event' });
         
         // 新建文件按钮（移到导航栏）
         const addFileBtn = new ButtonComponent(nav)

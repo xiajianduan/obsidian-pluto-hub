@@ -1,6 +1,6 @@
 # Changes Log
 
-## [1.1.4] - 2026-01-04
+## [1.1.4] - 2026-01-05
 
 ### Fixed
 - 修复了多个按钮点击取消后加载图标持续旋转的问题（新建文件、添加模块、导出所有、保存按钮）
@@ -10,6 +10,7 @@
 - 修复了加载模块时没有把背景设为logo.jpg的问题
 - 修复了opacity: 0.5导致文字变暗的问题
 - 修复了main.ts中根据prop创建ThirdComponent实例的问题
+- 修复了new Function不支持export class语法的问题
 
 ### Improved
 - 重构了renderDashboard方法，优化了错误处理逻辑
@@ -27,6 +28,7 @@
 - 优化了导入模块的逻辑，不再使用临时文件
 - 改进了文件读取功能，将多个文件读取方法封装到helper.ts中
 - 优化了toggle开关的样式和逻辑，实时更新样式而不重新渲染整个界面
+- 实现了卡片高度随宽度变化而等比缩放的效果
 
 ### Added
 - `src/third/third.ts` - 添加了ThirdFactory和其他组件类
@@ -34,12 +36,12 @@
 - `src/types/pluto.d.ts` - 新增了MiniModule和ModFile接口定义
 
 ### Files Modified
-- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例
-- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题，简化图片预览功能代码，优化toggle开关逻辑，简化导入导出功能
+- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例，添加了对export class语法的支持
+- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题，简化图片预览功能代码，优化toggle开关逻辑，简化导入导出功能，实现卡片等比缩放效果
 - `src/i18n/en.ts` - 添加验证相关的英文翻译，删除不再使用的翻译条目
 - `src/i18n/zh-cn.ts` - 添加验证相关的中文翻译，删除不再使用的翻译条目
 - `src/storage.ts` - 修复导入模块时背景颜色总是变化的问题，优化模块导入逻辑，添加图片下载和base64转换功能，优化bgColor保存逻辑，将saveBundle改为saveModule
-- `src/styles.css` - 更新了样式文件
+- `src/styles.css` - 更新了样式文件，实现卡片等比缩放效果
 - `src/types/global.d.ts` - 修改了ThirdComponent和Pluto接口定义，添加了Third接口
 - `src/types/pluto.d.ts` - 新增了MiniModule和ModFile接口定义
 - `src/utils/helper.ts` - 添加了多个工具函数：readFileAsArrayBuffer, readFileAsBase64, readFileAsText, promptMessage

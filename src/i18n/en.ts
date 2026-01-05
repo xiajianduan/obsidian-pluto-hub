@@ -16,6 +16,8 @@ export default {
 	'pluto.hub.settings.columns-desc': 'Number of modules displayed per row in Dashboard view',
 	'pluto.hub.settings.backup-path': 'Backup Path (TODO)',
 	'pluto.hub.settings.backup-path-desc': 'Folder path for manual backup or automatic export of modules',
+	'pluto.hub.settings.config-path': 'Config Path',
+	'pluto.hub.settings.config-path-desc': 'Path to the config file (relative to vault root)',
 	'pluto.hub.dashboard.title': 'Pluto Modules',
 	'pluto.hub.dashboard.add-module': 'Add Module',
 	'pluto.hub.dashboard.import': 'Import',

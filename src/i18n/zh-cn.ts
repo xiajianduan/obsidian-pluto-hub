@@ -1,13 +1,13 @@
 // 中文
 
 export default {
-	'pluto.hub': 'Pluto 中心',
-	'pluto.hub.display-text': 'Pluto 中心',
+	'pluto.hub': '冥王中心',
+	'pluto.hub.display-text': '冥王中心',
 	'pluto.hub.file-name-prompt': '文件名 (例如 config.json):',
 	'pluto.hub.import-success': '模块导入成功',
 	'pluto.hub.import-failure': '模块导入失败',
 	'pluto.hub.module-name-prompt': '模块名称:',
-	'pluto.hub.settings-title': 'Pluto 中心',
+	'pluto.hub.settings-title': '冥王中心',
 	'pluto.hub.settings.module-storage': '模块存储与显示',
 	'pluto.hub.settings.storage-path': '存储路径',
 	'pluto.hub.settings.storage-path-desc': '模块文件存储在中的位置(建议保留在.obsidian目录下以隐藏)',
@@ -17,7 +17,8 @@ export default {
 	'pluto.hub.settings.columns-desc': 'Dashboard 界面每行显示的模块个数',
 	'pluto.hub.settings.backup-path': '备份路径 (TODO)',
 	'pluto.hub.settings.backup-path-desc': '手动备份或自动导出模块的文件夹路径',
-	'pluto.hub.dashboard.title': 'Pluto 模块',
+	'pluto.hub.settings.config-path': '配置路径',
+	'pluto.hub.settings.config-path-desc': '配置文件的路径 (相对于库根目录)',
 	'pluto.hub.dashboard.add-module': '添加模块',
 	'pluto.hub.dashboard.import': '导入',
 	'pluto.hub.dashboard.export-all': '导出全部',

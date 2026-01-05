@@ -17,7 +17,8 @@ export interface ModFile {
 // 定义插件设置接口
 export interface PlutoSettings {
     moduleStoragePath: string;
-    backupFolderName: string
+    backupFolderName: string;
+    configPath: string;
     usePako: boolean;
     columns: number;
 }

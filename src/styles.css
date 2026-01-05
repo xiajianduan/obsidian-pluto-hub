@@ -68,7 +68,7 @@
 .pluto-card {
     min-height: 120px;
     border-radius: 12px;
-    padding: 10px;
+    padding: 5px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -76,7 +76,7 @@
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid var(--background-modifier-border);
     position: relative;
-    color: white;
+    background-color: transparent;
 }
 
 .pluto-card:hover {
@@ -97,7 +97,6 @@
     height: 100%;
     background-size: cover;
     background-position: top center;
-    opacity: 0.5;
     z-index: -1;
     border-radius: 12px;
 }
@@ -114,7 +113,9 @@
     font-size: 15px;
     font-weight: 600;
     margin-top: auto;
-    color: white;
+    color: var(--sky-button-color);
+    background-color: var(--sky-button-background);
+    border-radius: 40px;
 }
 
 /* 编辑器区域 */

@@ -7,6 +7,7 @@ import { PlutoSettings } from "types/pluto";
 export const DEFAULT_SETTINGS: PlutoSettings  = {
     moduleStoragePath: `.obsidian/cache/modules`,
 	backupFolderName: 'backups',
+    configPath: '99系统/app',
     usePako: true,
     columns: 3
 };
@@ -67,6 +68,16 @@ export class PlutoSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.backupFolderName)
                 .onChange(async (value) => {
                     this.plugin.settings.backupFolderName = value;
+                    await this.plugin.saveSettings();
+                }));
+        new Setting(containerEl)
+            .setName(t('pluto.hub.settings.config-path'))
+            .setDesc(t('pluto.hub.settings.config-path-desc'))
+            .addText(text => text
+                .setPlaceholder('99系统/app')
+                .setValue(this.plugin.settings.configPath)
+                .onChange(async (value) => {
+                    this.plugin.settings.configPath = value;
                     await this.plugin.saveSettings();
                 }));
     }

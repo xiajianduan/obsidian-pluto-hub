@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
 import { ThirdFactory } from './third/third';
 import { base64ToBlobUrl, isImageFile } from 'utils/helper';
-import { MiniModule, PlutoSettings } from 'types/pluto';
+import { MiniModule, ModFile, PlutoSettings } from 'types/pluto';
 
 export default class PlutoHubPlugin extends Plugin {
 
@@ -13,10 +13,10 @@ export default class PlutoHubPlugin extends Plugin {
 
     async onload() {
         await this.loadSettings();
-        
+
         // 从存储路径加载所有模块
         await ModStorage.loadAllModulesFromStorage(this);
-        
+
         await this.initializePlugin();
 
         this.i18n();
@@ -38,9 +38,15 @@ export default class PlutoHubPlugin extends Plugin {
         this.initPlutoObject();
 
         this.registerView(PLUTO_VIEW_TYPE, (leaf) => new PlutoView(leaf, this));
-        
+
         // 在布局准备就绪时加载所有模块
-        this.app.workspace.onLayoutReady(() => this.runAllEnabled());
+        this.app.workspace.onLayoutReady(async () => {
+            await this.runAllEnabled();
+            // 动态检测并绑定第三方插件依赖
+            this.bindPluginDependencies();
+        });
+
+
     }
 
     // 初始化全局 Pluto 对象
@@ -53,10 +59,10 @@ export default class PlutoHubPlugin extends Plugin {
             third: {
                 assets: {},
                 modules: {},
-                dva: ThirdFactory.create('dva'), // Dataview
-                react: ThirdFactory.create('react'), // React Components
-                qa: ThirdFactory.create('qa'), // QuickAdd
-                templater: ThirdFactory.create('templater'), // Templater
+                dva: ThirdFactory.create('dva', this.settings.configPath), // Dataview
+                react: ThirdFactory.create('react', this.settings.configPath), // React Components
+                qa: ThirdFactory.create('qa', this.settings.configPath), // QuickAdd
+                templater: ThirdFactory.create('templater', this.settings.configPath), // Templater
             },
             // 提供模块管理 API
             getModule: (name: string) => (window as any).pluto.third.modules[name],
@@ -64,9 +70,6 @@ export default class PlutoHubPlugin extends Plugin {
                 (window as any).pluto.third.modules[name] = exports;
             }
         };
-
-        // 动态检测并绑定第三方插件依赖
-        this.bindPluginDependencies();
     }
 
     // 绑定第三方插件依赖
@@ -75,7 +78,7 @@ export default class PlutoHubPlugin extends Plugin {
         if (!(window as any).pluto) {
             (window as any).pluto = {};
         }
-        
+
         const pluginMappings: { [key: string]: { prop: string, getter: () => any } } = {
             'dataview': { prop: 'dva', getter: () => (this.app as any).plugins.plugins['dataview']?.api },
             'react-components': { prop: 'react', getter: () => (this.app as any).plugins.plugins['obsidian-react-components'] },
@@ -96,7 +99,7 @@ export default class PlutoHubPlugin extends Plugin {
             if (op) {
                 await sleep(1000); // 等待 1 秒，确保插件完全加载
                 const third = window.pluto.third[prop];
-                third.bind(op, prop).executeAll();
+                await third.bind(op, prop).executeAll();
                 return true;
             }
             return false;
@@ -171,75 +174,79 @@ export default class PlutoHubPlugin extends Plugin {
         module.files.filter(f => f.type === 'md').forEach(file => {
             try {
                 const info = getFrontMatterInfo(file.content);
-                const yaml = parseYaml(info.frontmatter);
-                const definesReactComponents = yaml['defines-react-components'] || false;
-                const suppressComponentRefresh = yaml['suppress-component-refresh'] || true;
-                if(definesReactComponents) {
-                    const prefix = `const name = "${module.name}";\n`;
-                    const matches = /^\s*?```jsx:component:(.*)\n((.|\n)*?)\n^\s*?```$/gm.exec(file.content)
-                    if(matches && matches.length === 4) {
-                        const namespace = yaml['react-components-namespace'] || 'Global';
-                        const name = matches[1] || module.name;
-                        const block = {
-                            code: prefix + matches[2],
-                            name: name,
-                            namespace: namespace,
-                            suppressRefresh: suppressComponentRefresh
-                        };
-                        pluto.third.react.register(name, block);
-                        // 运行代码
-                        if(started) pluto.third.react.execute(block);
-                    }
+                const frontmatter = info.frontmatter;
+                if (!frontmatter) return;
+                const yaml = parseYaml(frontmatter);
+                const plutoLanguage = yaml['pluto-language'];
+                if (plutoLanguage) {
+                    const prop = plutoLanguage as PlutoProps;
+                    pluto.third[prop].load(module.name, file, yaml, started);
                 }
             } catch (e) {
                 console.error(`Error parsing YAML file ${file.name}:`, e);
             }
         });
         // 4. 执行所有 JS 文件
-        const jsFiles = module.files.filter(f => f.type === 'js');
-        jsFiles.forEach(file => {
-            try {
-                // 创建模块导出对象
-                const moduleExports: Record<string, any> = {};
-                const exports = moduleExports;
-                
-                const context = {
-                    app: this.app,
-                    pluto: pluto,
-                    mod: module, // 将模块信息暴露给脚本
-                    // 允许 JS 访问同模块下的其他文件
-                    getFile: (name: string) => module.files.find(f => f.name === name)?.content,
-                    // 添加 CommonJS 模块导出支持
-                    module: { exports: moduleExports },
-                    exports: exports,
-                    // 添加 ES 模块导出支持
-                    export: function(name: string, value: any) {
-                        moduleExports[name] = value;
-                    }
-                };
-                
-                // 使用 new Function 执行代码，提供安全的执行上下文
-                const runner = new Function('ctx', `with(ctx) { ${file.content} }`);
-                const result = runner(context);
-                
-                // 处理模块导出
-                let moduleResult;
-                if (result) {
-                    // 优先使用 return 的结果
-                    moduleResult = result;
-                } else if (Object.keys(moduleExports).length > 0) {
-                    // 其次使用 module.exports 或 exports
-                    moduleResult = moduleExports;
+        const mainJs = module.files.find(f => f.name === 'main.js');
+        if (!mainJs) return;
+        const def = this.executeJsFile(module, mainJs);
+        const main = new def.Main();
+        main.before();
+        const jsFiles = module.files.filter(f => f.type === 'js' && f.name !== 'main.js');
+        const object = jsFiles.reduce((prev: any, file) => {
+            const result = this.executeJsFile(module, file);
+            return Object.assign(prev, result);
+        }, {});
+        // 如果有模块导出结果，将其挂载到 pluto.modules
+        if (Object.keys(object).length > 0) {
+            pluto.third.modules[module.name] = object;
+        }
+        main.after();
+    }
+    executeJsFile(module: MiniModule, file: ModFile) {
+        try {
+            // 创建模块导出对象
+            const moduleExports: Record<string, any> = {};
+            const exports = moduleExports;
+
+            const context = {
+                app: this.app,
+                pluto: window.pluto,
+                mod: module, // 将模块信息暴露给脚本
+                // 允许 JS 访问同模块下的其他文件
+                getFile: (name: string) => module.files.find(f => f.name === name)?.content,
+                // 添加 CommonJS 模块导出支持
+                module: { exports: moduleExports },
+                exports: exports,
+                // 添加 ES 模块导出支持
+                exportVar: function (name: string, value: any) {
+                    moduleExports[name] = value;
                 }
-                
-                // 如果有模块导出结果，将其挂载到 pluto.modules
-                if (moduleResult) {
-                    pluto.third.modules[module.name] = moduleResult;
-                }
-            } catch (e) {
-                console.error(`Error in ${file.name}:`, e);
+            };
+
+            // 检测并处理 export class 语句
+            let content = file.content;
+            const exportClassRegex = /export\s+class\s+(\w+)\s*(\{[\s\S]*?\})(?![\s\S]*\})/g;
+            content = content.replace(exportClassRegex, (_match, className, classBody) => {
+                // 将 export class 转换为普通 class 定义，并将其导出到 module.exports
+                return `class ${className} ${classBody}\nmodule.exports.${className} = ${className};`;
+            });
+
+            // 使用 new Function 执行处理后的代码
+            const runner = new Function('ctx', `with(ctx) { ${content} }`);
+            const result = runner(context);
+
+            // 处理模块导出
+            if (result) {
+                // 优先使用 return 的结果
+                return result;
+            } else if (Object.keys(moduleExports).length > 0) {
+                // 其次使用 module.exports 或 exports
+                return moduleExports;
             }
-        });
+        } catch (e) {
+            console.error(`Error in ${file.name}:`, e);
+        }
     }
 
     // 运行所有启用的模块
@@ -249,7 +256,7 @@ export default class PlutoHubPlugin extends Plugin {
 
         // 从存储中加载所有模块
         const modules = await ModStorage.loadAllModulesFromStorage(this);
-        
+
         for (const mod of modules) {
             if (mod.enabled) {
                 try {

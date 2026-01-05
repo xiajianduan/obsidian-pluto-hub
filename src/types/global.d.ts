@@ -41,15 +41,22 @@ declare global {
      */
     bind(op: any, prop: string): ThirdComponent;
     /**
+     * 加载组件
+     * @param name 组件名称
+     * @param file 组件文件对象
+     * @param yaml 组件配置的 YAML 对象
+     * @param started 是否在启动时加载
+     */
+    load(name: string, file: ModFile, yaml: any, started: boolean): void;
+    /**
      * 执行组件注册
      * @param block 组件代码块对象
      */
-    execute(block: any): void;
-
+    execute(block: any): Promise<void>;
     /**
      * 执行所有注册的组件
      */
-    executeAll(): void;
+    executeAll(): Promise<void>;
   }
 }
 

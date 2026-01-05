@@ -1,6 +1,6 @@
 # Changes Log
 
-## [1.1.4] - 2026-01-05
+## [1.1.4] - 2026-01-06
 
 ### Fixed
 - 修复了多个按钮点击取消后加载图标持续旋转的问题（新建文件、添加模块、导出所有、保存按钮）
@@ -29,25 +29,45 @@
 - 改进了文件读取功能，将多个文件读取方法封装到helper.ts中
 - 优化了toggle开关的样式和逻辑，实时更新样式而不重新渲染整个界面
 - 实现了卡片高度随宽度变化而等比缩放的效果
+- 重构了项目结构，将功能拆分为多个模块，提高了代码的可维护性和可扩展性
+- 新增了多个执行器，用于处理不同类型的文件
+- 重构了Third组件，将third.ts拆分为多个组件文件
 
 ### Added
+- `src/core/ImageConverter.ts` - 添加了图片转换功能
+- `src/exec/CoreManager.ts` - 新增了核心管理器
+- `src/exec/CssExecutor.ts` - 新增了CSS执行器
+- `src/exec/ImageExecutor.ts` - 新增了图片执行器
+- `src/exec/JsonExecutor.ts` - 新增了JSON执行器
+- `src/exec/MarkdownExecutor.ts` - 新增了Markdown执行器
+- `src/exec/SandboxExecutor.ts` - 新增了沙箱执行器
+- `src/exec/SimpleCoreExecutor.ts` - 新增了简单核心执行器
+- `src/pluto.ts` - 新增了Pluto核心功能
+- `src/third/DvaComponent.ts` - 新增了Dva组件
+- `src/third/QaComponent.ts` - 新增了Qa组件
+- `src/third/ReactComponent.ts` - 新增了React组件
+- `src/third/SimpleThirdComponent.ts` - 新增了SimpleThird组件
+- `src/third/TemplaterComponent.ts` - 新增了Templater组件
+- `src/third/ThirdFactory.ts` - 新增了ThirdFactory组件
 - `src/third/third.ts` - 添加了ThirdFactory和其他组件类
 - `src/utils/helper.ts` - 新增了辅助工具函数
 - `src/types/pluto.d.ts` - 新增了MiniModule和ModFile接口定义
 
 ### Files Modified
-- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例，添加了对export class语法的支持
-- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题，简化图片预览功能代码，优化toggle开关逻辑，简化导入导出功能，实现卡片等比缩放效果
+- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例，添加了对export class语法的支持，重构了插件加载逻辑
+- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题，简化图片预览功能代码，优化toggle开关逻辑，简化导入导出功能，实现卡片等比缩放效果，更新了视图渲染逻辑
 - `src/i18n/en.ts` - 添加验证相关的英文翻译，删除不再使用的翻译条目
 - `src/i18n/zh-cn.ts` - 添加验证相关的中文翻译，删除不再使用的翻译条目
 - `src/storage.ts` - 修复导入模块时背景颜色总是变化的问题，优化模块导入逻辑，添加图片下载和base64转换功能，优化bgColor保存逻辑，将saveBundle改为saveModule
 - `src/styles.css` - 更新了样式文件，实现卡片等比缩放效果
-- `src/types/global.d.ts` - 修改了ThirdComponent和Pluto接口定义，添加了Third接口
-- `src/types/pluto.d.ts` - 新增了MiniModule和ModFile接口定义
+- `src/types/global.d.ts` - 修改了ThirdComponent和Pluto接口定义，添加了Third接口，更新了类型定义
+- `src/types/pluto.d.ts` - 新增了MiniModule和ModFile接口定义，更新了类型定义
 - `src/utils/helper.ts` - 添加了多个工具函数：readFileAsArrayBuffer, readFileAsBase64, readFileAsText, promptMessage
 - `src/utils/utils.ts` - 添加了base64ToBlobUrl公共方法
 - `src/settings.ts` - 修改了设置相关逻辑
-- `src/third/third.ts` - 更新了ThirdFactory和组件类
+
+### Deleted
+- `src/third/third.ts` - 将third.ts拆分为多个组件文件
 
 ## [1.1.3] - 2026-01-01
 

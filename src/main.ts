@@ -3,9 +3,11 @@ import { PlutoView, PLUTO_VIEW_TYPE } from './view';
 import { ModStorage } from './storage';
 import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
-import { ThirdFactory } from './third/third';
+import { ThirdFactory } from './third/ThirdFactory';
 import { base64ToBlobUrl, isImageFile } from 'utils/helper';
-import { MiniModule, ModFile, PlutoSettings } from 'types/pluto';
+import { MiniModule, PlutoSettings } from 'types/pluto';
+import { Pluto } from 'pluto';
+import { CoreManager } from 'exec/CoreManager';
 
 export default class PlutoHubPlugin extends Plugin {
 
@@ -13,12 +15,10 @@ export default class PlutoHubPlugin extends Plugin {
 
     async onload() {
         await this.loadSettings();
-
         // 从存储路径加载所有模块
         await ModStorage.loadAllModulesFromStorage(this);
-
         await this.initializePlugin();
-
+        // 初始化 i18n 翻译函数
         this.i18n();
         // This adds a settings tab so the user can configure various aspects of the plugin
         this.addSettingTab(new PlutoSettingTab(this.app, this));
@@ -32,44 +32,18 @@ export default class PlutoHubPlugin extends Plugin {
     }
 
     async initializePlugin() {
+        // 添加自定义 Ribbon 图标
         this.addCustomRibbonIcon();
-
         // 初始化并挂载全局 Pluto 对象
-        this.initPlutoObject();
-
+        window.pluto = new Pluto(this, this.settings);
+        // 注册 PlutoView 视图
         this.registerView(PLUTO_VIEW_TYPE, (leaf) => new PlutoView(leaf, this));
-
         // 在布局准备就绪时加载所有模块
         this.app.workspace.onLayoutReady(async () => {
-            await this.runAllEnabled();
+            await CoreManager.runAllEnabled(this);
             // 动态检测并绑定第三方插件依赖
             this.bindPluginDependencies();
         });
-
-
-    }
-
-    // 初始化全局 Pluto 对象
-    initPlutoObject() {
-        // 创建或重置 pluto 对象
-        (window as any).pluto = {
-            app: this.app,
-            config: {}, // 用于存储 JSON 配置
-            // 依赖映射
-            third: {
-                assets: {},
-                modules: {},
-                dva: ThirdFactory.create('dva', this.settings.configPath), // Dataview
-                react: ThirdFactory.create('react', this.settings.configPath), // React Components
-                qa: ThirdFactory.create('qa', this.settings.configPath), // QuickAdd
-                templater: ThirdFactory.create('templater', this.settings.configPath), // Templater
-            },
-            // 提供模块管理 API
-            getModule: (name: string) => (window as any).pluto.third.modules[name],
-            registerModule: (name: string, exports: any) => {
-                (window as any).pluto.third.modules[name] = exports;
-            }
-        };
     }
 
     // 绑定第三方插件依赖
@@ -80,6 +54,7 @@ export default class PlutoHubPlugin extends Plugin {
         }
 
         const pluginMappings: { [key: string]: { prop: string, getter: () => any } } = {
+
             'dataview': { prop: 'dva', getter: () => (this.app as any).plugins.plugins['dataview']?.api },
             'react-components': { prop: 'react', getter: () => (this.app as any).plugins.plugins['obsidian-react-components'] },
             'quickadd': { prop: 'qa', getter: () => (window as any).quickAddApi || null },
@@ -123,149 +98,6 @@ export default class PlutoHubPlugin extends Plugin {
         this.addRibbonIcon('layout-grid', t("pluto.hub"), () => {
             this.activateView();
         });
-    }
-
-    // 注入 CSS 样式到文档头部
-    injectStyle(id: string, code: string) {
-        let el = document.getElementById(`pluto-css-${id}`);
-        if (!el) {
-            el = document.createElement('style');
-            el.id = `pluto-css-${id}`;
-            document.head.appendChild(el);
-        }
-        el.textContent = code;
-    }
-
-    // 运行单个模块包
-    runBundle(module: MiniModule, started: boolean) {
-        const pluto = window.pluto;
-        const entry = {
-            json: new Map(),
-            images: new Map(),
-        };
-        pluto.third.assets[module.name] = entry;
-        // 1. 注入所有 CSS 文件
-        module.files.filter(f => f.type === 'css').forEach(file => {
-            this.injectStyle(`${module.id}-${file.name}`, file.content);
-        });
-
-        // 2. 解析并挂载所有 JSON 配置文件
-        module.files.filter(f => f.type === 'json').forEach(file => {
-            try {
-                const config = JSON.parse(file.content);
-                // 将配置挂载到 pluto.assets[模块名]
-                entry.json.set(file.name, config);
-            } catch (e) {
-                console.error(`Error parsing JSON file ${file.name}:`, e);
-            }
-        });
-        // 2. 解析并挂载所有 图片 配置文件
-        module.files.filter(f => isImageFile(f.type)).forEach(file => {
-            try {
-                // 将配置挂载到 pluto.assets[模块名]
-                const blobUrl = base64ToBlobUrl(file.content, file.type);
-                file.blobUrl = blobUrl;
-                entry.images.set(file.name, blobUrl);
-            } catch (e) {
-                console.error(`Error parsing image file ${file.name}:`, e);
-            }
-        });
-        // 3. 解析并挂载所有 Markdown 文件
-        module.files.filter(f => f.type === 'md').forEach(file => {
-            try {
-                const info = getFrontMatterInfo(file.content);
-                const frontmatter = info.frontmatter;
-                if (!frontmatter) return;
-                const yaml = parseYaml(frontmatter);
-                const plutoLanguage = yaml['pluto-language'];
-                if (plutoLanguage) {
-                    const prop = plutoLanguage as PlutoProps;
-                    pluto.third[prop].load(module.name, file, yaml, started);
-                }
-            } catch (e) {
-                console.error(`Error parsing YAML file ${file.name}:`, e);
-            }
-        });
-        // 4. 执行所有 JS 文件
-        const mainJs = module.files.find(f => f.name === 'main.js');
-        if (!mainJs) return;
-        const def = this.executeJsFile(module, mainJs);
-        const main = new def.Main();
-        main.before();
-        const jsFiles = module.files.filter(f => f.type === 'js' && f.name !== 'main.js');
-        const object = jsFiles.reduce((prev: any, file) => {
-            const result = this.executeJsFile(module, file);
-            return Object.assign(prev, result);
-        }, {});
-        // 如果有模块导出结果，将其挂载到 pluto.modules
-        if (Object.keys(object).length > 0) {
-            pluto.third.modules[module.name] = object;
-        }
-        main.after();
-    }
-    executeJsFile(module: MiniModule, file: ModFile) {
-        try {
-            // 创建模块导出对象
-            const moduleExports: Record<string, any> = {};
-            const exports = moduleExports;
-
-            const context = {
-                app: this.app,
-                pluto: window.pluto,
-                mod: module, // 将模块信息暴露给脚本
-                // 允许 JS 访问同模块下的其他文件
-                getFile: (name: string) => module.files.find(f => f.name === name)?.content,
-                // 添加 CommonJS 模块导出支持
-                module: { exports: moduleExports },
-                exports: exports,
-                // 添加 ES 模块导出支持
-                exportVar: function (name: string, value: any) {
-                    moduleExports[name] = value;
-                }
-            };
-
-            // 检测并处理 export class 语句
-            let content = file.content;
-            const exportClassRegex = /export\s+class\s+(\w+)\s*(\{[\s\S]*?\})(?![\s\S]*\})/g;
-            content = content.replace(exportClassRegex, (_match, className, classBody) => {
-                // 将 export class 转换为普通 class 定义，并将其导出到 module.exports
-                return `class ${className} ${classBody}\nmodule.exports.${className} = ${className};`;
-            });
-
-            // 使用 new Function 执行处理后的代码
-            const runner = new Function('ctx', `with(ctx) { ${content} }`);
-            const result = runner(context);
-
-            // 处理模块导出
-            if (result) {
-                // 优先使用 return 的结果
-                return result;
-            } else if (Object.keys(moduleExports).length > 0) {
-                // 其次使用 module.exports 或 exports
-                return moduleExports;
-            }
-        } catch (e) {
-            console.error(`Error in ${file.name}:`, e);
-        }
-    }
-
-    // 运行所有启用的模块
-    async runAllEnabled() {
-        // 清理所有 Pluto 注入的旧样式，防止重复累积
-        document.querySelectorAll('[id^="pluto-css-"]').forEach(el => el.remove());
-
-        // 从存储中加载所有模块
-        const modules = await ModStorage.loadAllModulesFromStorage(this);
-
-        for (const mod of modules) {
-            if (mod.enabled) {
-                try {
-                    this.runBundle(mod, false);
-                } catch (e) {
-                    console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
-                }
-            }
-        }
     }
 
     async activateView() {

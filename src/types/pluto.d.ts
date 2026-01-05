@@ -13,6 +13,12 @@ export interface ModFile {
     content: string;
     blobUrl?: string; // 用于存储图片 Blob URL
 }
+export interface ModParams {
+    module: MiniModule;
+    file: ModFile;
+    yaml?: any;
+    started: boolean;
+}
 
 // 定义插件设置接口
 export interface PlutoSettings {

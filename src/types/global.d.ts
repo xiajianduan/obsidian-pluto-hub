@@ -1,17 +1,18 @@
 export {}; // 使文件成为模块
-import { ModFile } from "./pluto";
+import { MiniModule, ModParams } from "./pluto";
 
 declare global {
 
   export interface Window {
-    pluto: Pluto;
+    pluto: IPluto;
   }
 
   type PlutoProps = "dva" | "react" | "qa" | "templater";
-  export interface Pluto {
+  export interface IPluto {
     web: any;
     images: any;
     third: Third;
+    core: Core;
   }
   export interface Third {
     assets: any;
@@ -22,17 +23,23 @@ declare global {
     templater: ThirdComponent;
   }
 
+  export interface Core {
+    css: CoreExecutor;
+    json: CoreExecutor;
+    image: CoreExecutor;
+    markdown: CoreExecutor;
+    sandbox: CoreExecutor;
+  }
+
   export interface ThirdComponent {
     op: any;
     api: any;
     codes: Map<string, any>;
     
     /**
-     * 注册组件
-     * @param key 组件的唯一键名
-     * @param code 组件的代码配置对象
+     * 补丁组件，用于修改组件的行为
      */
-    register(key: string, code: any): void;
+    patch(): void;
     /**
      * 绑定组件到 Pluto 实例
      * @param op 操作对象，通常是 Pluto 实例
@@ -41,22 +48,41 @@ declare global {
      */
     bind(op: any, prop: string): ThirdComponent;
     /**
-     * 加载组件
-     * @param name 组件名称
-     * @param file 组件文件对象
-     * @param yaml 组件配置的 YAML 对象
-     * @param started 是否在启动时加载
+     * 注册组件
+     * @param key 组件的唯一键名
+     * @param code 组件的代码配置对象
      */
-    load(name: string, file: ModFile, yaml: any, started: boolean): void;
+    register(key: string, code: any): void;
+    /**
+     * 加载组件
+     * @param params 组件加载参数对象
+     */
+    load(params: ModParams): void;
     /**
      * 执行组件注册
      * @param block 组件代码块对象
      */
-    execute(block: any): Promise<void>;
+    execute(block: any): void;
     /**
      * 执行所有注册的组件
      */
-    executeAll(): Promise<void>;
+    executeAll(): void;
+  }
+  export interface CoreExecutor {
+
+    codes: Map<string, any>;
+    configPath: string;
+
+    excutable(type: string): boolean;
+    /**
+     * 执行组件注册
+     * @param block 组件代码块对象
+     */
+    execute(module: MiniModule, started: boolean): void;
+    /**
+     * 执行所有注册的组件
+     */
+    executeAll(): void;
   }
 }
 

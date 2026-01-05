@@ -12,6 +12,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { css } from '@codemirror/lang-css';
 import { markdown } from '@codemirror/lang-markdown';
 import { base64ToBlob, base64ToBlobUrl, downloadImageToBase64, isImageFile, promptMessage, readFileAsArrayBuffer, readFileAsBase64, readFileAsText } from 'utils/helper';
+import { CoreManager } from 'exec/CoreManager';
 
 export const PLUTO_VIEW_TYPE = "pluto-dashboard-view";
 
@@ -124,7 +125,7 @@ export class PlutoView extends ItemView {
                 mod.enabled = toggle.checked;
                 await ModStorage.saveModule(this.plugin, mod);
                 if (mod.enabled) {
-                    this.plugin.runBundle(mod, true);
+                    CoreManager.runBundle(mod, true);
                     card.style.filter = '';
                 } else {
                     // 如果模块被禁用，移除该模块的所有样式

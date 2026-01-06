@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, ButtonComponent, Notice, MarkdownEditView, getBlobArrayBuffer } from 'obsidian';
+import { ItemView, WorkspaceLeaf, ButtonComponent, Notice } from 'obsidian';
 import { ModStorage } from './storage';
 import PlutoHubPlugin from './main';
 import { MiniModule, ModFile } from './types/pluto';
@@ -7,7 +7,7 @@ import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, syntaxHighlighting, defaultHighlightStyle, indentUnit } from '@codemirror/language';
-import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
+import { closeBrackets } from '@codemirror/autocomplete';
 import { javascript } from '@codemirror/lang-javascript';
 import { css } from '@codemirror/lang-css';
 import { markdown } from '@codemirror/lang-markdown';
@@ -776,10 +776,10 @@ export class PlutoView extends ItemView {
 
         // 检查pluto.skin.path是否存在
         const pluto = (window as any).pluto;
-        if (pluto && pluto.skin && pluto.skin.path) {
+        if (this.plugin.settings.enableIcon && pluto.skin?.path) {
             const skinPath = pluto.skin.path;
             // 下载图片并转换为base64
-            const imageBase64 = await downloadImageToBase64(skinPath);
+            const imageBase64 = await downloadImageToBase64(skinPath, this.plugin.settings.quality);
             if (imageBase64) {
                 const base64Parts = imageBase64.split(',');
                 moduleFiles = [{ name: 'logo.webp', type: 'webp', content: base64Parts[1]! }];

@@ -35,14 +35,14 @@ export function base64ToBlobUrl(base64: string, fileType: string): string {
 }
 
 // 下载图片并转换为base64
-export async function downloadImageToBase64(url: string): Promise<string | null> {
+export async function downloadImageToBase64(url: string, quality: number): Promise<string | null> {
     try {
         const response = await window.pluto.web?.download(url);
         if (response.status !== 200) {
             throw new Error(`Failed to download image: ${response.status}`);
         }
         const buffer = response.arrayBuffer;
-        const blob = await window.pluto.images?.convertJpgToWebp(buffer, 90);
+        const blob = await window.pluto.images.convertJpgToWebp(buffer, quality);
         return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => {
@@ -93,8 +93,8 @@ export async function readFileAsText(file: File): Promise<string> {
 export async function promptMessage(message: any, holder?: any): Promise<string | null> {
     return new Promise((resolve) => {
         // 优先使用 QuickAdd 的 inputPrompt 方法
-        if ((window as any).pluto.third.qa?.op?.inputPrompt) {
-            (window as any).pluto.third.qa?.op?.inputPrompt(message, holder).then(resolve);
+        if (window.pluto.third.qa?.api.inputPrompt) {
+            window.pluto.third.qa.api.inputPrompt(message, holder).then(resolve);
         } else {
             // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
             const input = prompt(message, holder);

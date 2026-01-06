@@ -71,10 +71,13 @@ export class ModStorage {
             
             const module = JSON.parse(jsonStr);
             
-            // 检查模块中是否有logo.webp文件，如果有则将其转换为blob URL并设置到bgColor属性
-            const logoFile = module.files.find((file: any) => file.name === 'logo.webp' && file.type === 'webp');
-            if (logoFile && logoFile.content) {
-                module.bgUrl = base64ToBlobUrl(logoFile.content, 'webp');
+            // 只有当enableIcon为true时才检查logo.webp文件
+            if (plugin.settings.enableIcon) {
+                // 检查模块中是否有logo.webp文件，如果有则将其转换为blob URL并设置到bgColor属性
+                const logoFile = module.files.find((file: any) => file.name === 'logo.webp' && file.type === 'webp');
+                if (logoFile && logoFile.content) {
+                    module.bgUrl = base64ToBlobUrl(logoFile.content, 'webp');
+                }
             }
             
             return module;

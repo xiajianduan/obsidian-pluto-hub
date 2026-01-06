@@ -3,6 +3,10 @@ import { SimpleThirdComponent } from "./SimpleThirdComponent";
 
 export class TemplaterComponent extends SimpleThirdComponent {
     
+    get pluginId(): string {
+        return 'templater-obsidian';
+    }
+    
     patch(): void {
         this.op.templater.functions_generator.internal_functions.generate_params = function(params: any) {
             let t: any = {};

@@ -9,7 +9,9 @@ export const DEFAULT_SETTINGS: PlutoSettings  = {
 	backupFolderName: 'backups',
     configPath: '99系统/app',
     usePako: true,
-    columns: 3
+    columns: 3,
+    enableIcon: true,
+    quality: 90,
 };
 
 export class PlutoSettingTab extends PluginSettingTab {
@@ -78,6 +80,26 @@ export class PlutoSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.configPath)
                 .onChange(async (value) => {
                     this.plugin.settings.configPath = value;
+                    await this.plugin.saveSettings();
+                }));
+        new Setting(containerEl)
+            .setName(t('pluto.hub.settings.enable-icon'))
+            .setDesc(t('pluto.hub.settings.enable-icon-desc'))
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.enableIcon)
+                .onChange(async (value) => {
+                    this.plugin.settings.enableIcon = value;
+                    await this.plugin.saveSettings();
+                }));
+        new Setting(containerEl)
+            .setName(t('pluto.hub.settings.quality'))
+            .setDesc(t('pluto.hub.settings.quality-desc'))
+            .addSlider(slider => slider
+                .setLimits(30, 100, 10)
+                .setValue(this.plugin.settings.quality)
+                .setDynamicTooltip()
+                .onChange(async (value) => {
+                    this.plugin.settings.quality = value;
                     await this.plugin.saveSettings();
                 }));
     }

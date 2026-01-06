@@ -27,4 +27,6 @@ export interface PlutoSettings {
     configPath: string;
     usePako: boolean;
     columns: number;
+    enableIcon: boolean;
+    quality: number;
 }

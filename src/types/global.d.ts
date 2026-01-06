@@ -1,4 +1,6 @@
 export {}; // 使文件成为模块
+
+import { ImageConverter } from "core/ImageConverter";
 import { MiniModule, ModParams } from "./pluto";
 
 declare global {
@@ -7,10 +9,10 @@ declare global {
     pluto: IPluto;
   }
 
-  type PlutoProps = "dva" | "react" | "qa" | "templater";
+  type PlutoProps = "dva" | "react" | "qa" | "templater" | "form";
   export interface IPluto {
     web: any;
-    images: any;
+    images: ImageConverter;
     third: Third;
     core: Core;
   }
@@ -21,6 +23,7 @@ declare global {
     react: ThirdComponent;
     qa: ThirdComponent;
     templater: ThirdComponent;
+    form: ThirdComponent;
   }
 
   export interface Core {
@@ -36,6 +39,7 @@ declare global {
     api: any;
     codes: Map<string, any>;
     
+    get pluginId(): string;
     /**
      * 补丁组件，用于修改组件的行为
      */

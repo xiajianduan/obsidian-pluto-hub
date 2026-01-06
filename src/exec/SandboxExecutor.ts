@@ -9,10 +9,15 @@ export class SandboxExecutor extends SimpleCoreExecutor {
 
     async execute(module: MiniModule) {
         const mainJs = module.files.find(f => f.name === 'main.js');
-        if (!mainJs) return;
+        if (!mainJs) return this.execModule(module);
         const def = this.load({ module, file: mainJs, started: true });
         const main = new def.Main();
-        main.before();
+        main.start();
+        this.execModule(module);
+        main.finish?.();
+    }
+
+    private execModule(module: MiniModule) {
         const jsFiles = module.files.filter(f => this.excutable(f.type) && f.name !== 'main.js');
         const object = jsFiles.reduce((prev: any, file) => {
             const result = this.load({ module, file, started: true });
@@ -22,7 +27,6 @@ export class SandboxExecutor extends SimpleCoreExecutor {
         if (Object.keys(object).length > 0) {
             window.pluto.third.modules[module.name] = object;
         }
-        main.after();
     }
 
     load(params: ModParams): any {

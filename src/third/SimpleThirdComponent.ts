@@ -12,6 +12,10 @@ export class SimpleThirdComponent implements ThirdComponent {
         this.configPath = configPath;
     }
 
+    get pluginId(): string {
+        return 'obsidian-pluto-hub';
+    }
+
     patch(): void {
 
     }

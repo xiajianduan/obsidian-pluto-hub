@@ -32,10 +32,18 @@
 - 重构了项目结构，将功能拆分为多个模块，提高了代码的可维护性和可扩展性
 - 新增了多个执行器，用于处理不同类型的文件
 - 重构了Third组件，将third.ts拆分为多个组件文件
+- 重构了视图系统，将view.ts拆分为PlutoBoardView.ts和PlutoHomeView.ts
+- 新增了核心渲染模块：BoardRenderer.ts, EditorRenderer.ts, MirrorRenderer.ts
+- 新增了ModuleAction.ts和ViewResolver.ts，优化了模块操作和视图解析逻辑
 - 新增了国际化支持，包括enable-icon和webp-quality设置
 
 ### Added
 - `src/core/ImageConverter.ts` - 添加了图片转换功能
+- `src/core/BoardRenderer.ts` - 添加了看板渲染器
+- `src/core/EditorRenderer.ts` - 添加了编辑器渲染器
+- `src/core/MirrorRenderer.ts` - 添加了镜像渲染器
+- `src/core/ModuleAction.ts` - 添加了模块操作管理器
+- `src/core/ViewResolver.ts` - 添加了视图解析器
 - `src/exec/CoreManager.ts` - 新增了核心管理器
 - `src/exec/CssExecutor.ts` - 新增了CSS执行器
 - `src/exec/ImageExecutor.ts` - 新增了图片执行器
@@ -57,8 +65,12 @@
 - `src/types/obsidian.d.ts` - 新增了Obsidian相关类型定义
 
 ### Files Modified
-- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例，添加了对export class语法的支持，重构了插件加载逻辑
-- `src/view.ts` - 修复按钮状态重置问题，重构renderDashboard方法，增强输入验证，优化UI显示，添加图片背景支持，修复背景图片显示问题，简化图片预览功能代码，优化toggle开关逻辑，简化导入导出功能，实现卡片等比缩放效果，更新了视图渲染逻辑
+- `src/main.ts` - 修改了插件绑定逻辑，使用ThirdFactory创建组件实例，添加了对export class语法的支持，重构了插件加载逻辑和视图注册
+- `src/view.ts` - 重构视图系统，将其拆分为PlutoBoardView.ts和PlutoHomeView.ts
+- `src/pluto.ts` - 更新了Pluto核心功能，优化了模块管理和视图处理
+- `src/types/obsidian.d.ts` - 更新了Obsidian相关类型定义
+- `src/view/PlutoBoardView.ts` - 新增了看板视图组件
+- `src/view/PlutoHomeView.ts` - 新增了主页视图组件
 - `src/i18n/en.ts` - 添加验证相关的英文翻译，删除不再使用的翻译条目，新增了enable-icon和webp-quality设置的翻译
 - `src/i18n/zh-cn.ts` - 添加验证相关的中文翻译，删除不再使用的翻译条目，新增了enable-icon和webp-quality设置的翻译
 - `src/storage.ts` - 修复导入模块时背景颜色总是变化的问题，优化模块导入逻辑，添加图片下载和base64转换功能，优化bgColor保存逻辑，将saveBundle改为saveModule
@@ -78,6 +90,7 @@
 
 ### Deleted
 - `src/third/third.ts` - 将third.ts拆分为多个组件文件
+- `src/view.ts` - 将视图系统拆分为PlutoBoardView.ts和PlutoHomeView.ts
 
 ## [1.1.3] - 2026-01-01
 

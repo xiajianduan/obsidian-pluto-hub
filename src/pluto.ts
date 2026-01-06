@@ -1,11 +1,10 @@
 import { CoreManager } from "exec/CoreManager";
 import { App, normalizePath, TFile } from "obsidian";
 import { ThirdFactory } from "third/ThirdFactory";
-import { PlutoSettings } from "types/pluto";
 import * as obsidian from "obsidian";
 import { ImageConverter } from "core/ImageConverter";
 import PlutoHubPlugin from "main";
-import { PLUTO_VIEW_TYPE, PlutoView } from "view";
+import { VIEW_TYPE_BOARD, PlutoBoardView } from "view/PlutoBoardView";
 
 export class Pluto implements IPluto {
     app: App;
@@ -34,8 +33,8 @@ export class Pluto implements IPluto {
         this.core = CoreManager.createCoreExecutor(settings.configPath);
         this.third = ThirdFactory.createThirdComponent(settings.configPath);
         const plugin = this.self;
-        // 注册 PlutoView 视图
-        plugin.registerView(PLUTO_VIEW_TYPE, (leaf) => new PlutoView(leaf, plugin));
+        // 注册 PlutoBoardView 视图
+        plugin.registerView(VIEW_TYPE_BOARD, (leaf) => new PlutoBoardView(leaf, plugin));
         // 在布局准备就绪时加载所有模块
         plugin.app.workspace.onLayoutReady(async () => {
             await CoreManager.runAllEnabled(plugin);
@@ -96,5 +95,15 @@ export class Pluto implements IPluto {
     }
     registerModule(name: string, exports: any): void {
         (window as any).pluto.third.modules[name] = exports;
+    }
+
+    static async activateView(app: App) {
+        const { workspace } = app;
+        let leaf = workspace.getLeavesOfType(VIEW_TYPE_BOARD)[0];
+        if (!leaf) {
+            leaf = workspace.getLeaf('tab');
+            await leaf.setViewState({ type: VIEW_TYPE_BOARD, active: true });
+        }
+        void workspace.revealLeaf(leaf);
     }
 }

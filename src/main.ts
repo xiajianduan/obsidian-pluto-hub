@@ -1,5 +1,4 @@
 import { Plugin } from 'obsidian';
-import { PLUTO_VIEW_TYPE } from './view';
 import { ModStorage } from './storage';
 import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
@@ -37,18 +36,8 @@ export default class PlutoHubPlugin extends Plugin {
 
     addCustomRibbonIcon() {
         this.addRibbonIcon('layout-grid', t("pluto.hub"), () => {
-            this.activateView();
+            Pluto.activateView(this.app);
         });
-    }
-
-    async activateView() {
-        const { workspace } = this.app;
-        let leaf = workspace.getLeavesOfType(PLUTO_VIEW_TYPE)[0];
-        if (!leaf) {
-            leaf = workspace.getLeaf('tab');
-            await leaf.setViewState({ type: PLUTO_VIEW_TYPE, active: true });
-        }
-        void workspace.revealLeaf(leaf);
     }
 
     async loadSettings() {

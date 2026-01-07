@@ -5,7 +5,6 @@ import { t } from "utils/translation";
 import { ModuleAction } from "./ModuleAction";
 import { EditorRenderer } from "./EditorRenderer";
 import PlutoHubPlugin from "main";
-import { MiniModule } from "types/pluto";
 import { CoreManager } from "exec/CoreManager";
 import { ViewResolver } from "./ViewResolver";
 

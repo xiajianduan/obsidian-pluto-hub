@@ -311,3 +311,21 @@ button.mod-export-btn:hover {
     --pluto-card-padding: 16px;
     --pluto-card-border-radius: 8px;
 }
+
+/*
+----------------
+-- 表单弹窗样式 --
+----------------
+*/
+/* 根目录 styles.css - Obsidian表单极简原生样式 (推荐) */
+.pluto-form textarea,
+.pluto-form input {
+    width: 100%;
+}
+.setting-item-name.required {
+    color: var(--text-error);
+}
+.form-input[required] {
+    color: var(--text-error);
+    border: 1px solid var(--text-error);
+}

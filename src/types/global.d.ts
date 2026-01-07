@@ -1,21 +1,21 @@
-export {}; // 使文件成为模块
+import { FormManager } from "modal/FormManager";
 
-import { ImageConverter } from "core/ImageConverter";
-import { MiniModule, ModParams } from "./pluto";
-
+export { }; // 使文件成为模块
 declare global {
-
   export interface Window {
     pluto: IPluto;
   }
+  export const pluto: IPluto;
 
   type PlutoProps = "dva" | "react" | "qa" | "templater" | "form";
   export interface IPluto {
     web: any;
-    images: ImageConverter;
+    images: any;
     third: Third;
     core: Core;
     helper: any;
+    form: FormManager;
+    skin: any;
   }
   export interface Third {
     assets: any;
@@ -39,7 +39,7 @@ declare global {
     op: any;
     api: any;
     codes: Map<string, any>;
-    
+
     get pluginId(): string;
     /**
      * 补丁组件，用于修改组件的行为
@@ -88,6 +88,39 @@ declare global {
      * 执行所有注册的组件
      */
     executeAll(): void;
+  }
+
+  // 定义模块的元数据接口
+  export interface MiniModule {
+    id: string;
+    name: string;
+    enabled: boolean;
+    bgColor?: string; // 用于存储随机渐变色
+    files: ModFile[]; // 直接在MiniModule中包含文件数组
+    bgUrl?: string; // 用于存储图片 URL
+  }
+  export interface ModFile {
+    name: string;
+    type: string;
+    content: string;
+    blobUrl?: string; // 用于存储图片 Blob URL
+  }
+  export interface ModParams {
+    module: MiniModule;
+    file: ModFile;
+    yaml?: any;
+    started: boolean;
+  }
+
+  // 定义插件设置接口
+  export interface PlutoSettings {
+    moduleStoragePath: string;
+    backupFolderName: string;
+    configPath: string;
+    usePako: boolean;
+    columns: number;
+    enableIcon: boolean;
+    quality: number;
   }
 }
 

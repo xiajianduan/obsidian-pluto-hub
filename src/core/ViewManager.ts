@@ -16,7 +16,7 @@ export class ViewManager {
     }
 
     preview(props: any) {
-        const file = window.pluto.helper.find_tfile(props.click);
+        const file = pluto.helper.find_tfile(props.click);
         const leaf = this.plugin.app.workspace.getLeaf("tab");
         leaf.setViewState({
             type: VIEW_TYPE_FILE,

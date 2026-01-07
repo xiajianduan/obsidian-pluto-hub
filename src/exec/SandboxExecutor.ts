@@ -1,4 +1,3 @@
-import { MiniModule, ModParams } from "types/pluto";
 import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
 
 export class SandboxExecutor extends SimpleCoreExecutor {
@@ -25,7 +24,7 @@ export class SandboxExecutor extends SimpleCoreExecutor {
         }, {});
         // 如果有模块导出结果，将其挂载到 pluto.modules
         if (Object.keys(object).length > 0) {
-            window.pluto.third.modules[module.name] = object;
+            pluto.third.modules[module.name] = object;
         }
     }
 
@@ -36,7 +35,7 @@ export class SandboxExecutor extends SimpleCoreExecutor {
         const exports = moduleExports;
 
         const context = {
-            pluto: window.pluto,
+            pluto,
             // 将模块信息暴露给脚本
             params: {
                 ...module,

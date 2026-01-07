@@ -1,7 +1,6 @@
 import { SimpleThirdComponent } from "third/SimpleThirdComponent";
 import { SandboxExecutor } from "./SandboxExecutor";
 import { CssExecutor } from "./CssExecutor";
-import { MiniModule } from "types/pluto";
 import { ImageExecutor } from "./ImageExecutor";
 import { JsonExecutor } from "./JsonExecutor";
 import { MarkdownExecutor } from "./MarkdownExecutor";
@@ -41,7 +40,7 @@ export class CoreManager {
             json: new Map(),
             images: new Map(),
         };
-        window.pluto.third.assets[module.name] = entry;
+        pluto.third.assets[module.name] = entry;
         // 1. 执行所有 CoreComponent
         Object.values(CoreManager.core).forEach(component => {
             component.execute(module, started);

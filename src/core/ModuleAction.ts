@@ -1,8 +1,7 @@
 import PlutoHubPlugin from "main";
 import { Notice } from "obsidian";
 import { ModStorage } from "storage";
-import { MiniModule } from "types/pluto";
-import { downloadImageToBase64, promptMessage } from "utils/helper";
+import { downloadImageToBase64 } from "utils/helper";
 import { t } from "utils/translation";
 
 export class ModuleAction {
@@ -21,7 +20,7 @@ export class ModuleAction {
     }
 
     async create() {
-        const name = await promptMessage(t('pluto.hub.module-name-prompt'));
+        const name = await pluto.form.prompt(t('pluto.hub.module-name-prompt'));
         if (!name || name.trim() === '') {
             new Notice(t('pluto.hub.validation.empty-module-name'));
             return;
@@ -39,7 +38,6 @@ export class ModuleAction {
         let moduleFiles: { name: string; type: string; content: string }[] = [{ name: 'main.js', type: 'js', content: 'new Notice(mod.name);' }];
 
         // 检查pluto.skin.path是否存在
-        const pluto = (window as any).pluto;
         if (this.plugin.settings.enableIcon && pluto.skin?.path) {
             const skinPath = pluto.skin.path;
             // 下载图片并转换为base64

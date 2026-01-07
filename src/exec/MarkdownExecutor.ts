@@ -1,4 +1,3 @@
-import { MiniModule } from "types/pluto";
 import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
 import { getFrontMatterInfo, parseYaml } from "obsidian";
 
@@ -18,7 +17,7 @@ export class MarkdownExecutor extends SimpleCoreExecutor {
                 const plutoLanguage = yaml['pluto-language'];
                 if (plutoLanguage) {
                     const prop = plutoLanguage as PlutoProps;
-                    window.pluto.third[prop].load({ module, file, yaml, started });
+                    pluto.third[prop].load({ module, file, yaml, started });
                 }
             } catch (e) {
                 console.error(`Error parsing YAML file ${file.name}:`, e);

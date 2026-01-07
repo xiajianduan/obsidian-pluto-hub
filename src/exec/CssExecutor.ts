@@ -1,4 +1,3 @@
-import { MiniModule } from "types/pluto";
 import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
 
 export class CssExecutor extends SimpleCoreExecutor {

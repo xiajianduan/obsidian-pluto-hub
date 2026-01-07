@@ -1,5 +1,3 @@
-import { ModParams } from "types/pluto";
-
 // 创建一个简单的ThirdComponent实现，用于其他插件
 export class SimpleThirdComponent implements ThirdComponent {
 
@@ -24,7 +22,7 @@ export class SimpleThirdComponent implements ThirdComponent {
         this.op = op;
         this.api = op.api;
         this.patch();
-        window.pluto.third[prop] = this;
+        pluto.third[prop] = this;
         console.log(`[Pluto Hub] ${prop} successfully bound to pluto.third.${prop}`);
         return this;
     }

@@ -1,7 +1,6 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
 import PlutoHubPlugin from "./main";
 import { t } from './utils/translation';
-import { PlutoSettings } from "types/pluto";
 
 // 默认设置：动态获取 configDir
 export const DEFAULT_SETTINGS: PlutoSettings  = {

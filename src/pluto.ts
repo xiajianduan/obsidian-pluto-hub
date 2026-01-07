@@ -7,6 +7,7 @@ import PlutoHubPlugin from "main";
 import { VIEW_TYPE_BOARD } from "view/PlutoBoardView";
 import { find_tfile } from "utils/helper";
 import { ViewManager } from "core/ViewManager";
+import { FormManager } from "modal/FormManager";
 
 export class Pluto implements IPluto {
     app: App;
@@ -18,6 +19,8 @@ export class Pluto implements IPluto {
     self: PlutoHubPlugin;
     helper: any;
     view: ViewManager;
+    form: any;
+    skin: any;
 
     constructor(plugin: PlutoHubPlugin) {
         this.app = plugin.app;
@@ -25,6 +28,7 @@ export class Pluto implements IPluto {
         this.self = plugin;
         window.pluto = this;
         this.view = new ViewManager();
+        this.form = new FormManager(this.app);
     }
 
     boot() {
@@ -58,7 +62,7 @@ export class Pluto implements IPluto {
     async bindPlugin(prop: PlutoProps) {
         // 尝试绑定的函数
         const tryBind = async () => {
-            const component : ThirdComponent = this.third[prop];
+            const component: ThirdComponent = this.third[prop];
             const op = this.app.plugins.plugins[component.pluginId];
             if (op) {
                 await sleep(1000); // 等待 1 秒，确保插件完全加载

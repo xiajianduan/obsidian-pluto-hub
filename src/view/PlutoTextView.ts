@@ -47,6 +47,6 @@ export class PlutoTextView extends ItemView {
             this.state.file, //文件路径，可选
             this //组件上下文
         );
-        // window.pluto.third.dva.api.renderValue(text, contentEl);
+        // pluto.third.dva.api.renderValue(text, contentEl);
     }
 } 

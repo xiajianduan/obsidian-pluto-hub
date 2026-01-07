@@ -1,6 +1,5 @@
 import PlutoHubPlugin from 'main';
 import * as pako from 'pako';
-import { MiniModule } from './types/pluto';
 import { base64ToBlobUrl, promptMessage } from 'utils/helper';
 
 export class ModStorage {

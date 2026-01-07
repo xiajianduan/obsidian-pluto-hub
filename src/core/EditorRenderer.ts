@@ -1,7 +1,6 @@
 import { MirrorRenderer } from "core/MirrorRenderer";
 import { ModuleAction } from "core/ModuleAction";
 import { ButtonComponent, Notice } from "obsidian";
-import { MiniModule, ModFile } from "types/pluto";
 import { base64ToBlob, isImageFile, promptMessage, readFileAsBase64, readFileAsText } from "utils/helper";
 import { t } from "utils/translation";
 import { EditorView } from '@codemirror/view';

@@ -1,4 +1,3 @@
-import { ModFile, ModParams } from "types/pluto";
 import { SimpleThirdComponent } from "./SimpleThirdComponent";
 
 export class ReactComponent extends SimpleThirdComponent {

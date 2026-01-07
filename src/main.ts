@@ -2,8 +2,7 @@ import { Plugin } from 'obsidian';
 import { ModStorage } from './storage';
 import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
-import { PlutoSettings } from 'types/pluto';
-import { Pluto } from 'pluto';
+import { Pluto } from './pluto';
 
 export default class PlutoHubPlugin extends Plugin {
 

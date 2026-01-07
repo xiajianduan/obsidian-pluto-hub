@@ -1,4 +1,3 @@
-
 // 创建一个简单的CoreExecutor实现，用于其他插件
 export class SimpleCoreExecutor implements CoreExecutor {
 

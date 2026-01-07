@@ -192,8 +192,7 @@ export class EditorRenderer {
 
             // 使用配置中的备份目录作为导出路径
             const backupFolder = this.plugin.settings.backupFolderName;
-            const configDir = this.plugin.app.vault.configDir;
-            const folder = `${configDir}/${backupFolder}/${mod.name}`;
+            const folder = `${backupFolder}/${mod.name}`;
             const adapter = this.plugin.app.vault.adapter;
 
             // 创建目录（如果不存在）

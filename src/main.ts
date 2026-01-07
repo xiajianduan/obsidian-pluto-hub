@@ -12,12 +12,24 @@ export default class PlutoHubPlugin extends Plugin {
     async onload() {
         await this.loadSettings();
         // 从存储路径加载所有模块
-        await ModStorage.loadAllModulesFromStorage(this);
+        await this.checkAndCreatePath();
+        await ModStorage.loadAllFromStorage(this);
         await this.initializePlugin();
         // 初始化 i18n 翻译函数
         this.i18n();
         // This adds a settings tab so the user can configure various aspects of the plugin
         this.addSettingTab(new PlutoSettingTab(this.app, this));
+    }
+
+    async checkAndCreatePath(): Promise<void> {
+        const storagePath = this.settings.moduleStoragePath;
+        if (!(await this.app.vault.adapter.exists(storagePath))) {
+            await this.app.vault.adapter.mkdir(storagePath);
+        }
+        const backupPath = this.settings.backupFolderName;
+        if (!(await this.app.vault.adapter.exists(backupPath))) {
+            await this.app.vault.adapter.mkdir(backupPath);
+        }
     }
 
     i18n() {

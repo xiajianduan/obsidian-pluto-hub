@@ -6,13 +6,12 @@ import { base64ToBlobUrl, promptMessage } from 'utils/helper';
 export class ModStorage {
     // 获取模块存储目录路径
     static getModulesDir(plugin: PlutoHubPlugin): string {
-        const configDir = plugin.app.vault.configDir;
-        return plugin.settings.moduleStoragePath || `${configDir}/cache/modules`;
+        return plugin.settings.moduleStoragePath;
     }
 
     // 获取单个模块的存储路径（使用模块名称作为文件名）
     static getModulePath(plugin: PlutoHubPlugin, moduleName: string): string {
-        const dir = this.getModulesDir(plugin);
+        const dir = plugin.settings.moduleStoragePath;;
         // 清理文件名，移除可能导致问题的字符，但允许中文字符
         const safeName = moduleName.replace(/[^a-zA-Z0-9_\u4e00-\u9fa5-]/g, '_');
         return `${dir}/${safeName}.ops`;
@@ -56,7 +55,7 @@ export class ModStorage {
 
     // 加载单个模块
     static async loadModule(plugin: PlutoHubPlugin, fileName: string): Promise<MiniModule> {
-        const modulesDir = this.getModulesDir(plugin);
+        const modulesDir = plugin.settings.moduleStoragePath;;
         const adapter = plugin.app.vault.adapter;
         // 检查fileName是否已经是完整路径
         const filePath = fileName.startsWith('/') || fileName.startsWith('.obsidian') 
@@ -97,7 +96,7 @@ export class ModStorage {
     // 全量备份：将所有模块（包括MiniModule和ModuleBundle）压缩为一个pako文件
     static async backupAllModules(plugin: PlutoHubPlugin, targetPath: string): Promise<void> {
         // 从存储中加载所有模块
-        const modules = await this.loadAllModulesFromStorage(plugin);
+        const modules = await this.loadAllFromStorage(plugin);
         // 压缩并导出
         const jsonStr = JSON.stringify(modules);
         const binary = pako.deflate(jsonStr);
@@ -113,8 +112,8 @@ export class ModStorage {
     }
 
     // 从存储路径读取所有模块
-    static async loadAllModulesFromStorage(plugin: PlutoHubPlugin): Promise<MiniModule[]> {
-        const modulesDir = this.getModulesDir(plugin);
+    static async loadAllFromStorage(plugin: PlutoHubPlugin): Promise<MiniModule[]> {
+        const modulesDir = plugin.settings.moduleStoragePath;
         const adapter = plugin.app.vault.adapter;
         
         // 获取目录下的所有文件

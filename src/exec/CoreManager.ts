@@ -54,7 +54,7 @@ export class CoreManager {
         document.querySelectorAll('[id^="pluto-css-"]').forEach(el => el.remove());
 
         // 从存储中加载所有模块
-        const modules = await ModStorage.loadAllModulesFromStorage(plugin);
+        const modules = await ModStorage.loadAllFromStorage(plugin);
 
         for (const mod of modules) {
             if (mod.enabled) {

@@ -231,8 +231,7 @@ export class BoardRenderer {
             if (result) {
                 // 使用配置中的备份目录
                 const backupFolder = this.plugin.settings.backupFolderName;
-                const configDir = this.plugin.app.vault.configDir;
-                const backupFile = `${configDir}/${backupFolder}/${result}.ops`;
+                const backupFile = `${backupFolder}/${result}.ops`;
                 await ModStorage.backupAllModules(this.plugin, backupFile);
                 new Notice(t('pluto.hub.export.all-success'));
             }

@@ -14,8 +14,16 @@
 - 优化了文件视图和文本视图的功能
 
 ### Files Modified
-- `src/core/BoardRenderer.ts` - 优化了看板渲染器
+- `src/core/BoardRenderer.ts` - 优化了看板渲染器和导出路径处理
+- `src/core/EditorRenderer.ts` - 优化了导出路径处理
+- `src/core/ModuleAction.ts` - 方法重命名
+- `src/exec/CoreManager.ts` - 方法调用更新
+- `src/i18n/en.ts` - 更新了国际化字符串
+- `src/i18n/zh-cn.ts` - 更新了国际化字符串
+- `src/main.ts` - 添加了路径检查方法
 - `src/pluto.ts` - 实现了FormModal动态表单模态框，支持openForm方法
+- `src/settings.ts` - 更新了默认设置和UI
+- `src/storage.ts` - 优化了路径处理和方法重命名
 - `src/third/SimpleThirdComponent.ts` - 优化了简单第三方组件
 - `src/types/global.d.ts` - 更新了全局类型定义
 - `src/types/obsidian.d.ts` - 更新了Obsidian相关类型定义

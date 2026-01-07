@@ -17,7 +17,7 @@ export class ModuleAction {
      * 加载所有模块的辅助方法，避免重复调用ModStorage.loadAllModulesFromStorage
      */
     async loadAll(): Promise<MiniModule[]> {
-        return await ModStorage.loadAllModulesFromStorage(this.plugin);
+        return await ModStorage.loadAllFromStorage(this.plugin);
     }
 
     async create() {

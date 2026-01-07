@@ -1,4 +1,4 @@
-import { ModFile, ModParams } from "types/pluto";
+import { ModParams } from "types/pluto";
 
 // 创建一个简单的ThirdComponent实现，用于其他插件
 export class SimpleThirdComponent implements ThirdComponent {

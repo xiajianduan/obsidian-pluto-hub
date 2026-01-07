@@ -1,10 +1,12 @@
 import { CoreManager } from "exec/CoreManager";
-import { App, normalizePath, TFile } from "obsidian";
+import { App } from "obsidian";
 import { ThirdFactory } from "third/ThirdFactory";
 import * as obsidian from "obsidian";
 import { ImageConverter } from "core/ImageConverter";
 import PlutoHubPlugin from "main";
-import { VIEW_TYPE_BOARD, PlutoBoardView } from "view/PlutoBoardView";
+import { VIEW_TYPE_BOARD } from "view/PlutoBoardView";
+import { find_tfile } from "utils/helper";
+import { ViewManager } from "core/ViewManager";
 
 export class Pluto implements IPluto {
     app: App;
@@ -15,26 +17,28 @@ export class Pluto implements IPluto {
     third: Third;
     self: PlutoHubPlugin;
     helper: any;
+    view: ViewManager;
 
     constructor(plugin: PlutoHubPlugin) {
         this.app = plugin.app;
         this.config = {};
         this.self = plugin;
         window.pluto = this;
+        this.view = new ViewManager();
     }
 
     boot() {
         const settings = this.self.settings;
         this.images = new ImageConverter(this.app);
         this.helper = {
-            find_tfile: this.find_tfile.bind(this, this.app),
+            find_tfile: find_tfile.bind(this, this.app),
             obsidian,
         };
         this.core = CoreManager.createCoreExecutor(settings.configPath);
         this.third = ThirdFactory.createThirdComponent(settings.configPath);
         const plugin = this.self;
-        // 注册 PlutoBoardView 视图
-        plugin.registerView(VIEW_TYPE_BOARD, (leaf) => new PlutoBoardView(leaf, plugin));
+        // 注册视图
+        this.view.build(plugin);
         // 在布局准备就绪时加载所有模块
         plugin.app.workspace.onLayoutReady(async () => {
             await CoreManager.runAllEnabled(plugin);
@@ -58,7 +62,7 @@ export class Pluto implements IPluto {
             const op = this.app.plugins.plugins[component.pluginId];
             if (op) {
                 await sleep(1000); // 等待 1 秒，确保插件完全加载
-                await component.bind(op, prop).executeAll();
+                component.bind(op, prop).executeAll();
                 return true;
             }
             return false;
@@ -72,16 +76,10 @@ export class Pluto implements IPluto {
             if (await tryBind()) {
                 clearInterval(timer); // 绑定成功后停止轮询
             }
-        }, 1000);
+        }, 3000);
 
         // 设置一个超时保护，防止无限轮询（30 秒后停止）
         setTimeout(() => clearInterval(timer), 30000);
-    }
-
-
-    find_tfile(app: App, name: string): TFile | null {
-        const normalizedName = normalizePath(name);
-        return app.metadataCache.getFirstLinkpathDest(normalizedName, "");
     }
 
     async importJs(path: string) {

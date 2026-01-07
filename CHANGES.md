@@ -1,5 +1,26 @@
 # Changes Log
 
+## [1.1.5] - 2026-01-07
+
+### Added
+- `src/core/ViewManager.ts` - 新增了视图管理器，优化视图系统
+- `src/view/FormModal.ts` - 实现了动态表单模态框，支持openForm方法
+- `src/view/PlutoFileView.ts` - 重命名自PlutoHomeView.ts，优化文件视图
+- `src/view/PlutoTextView.ts` - 新增了文本视图
+
+### Improved
+- 重构了视图系统，优化了视图管理逻辑
+- 增强了动态表单支持，提供了更灵活的表单创建方式
+- 优化了文件视图和文本视图的功能
+
+### Files Modified
+- `src/core/BoardRenderer.ts` - 优化了看板渲染器
+- `src/pluto.ts` - 实现了FormModal动态表单模态框，支持openForm方法
+- `src/third/SimpleThirdComponent.ts` - 优化了简单第三方组件
+- `src/types/global.d.ts` - 更新了全局类型定义
+- `src/types/obsidian.d.ts` - 更新了Obsidian相关类型定义
+- `src/utils/helper.ts` - 新增了辅助工具函数
+
 ## [1.1.4] - 2026-01-06
 
 ### Fixed

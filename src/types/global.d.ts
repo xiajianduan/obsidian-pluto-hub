@@ -15,6 +15,7 @@ declare global {
     images: ImageConverter;
     third: Third;
     core: Core;
+    helper: any;
   }
   export interface Third {
     assets: any;

@@ -10,11 +10,14 @@ declare module 'obsidian' {
     interface ViewStateResult {
         layout: any;
     }
+
     interface MarkdownView {
-        headerEl: any;
         inlineTitleEl: any;
-        canDropAnywhere: boolean;
         loadFileInternal(e: any, t: any): Promise<void>;
+    }
+    interface ItemView {
+        headerEl: any;
+        canDropAnywhere: boolean;
     }
     interface MarkdownPreviewView {
         renderer: any;

@@ -1,8 +1,8 @@
 import { MarkdownView, WorkspaceLeaf, ViewStateResult } from "obsidian";
 
-export const VIEW_TYPE_HOME = "pluto-home-view";
+export const VIEW_TYPE_FILE = "home-view";//pluto-file-view
 
-export class PlutoHomeView extends MarkdownView {
+export class PlutoFileView extends MarkdownView {
 
     state: Record<string, any>;
 
@@ -19,7 +19,7 @@ export class PlutoHomeView extends MarkdownView {
     }
 
     getViewType() {
-        return VIEW_TYPE_HOME;
+        return VIEW_TYPE_FILE;
     }
 
     getDisplayText() {
@@ -39,6 +39,6 @@ export class PlutoHomeView extends MarkdownView {
 
     async loadFileInternal(e: any, t: any) {
         super.loadFileInternal(e, t);
-        this.previewMode.renderer.previewEl.addClass(VIEW_TYPE_HOME);
+        this.previewMode.renderer.previewEl.addClass(VIEW_TYPE_FILE);
     }
 } 

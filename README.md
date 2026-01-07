@@ -163,12 +163,32 @@ Pluto Hub 会自动映射常用的第三方插件：
 ### 项目结构
 ```
 src/
-├── main.ts          # 插件主入口
-├── view.ts          # 视图组件
-├── storage.ts       # 存储管理
-├── settings.ts      # 设置管理
-├── types/           # TypeScript 类型定义
-└── utils/           # 工具函数
+├── main.ts             # 插件主入口
+├── pluto.ts            # Pluto 核心功能
+├── core/               # 核心模块
+│   ├── BoardRenderer.ts   # 看板渲染器
+│   ├── EditorRenderer.ts  # 编辑器渲染器
+│   ├── MirrorRenderer.ts  # 镜像渲染器
+│   ├── ModuleAction.ts    # 模块操作管理器
+│   ├── ViewResolver.ts    # 视图解析器
+│   └── ViewManager.ts     # 视图管理器
+├── exec/               # 执行器
+│   ├── CoreManager.ts     # 核心管理器
+│   ├── CssExecutor.ts     # CSS 执行器
+│   ├── ImageExecutor.ts   # 图片执行器
+│   ├── JsonExecutor.ts    # JSON 执行器
+│   ├── MarkdownExecutor.ts # Markdown 执行器
+│   ├── SandboxExecutor.ts # 沙箱执行器
+│   └── SimpleCoreExecutor.ts # 简单核心执行器
+├── i18n/               # 国际化
+├── third/              # 第三方组件
+├── types/              # TypeScript 类型定义
+├── utils/              # 工具函数
+└── view/               # 视图组件
+    ├── FormModal.ts       # 动态表单模态框
+    ├── PlutoBoardView.ts  # 看板视图
+    ├── PlutoFileView.ts   # 文件视图
+    └── PlutoTextView.ts   # 文本视图
 ```
 
 ### 核心 API

@@ -1,3 +1,5 @@
+import { App, normalizePath, TFile } from "obsidian";
+
 /**
  * 判断文件是否为图片类型
  */
@@ -101,4 +103,9 @@ export async function promptMessage(message: any, holder?: any): Promise<string 
             resolve(input);
         }
     });
+}
+
+export function find_tfile(app: App, name: string): TFile | null {
+    const normalizedName = normalizePath(name);
+    return app.metadataCache.getFirstLinkpathDest(normalizedName, "");
 }

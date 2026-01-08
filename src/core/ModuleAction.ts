@@ -19,13 +19,7 @@ export class ModuleAction {
         return await ModStorage.loadAllFromStorage(this.plugin);
     }
 
-    async create() {
-        const name = await pluto.form.prompt(t('pluto.hub.module-name-prompt'));
-        if (!name || name.trim() === '') {
-            new Notice(t('pluto.hub.validation.empty-module-name'));
-            return;
-        }
-
+    async create(name: string) {
         // 检查模块名是否已存在
         const allModules = await this.loadAll();
         if (allModules.some(mod => mod.name.toLowerCase() === name.trim().toLowerCase())) {
@@ -35,7 +29,7 @@ export class ModuleAction {
 
         const newId = Date.now().toString();
         let bgColor = ModStorage.generateRandomGradient();
-        let moduleFiles: { name: string; type: string; content: string }[] = [{ name: 'main.js', type: 'js', content: 'new Notice(mod.name);' }];
+        let moduleFiles: { name: string; type: string; content: string }[] = [{ name: 'main.js', type: 'js', content: 'new Notice(params.name);' }];
 
         // 检查pluto.skin.path是否存在
         if (this.plugin.settings.enableIcon && pluto.skin?.path) {

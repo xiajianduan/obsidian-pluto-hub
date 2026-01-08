@@ -93,10 +93,10 @@ export class Pluto implements IPluto {
     }
 
     getModule(name: string) {
-        return (window as any).pluto.third.modules[name];
+        return this.third.modules[name];
     }
     registerModule(name: string, exports: any): void {
-        (window as any).pluto.third.modules[name] = exports;
+        this.third.modules[name] = exports;
     }
 
     static async activateView(app: App) {

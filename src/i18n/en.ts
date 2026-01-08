@@ -10,10 +10,6 @@ export default {
 	'pluto.hub.settings.module-storage': 'Module Storage & Display',
 	'pluto.hub.settings.storage-path': 'Storage Path',
 	'pluto.hub.settings.storage-path-desc': 'Location where module files are stored (recommended to keep in .obsidian directory to hide)',
-	'pluto.hub.settings.enable-pako': 'Enable Pako Compression',
-	'pluto.hub.settings.enable-pako-desc': 'When enabled, code will be stored in binary compressed format, saving space and preventing accidental deletion',
-	'pluto.hub.settings.columns': 'Store Columns',
-	'pluto.hub.settings.columns-desc': 'Number of modules displayed per row in Dashboard view',
 	'pluto.hub.settings.backup-path': 'Backup Path',
 	'pluto.hub.settings.backup-path-desc': 'Folder path for manual backup or automatic export of modules',
 	'pluto.hub.settings.config-path': 'Config Path',
@@ -44,8 +40,7 @@ export default {
 	'pluto.hub.editor.cannot-delete-last-file': 'Cannot delete the last file!',
 	'pluto.hub.editor.confirm-delete-file': 'Are you sure you want to delete {filename}?',
 	'pluto.hub.editor.module-saved': 'Module bundle saved',
-	'pluto.hub.export.all-title': 'Export All Modules',
-	'pluto.hub.export.all-default-filename': 'backup.ops',
+	'pluto.hub.export.all-label': 'Export Filename',
 	'pluto.hub.export.all-success': 'All modules exported successfully',
 	'pluto.hub.export.all-failure': 'Failed to export modules',
 	'pluto.hub.export.module-title': 'Export Module',
@@ -60,6 +55,5 @@ export default {
 	'pluto.hub.validation.empty-file-name': 'File name cannot be empty',
 	'pluto.hub.validation.duplicate-file-name': 'File already exists',
 	'pluto.hub.validation.invalid-file-name': 'Invalid file name',
-	'pluto.hub.validation.empty-module-name': 'Module name cannot be empty',
 	'pluto.hub.validation.duplicate-module-name': 'Module already exists'
 };

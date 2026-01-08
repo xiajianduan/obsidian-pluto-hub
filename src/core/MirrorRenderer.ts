@@ -12,8 +12,8 @@ export class MirrorRenderer {
 
     currentEditor: EditorView | null = null;
 
-    constructor(currentEditor: EditorView | null = null) {
-        this.currentEditor = currentEditor;
+    constructor() {
+
     }
 
     // 渲染 CodeMirror 6 编辑器或图片预览
@@ -139,5 +139,20 @@ export class MirrorRenderer {
             state: startState,
             parent: containerEl
         });
+    }
+    /**
+     * 获取当前编辑器的文档内容
+     * @returns 文档内容字符串
+     */
+    getContent(): string | null {
+        if (!this.currentEditor) return null;
+        return this.currentEditor.state.doc.toString();
+    }
+    /**
+     * 销毁当前编辑器实例
+     */
+    destroy() {
+        this.currentEditor?.destroy();
+        this.currentEditor = null;
     }
 }

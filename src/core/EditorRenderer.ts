@@ -3,7 +3,6 @@ import { ModuleAction } from "core/ModuleAction";
 import { ButtonComponent, Notice } from "obsidian";
 import { base64ToBlob, isImageFile, promptMessage, readFileAsBase64, readFileAsText } from "utils/helper";
 import { t } from "utils/translation";
-import { EditorView } from '@codemirror/view';
 import PlutoHubPlugin from "main";
 import { ViewResolver } from "./ViewResolver";
 
@@ -13,55 +12,50 @@ export class EditorRenderer {
 
     state: Record<string, any>;
     mirrorRenderer: MirrorRenderer;
-    currentEditor: EditorView | null = null;
-    currentFileIndex: number = 0;
     plugin: PlutoHubPlugin;
     resolver: ViewResolver;
     moduleAction: ModuleAction;
+    contentEl: HTMLElement;
+    currentFileIndex: number = 0;
+    currentModId: string;
 
     constructor(resolver: ViewResolver) {
         this.resolver = resolver;
         this.mirrorRenderer = new MirrorRenderer();
         this.plugin = resolver.plugin;
         this.moduleAction = resolver.moduleAction;
+        this.contentEl = resolver.contentEl;
     }
 
     // --- 2. 编辑器界面 (基于 ModuleBundle 内容) ---
     /**
      * 渲染编辑器界面，包括文件侧边栏和代码编辑器
      */
-    async render(el: HTMLElement) {
-        if (!this.resolver.currentModId) return;
+    async render() {
+        if (!this.currentModId) return;
 
         // 从存储中加载所有模块，查找当前模块
         const allModules = await this.moduleAction.loadAll();
-        const module = allModules.find(m => m.id === this.resolver.currentModId);
+        const module = allModules.find(m => m.id === this.currentModId);
         if (!module) return;
 
         // 1. 创建导航栏
-        const nav = el.createDiv({ cls: 'pluto-editor-nav' });
+        const nav = this.contentEl.createDiv({ cls: 'pluto-editor-nav' });
 
         // 返回按钮
         new ButtonComponent(nav)
             .setIcon("arrow-left")
             .setTooltip(t('pluto.hub.editor.back-to-dashboard'))
             .onClick(() => {
-                this.resolver.isEditing = false;
-                this.currentEditor?.destroy();
-                this.currentEditor = null;
-                this.resolver.render();
+                this.mirrorRenderer.destroy();
+                this.resolver.borad();
             });
 
         // 模块名称（居中）
         nav.createEl('h3', { text: module.name, cls: 'editor-title centered-title' });
 
-        // 如果没有文件，创建一个默认的 main.js
-        if (module.files.length === 0) {
-            module.files.push({ name: 'main.js', type: 'js', content: 'new Notice(mod.name);' });
-        }
-
         // 3. 渲染编辑器布局
-        const editorLayout = el.createDiv({ cls: 'pluto-editor-layout' });
+        const editorLayout = this.contentEl.createDiv({ cls: 'pluto-editor-layout' });
 
         // 文件侧边栏
         const fileSidebar = editorLayout.createDiv({ cls: 'pluto-file-sidebar' });
@@ -109,7 +103,7 @@ export class EditorRenderer {
         new ButtonComponent(nav)
             .setButtonText(t('pluto.hub.editor.import-file'))
             .setClass("btn_nob")
-            .onClick(() => this.importFile(module, editorContainer, el));
+            .onClick(() => this.importFile(module, editorContainer, this.contentEl));
 
         // 导出文件按钮（移到导航栏）
         new ButtonComponent(nav)
@@ -123,14 +117,9 @@ export class EditorRenderer {
             .setClass("btn_nob")
             .setCta()
             .onClick(async () => {
-                try {
-                    // 保存当前文件内容
-                    this.saveCurrentEditorContent(module);
-                    await this.moduleAction.save(module);
-                } finally {
-                    // 确保按钮状态重置
-                    (saveBtn.buttonEl as any).isLoading = false;
-                }
+                // 保存当前文件内容
+                this.saveCurrentEditorContent(module);
+                await this.moduleAction.save(module);
             });
 
         // 删除按钮（移到导航栏）
@@ -141,10 +130,8 @@ export class EditorRenderer {
             .onClick(async () => {
                 if (confirm(`Delete ${module.name}? This cannot be undone.`)) {
                     await this.moduleAction.delete(module.id);
-                    this.resolver.isEditing = false;
-                    this.currentEditor?.destroy();
-                    this.currentEditor = null;
-                    this.resolver.render();
+                    this.mirrorRenderer.destroy();
+                    this.resolver.borad();
                 }
             });
 
@@ -161,14 +148,11 @@ export class EditorRenderer {
 
     /**
      * 获取当前选中的文件
-     * @param bundle MiniModule对象
+     * @param module MiniModule对象
      * @returns 当前选中的文件或null
      */
-    getCurrentFile(bundle: MiniModule): ModFile | null {
-        if (this.currentFileIndex < 0 || this.currentFileIndex >= bundle.files.length) {
-            return null;
-        }
-        return bundle.files[this.currentFileIndex] || null;
+    getCurrentFile(module: MiniModule): ModFile {
+        return module.files[this.currentFileIndex]!;
     }
 
     /**
@@ -176,8 +160,9 @@ export class EditorRenderer {
      */
     saveCurrentEditorContent(bundle: MiniModule): void {
         const currentFile = this.getCurrentFile(bundle);
-        if (this.currentEditor && currentFile) {
-            currentFile.content = this.currentEditor.state.doc.toString();
+        const content = this.mirrorRenderer.getContent();
+        if (content !== null) {
+            currentFile.content = content;
         }
     }
 
@@ -212,10 +197,7 @@ export class EditorRenderer {
             }
 
             // 保存当前文件内容
-            const currentFile = this.getCurrentFile(module);
-            if (this.currentEditor && currentFile) {
-                currentFile.content = this.currentEditor.state.doc.toString();
-            }
+            this.saveCurrentEditorContent(module);
 
             // 导出每个文件
             for (const file of module.files) {
@@ -277,18 +259,13 @@ export class EditorRenderer {
             // 文件点击事件（绑定到整个item元素）
             item.onclick = async () => {
                 // 保存当前文件内容
-                const currentFile = this.getCurrentFile(module);
-                if (this.currentEditor && currentFile) {
-                    currentFile.content = this.currentEditor.state.doc.toString();
-                }
-
+                this.saveCurrentEditorContent(module);
                 // 切换文件
                 this.currentFileIndex = index;
                 this.renderFileSidebar(sidebarEl, module, editorContainer);
 
                 // 重新渲染编辑器
-                this.currentEditor?.destroy();
-                this.currentEditor = null; // 清除当前编辑器引用，避免影响图片预览
+                this.mirrorRenderer.destroy();
                 this.mirrorRenderer.render(editorContainer, file);
             };
 
@@ -308,10 +285,7 @@ export class EditorRenderer {
                 }
 
                 // 保存当前文件内容
-                const currentFile = this.getCurrentFile(module);
-                if (this.currentEditor && currentFile) {
-                    currentFile.content = this.currentEditor.state.doc.toString();
-                }
+                this.saveCurrentEditorContent(module);
 
                 // 删除文件
                 module.files.splice(index, 1);
@@ -325,7 +299,7 @@ export class EditorRenderer {
                 this.renderFileSidebar(sidebarEl, module, editorContainer);
 
                 // 重新渲染编辑器
-                this.currentEditor?.destroy();
+                this.mirrorRenderer.destroy();
                 const fileToRender = module.files[this.currentFileIndex];
                 if (fileToRender) {
                     this.mirrorRenderer.render(editorContainer, fileToRender);
@@ -407,7 +381,7 @@ export class EditorRenderer {
                     this.renderFileSidebar(el.querySelector('.pluto-file-sidebar')!, bundle, editorContainer);
 
                     // 重新渲染编辑器并选中最后导入的文件
-                    this.currentEditor?.destroy();
+                    this.mirrorRenderer.destroy();
                     const lastFile = bundle.files[this.currentFileIndex];
                     if (lastFile) {
                         this.mirrorRenderer.render(editorContainer, lastFile);

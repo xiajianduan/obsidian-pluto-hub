@@ -8,13 +8,9 @@ export class JsonExecutor extends SimpleCoreExecutor {
         
     execute(module: MiniModule, started: boolean): void {
         module.files.filter(f => this.excutable(f.type)).forEach(file => {
-            try {
-                const config = JSON.parse(file.content);
-                // 将配置挂载到 pluto.assets[模块名]
-                pluto.third.assets[module.name].json.set(file.name, config);
-            } catch (e) {
-                console.error(`Error parsing JSON file ${file.name}:`, e);
-            }
+            const config = JSON.parse(file.content);
+            // 将配置挂载到 pluto.assets[模块名]
+            pluto.third.assets[module.name].json.set(file.name, config);
         });
     }
 }

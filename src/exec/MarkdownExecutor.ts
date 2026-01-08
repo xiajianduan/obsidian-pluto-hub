@@ -9,18 +9,14 @@ export class MarkdownExecutor extends SimpleCoreExecutor {
 
     execute(module: MiniModule, started: boolean): void {
         module.files.filter(f => this.excutable(f.type)).forEach(file => {
-            try {
-                const info = getFrontMatterInfo(file.content);
-                const frontmatter = info.frontmatter;
-                if (!frontmatter) return;
-                const yaml = parseYaml(frontmatter);
-                const plutoLanguage = yaml['pluto-language'];
-                if (plutoLanguage) {
-                    const prop = plutoLanguage as PlutoProps;
-                    pluto.third[prop].load({ module, file, yaml, started });
-                }
-            } catch (e) {
-                console.error(`Error parsing YAML file ${file.name}:`, e);
+            const info = getFrontMatterInfo(file.content);
+            const frontmatter = info.frontmatter;
+            if (!frontmatter) return;
+            const yaml = parseYaml(frontmatter);
+            const plutoLanguage = yaml['pluto-language'];
+            if (plutoLanguage) {
+                const prop = plutoLanguage as PlutoProps;
+                pluto.third[prop].load({ module, file, yaml, started });
             }
         });
     }

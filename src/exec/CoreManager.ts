@@ -6,6 +6,7 @@ import { JsonExecutor } from "./JsonExecutor";
 import { MarkdownExecutor } from "./MarkdownExecutor";
 import { ModStorage } from "storage";
 import PlutoHubPlugin from "main";
+import { Notice } from "obsidian";
 
 
 // CoreComponent工厂类，用于根据prop创建相应的组件实例
@@ -41,10 +42,15 @@ export class CoreManager {
             images: new Map(),
         };
         pluto.third.assets[module.name] = entry;
-        // 1. 执行所有 CoreComponent
-        Object.values(CoreManager.core).forEach(component => {
-            component.execute(module, started);
-        });
+        try {
+            Object.values(CoreManager.core).forEach(component => {
+                component.execute(module, started);
+            });
+        } catch (e: any) {
+            new Notice(e.message);
+            console.info(`%c[Pluto Hub] ${e.message}`, 'color: red');
+        }
+
     }
 
     // 运行所有启用的模块
@@ -57,11 +63,7 @@ export class CoreManager {
 
         for (const mod of modules) {
             if (mod.enabled) {
-                try {
-                    CoreManager.runBundle(mod, false);
-                } catch (e) {
-                    console.error(`[Pluto Hub] Failed to load module ${mod.name}:`, e);
-                }
+                CoreManager.runBundle(mod, false);
             }
         }
     }

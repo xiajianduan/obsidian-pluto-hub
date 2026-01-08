@@ -22,7 +22,7 @@ export class PlutoBoardView extends ItemView {
     getDisplayText() { return t('pluto.hub.display-text'); }
     getIcon() { return "layout-grid"; }
 
-    async onOpen() { this.resolver.render(); }
+    async onOpen() { this.resolver.borad(); }
 
 
 }

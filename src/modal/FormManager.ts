@@ -1,6 +1,6 @@
 import { FormModalConfig, FormValues } from "types/form";
 import { PlutoFormModal } from "modal/PlutoFormModal";
-import { App, Notice } from "obsidian";
+import { App } from "obsidian";
 
 export class FormManager {
 
@@ -10,12 +10,14 @@ export class FormManager {
         this.app = app;
     }
 
-    async prompt(name: string, title: string = 'Pluto Form'): Promise<string> {
+    async prompt(name: string, required: boolean = true, title: string = ''): Promise<string> {
         const values = await this.openJson({
-            title, fields: [{
+                title,
+                fields: [{
                 input: { type: 'text', hidden: false },
                 name: "name",
-                label: name
+                label: name,
+                required
             }]
         }, {});
         return values["name"] as string;
@@ -25,8 +27,9 @@ export class FormManager {
         return new Promise((resolve, reject) => {
             new PlutoFormModal(this.app, config, defaultValues, (values) => {
                 console.log('表单提交值:', values);
-                new Notice(`✅ 表单提交成功: ${JSON.stringify(values)}`);
                 resolve(values);
+            }, () => {
+                reject({type: 'cancel', message: '用户取消了操作'});
             }).open();
         });
     }
@@ -35,8 +38,9 @@ export class FormManager {
         return new Promise((resolve, reject) => {
             new PlutoFormModal(this.app, config, defaultValues, (values) => {
                 console.log('表单提交值:', values);
-                new Notice(`✅ 表单提交成功: ${JSON.stringify(values)}`);
                 resolve(values);
+            }, () => {
+                reject({type: 'cancel', message: '用户取消了操作'});
             }).open();
         });
     }

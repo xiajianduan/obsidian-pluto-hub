@@ -37,36 +37,26 @@ export class ModStorage {
     // 保存单个模块
     static async saveModule(plugin: PlutoHubPlugin, module: MiniModule): Promise<void> {
         const path = this.getModulePath(plugin, module.name);
-        const adapter = plugin.app.vault.adapter;
-        const dir = path.substring(0, path.lastIndexOf('/'));
-
-        if (!(await adapter.exists(dir))) await adapter.mkdir(dir);
         // 移除bgUrl字段，因为它不应该被序列化
         delete module.bgUrl;
         // 移除files数组中的blobUrl字段，因为它不应该被序列化
         module.files.filter(f => f.blobUrl).forEach(file => delete file.blobUrl);
         const jsonStr = JSON.stringify(module);
-        const binary = plugin.settings.usePako 
-            ? pako.deflate(jsonStr) 
-            : new TextEncoder().encode(jsonStr);
-        await adapter.writeBinary(path, binary.buffer);
+        const binary = pako.deflate(jsonStr);
+        await plugin.app.vault.adapter.writeBinary(path, binary.buffer);
     }
 
     // 加载单个模块
     static async loadModule(plugin: PlutoHubPlugin, fileName: string): Promise<MiniModule> {
-        const modulesDir = plugin.settings.moduleStoragePath;;
-        const adapter = plugin.app.vault.adapter;
+        const modulesDir = plugin.settings.moduleStoragePath;
         // 检查fileName是否已经是完整路径
         const filePath = fileName.startsWith('/') || fileName.startsWith('.obsidian') 
                 ? fileName
                 : `${modulesDir}/${fileName}.ops`;
         try {
-            const buffer = await adapter.readBinary(filePath);
+            const buffer = await plugin.app.vault.adapter.readBinary(filePath);
             const uint8 = new Uint8Array(buffer);
-            const jsonStr = plugin.settings.usePako 
-                ? pako.inflate(uint8, { to: 'string' }) 
-                : new TextDecoder().decode(uint8);
-            
+            const jsonStr = pako.inflate(uint8, { to: 'string' });
             const module = JSON.parse(jsonStr);
             
             // 只有当enableIcon为true时才检查logo.webp文件
@@ -141,13 +131,6 @@ export class ModStorage {
         if (data.id && data.files) {
             // 单个模块导入
             const module = data as MiniModule;
-            
-            // 优先使用 QuickAdd 的 inputPrompt 方法获取模块名称
-            const moduleName = await promptMessage("请输入模块名称:", module.id);
-            
-            // 如果用户取消了输入，直接返回
-            if (!moduleName) return;
-            
             // 保存ModuleBundle到磁盘
             await this.saveModule(plugin, module);
         } else if (data.length) {

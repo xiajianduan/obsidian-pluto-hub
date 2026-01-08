@@ -11,10 +11,6 @@ export default {
 	'pluto.hub.settings.module-storage': '模块存储与显示',
 	'pluto.hub.settings.storage-path': '存储路径',
 	'pluto.hub.settings.storage-path-desc': '模块文件存储在中的位置(建议保留在.obsidian目录下以隐藏)',
-	'pluto.hub.settings.enable-pako': '启用 Pako 压缩',
-	'pluto.hub.settings.enable-pako-desc': '开启后，代码将以二进制压缩格式存储，节省空间并防止直接误删',
-	'pluto.hub.settings.columns': '商店列数',
-	'pluto.hub.settings.columns-desc': 'Dashboard 界面每行显示的模块个数',
 	'pluto.hub.settings.backup-path': '备份路径',
 	'pluto.hub.settings.backup-path-desc': '手动备份或自动导出模块的文件夹路径',
 	'pluto.hub.settings.config-path': '配置路径',
@@ -44,8 +40,7 @@ export default {
 	'pluto.hub.editor.cannot-delete-last-file': '不能删除最后一个文件！',
 	'pluto.hub.editor.confirm-delete-file': '确定要删除 {filename} 吗？',
 	'pluto.hub.editor.module-saved': '模块已保存',
-	'pluto.hub.export.all-title': '导出所有模块',
-	'pluto.hub.export.all-default-filename': 'backup.ops',
+	'pluto.hub.export.all-label': '导出文件名',
 	'pluto.hub.export.all-success': '所有模块导出成功',
 	'pluto.hub.export.all-failure': '导出模块失败',
 	'pluto.hub.export.module-title': '导出模块',
@@ -60,6 +55,5 @@ export default {
 	'pluto.hub.validation.empty-file-name': '文件名不能为空',
 	'pluto.hub.validation.duplicate-file-name': '文件已存在',
 	'pluto.hub.validation.invalid-file-name': '无效的文件名',
-	'pluto.hub.validation.empty-module-name': '模块名不能为空',
 	'pluto.hub.validation.duplicate-module-name': '模块已存在'
 };

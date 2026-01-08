@@ -7,8 +7,6 @@ export const DEFAULT_SETTINGS: PlutoSettings  = {
     moduleStoragePath: `.obsidian/cache/modules`,
 	backupFolderName: '.obsidian/cache/backups',
     configPath: 'config',
-    usePako: true,
-    columns: 5,
     enableIcon: true,
     quality: 90,
 };
@@ -35,28 +33,6 @@ export class PlutoSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.moduleStoragePath)
                 .onChange(async (value) => {
                     this.plugin.settings.moduleStoragePath = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        new Setting(containerEl)
-            .setName(t('pluto.hub.settings.enable-pako'))
-            .setDesc(t('pluto.hub.settings.enable-pako-desc'))
-            .addToggle(toggle => toggle
-                .setValue(this.plugin.settings.usePako)
-                .onChange(async (value) => {
-                    this.plugin.settings.usePako = value;
-                    await this.plugin.saveSettings();
-                }));
-
-        new Setting(containerEl)
-            .setName(t('pluto.hub.settings.columns'))
-            .setDesc(t('pluto.hub.settings.columns-desc'))
-            .addSlider(slider => slider
-                .setLimits(1, 6, 1)
-                .setValue(this.plugin.settings.columns)
-                .setDynamicTooltip()
-                .onChange(async (value) => {
-                    this.plugin.settings.columns = value;
                     await this.plugin.saveSettings();
                 }));
 		

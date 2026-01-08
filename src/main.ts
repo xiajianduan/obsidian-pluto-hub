@@ -29,6 +29,10 @@ export default class PlutoHubPlugin extends Plugin {
         if (!(await this.app.vault.adapter.exists(backupPath))) {
             await this.app.vault.adapter.mkdir(backupPath);
         }
+        const configPath = this.settings.configPath;
+        if (!(await this.app.vault.adapter.exists(configPath))) {
+            await this.app.vault.adapter.mkdir(configPath);
+        }
     }
 
     i18n() {

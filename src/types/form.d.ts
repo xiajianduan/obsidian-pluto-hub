@@ -6,7 +6,7 @@ export interface FormField {
   name: string;
   label: string;
   description?: string;
-  isRequired?: boolean;
+  required?: boolean;
   input: {
     type: InputType;
     hidden: boolean;
@@ -18,7 +18,7 @@ export interface FormField {
 
 // 表单弹窗配置
 export interface FormModalConfig {
-  title: string;
+  title?: string;
   name?: string;
   fields: FormField[];
 }

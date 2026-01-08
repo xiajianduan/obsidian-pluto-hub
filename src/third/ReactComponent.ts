@@ -42,6 +42,7 @@ export class ReactComponent extends SimpleThirdComponent {
     }
 
     execute(block: any): void {
+        this.check();
         this.op.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
     }
 }

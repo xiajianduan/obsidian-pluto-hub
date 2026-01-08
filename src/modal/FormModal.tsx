@@ -27,7 +27,7 @@ export const FormModalContent: React.FC<FormModalProps> = ({ config, defaultValu
   // 表单提交校验
   const handleSubmit = () => {
     // 校验必填项
-    const requiredFields = config.fields.filter(f => f.isRequired && !f.input.hidden);
+    const requiredFields = config.fields.filter(f => f.required && !f.input.hidden);
     const missingFields = requiredFields.filter(f => !formValues[f.name]);
 
     if (missingFields.length > 0) {
@@ -41,9 +41,11 @@ export const FormModalContent: React.FC<FormModalProps> = ({ config, defaultValu
 
   return (
     <>
-      <div className="modal-header">
-        <h2>{config.title}</h2>
-      </div>
+      {config.title && (
+        <div className="modal-header">
+          <h2>{config.title}</h2>
+        </div>
+      )}
       <div className="modal-content pluto-form">
         {config.fields.map((field) => (
           <FormField

@@ -1,5 +1,4 @@
 import { DvaComponent } from "./DvaComponent";
-import { FormComponent } from "./FormComponent";
 import { QaComponent } from "./QaComponent";
 import { ReactComponent } from "./ReactComponent";
 import { SimpleThirdComponent } from "./SimpleThirdComponent";
@@ -12,8 +11,7 @@ export class ThirdFactory {
         'react': ReactComponent,
         'dva': DvaComponent,
         'templater': TemplaterComponent,
-        'qa': QaComponent,
-        'form': FormComponent
+        'qa': QaComponent
     };
 
     static create(prop: PlutoProps, configPath: string): ThirdComponent {

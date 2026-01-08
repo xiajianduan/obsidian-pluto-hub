@@ -31,7 +31,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
               setLocalValue(e.target.value);
               onChange(name, e.target.value);
             }}
-            required={field.isRequired}
+            required={field.required}
           />
         );
       case 'toggle':
@@ -60,7 +60,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
               setLocalValue(e.target.value);
               onChange(name, e.target.value);
             }}
-            required={field.isRequired}
+            required={field.required}
           />
         );
       case 'dropdown':
@@ -72,7 +72,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
               setLocalValue(e.target.value);
               onChange(name, e.target.value);
             }}
-            required={field.isRequired}
+            required={field.required}
           >
             <option value="">请选择{field.label}</option>
             {input.options?.map((opt) => (
@@ -104,9 +104,9 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
   return (
     <div className="setting-item" data-field-name={field.name}>
       <div className="setting-item-info">
-        <label className={`setting-item-name ${field.isRequired ? 'required' : ''}`}>
+        <label className={`setting-item-name ${field.required ? 'required' : ''}`}>
           {field.label}
-          {field.isRequired ? ' *' : ''}
+          {field.required ? ' *' : ''}
         </label>
       </div>
       <div className="setting-item-control">

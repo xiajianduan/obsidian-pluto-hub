@@ -10,9 +10,6 @@ export class ViewResolver {
     boardRenderer: BoardRenderer;
     editorRenderer: EditorRenderer;
     contentEl: HTMLElement;
-    isEditing: boolean = false;
-    currentModId: string | null = null;
-    currentFileIndex: number = 0;
     
     constructor(plugin: PlutoHubPlugin, contentEl: HTMLElement) {
         this.plugin = plugin;
@@ -21,17 +18,20 @@ export class ViewResolver {
         this.editorRenderer = new EditorRenderer(this);
         this.boardRenderer = new BoardRenderer(this);
     }
-
-    render() {
+    private render() {
         const container = this.contentEl;
         container.empty();
         container.addClass('pluto-main-container');
-        // 使用 CSS 变量控制商店列数
-        container.style.setProperty('--pluto-cols', String(this.plugin.settings.columns));
-        if (this.isEditing) {
-            this.editorRenderer.render(this.contentEl);
-        } else {
-            this.boardRenderer.render(this.contentEl);
-        }
+    }
+
+    edit(id: string) {
+        this.editorRenderer.currentModId = id;
+        this.editorRenderer.currentFileIndex = 0;
+        this.render();
+        this.editorRenderer.render();
+    }
+    borad() {
+        this.render();
+        this.boardRenderer.render();
     }
 }

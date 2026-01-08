@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import { SimpleThirdComponent } from "./SimpleThirdComponent";
 
 export class TemplaterComponent extends SimpleThirdComponent {
@@ -27,6 +28,7 @@ export class TemplaterComponent extends SimpleThirdComponent {
         if (started) this.execute(block);
     }
     execute(block: any): void {
+        this.check();
         const mod = {
             name: block.name,
             configPath: this.configPath,

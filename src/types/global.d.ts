@@ -7,7 +7,7 @@ declare global {
   }
   export const pluto: IPluto;
 
-  type PlutoProps = "dva" | "react" | "qa" | "templater" | "form";
+  type PlutoProps = "dva" | "react" | "qa" | "templater";
   export interface IPluto {
     web: any;
     images: any;
@@ -24,7 +24,6 @@ declare global {
     react: ThirdComponent;
     qa: ThirdComponent;
     templater: ThirdComponent;
-    form: ThirdComponent;
   }
 
   export interface Core {
@@ -45,6 +44,10 @@ declare global {
      * 补丁组件，用于修改组件的行为
      */
     patch(): void;
+    /**
+     * 检查组件是否可用
+     */
+    check(): void;
     /**
      * 绑定组件到 Pluto 实例
      * @param op 操作对象，通常是 Pluto 实例
@@ -117,8 +120,6 @@ declare global {
     moduleStoragePath: string;
     backupFolderName: string;
     configPath: string;
-    usePako: boolean;
-    columns: number;
     enableIcon: boolean;
     quality: number;
   }

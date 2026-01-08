@@ -1,3 +1,5 @@
+import { Notice } from "obsidian";
+
 // 创建一个简单的ThirdComponent实现，用于其他插件
 export class SimpleThirdComponent implements ThirdComponent {
 
@@ -18,6 +20,10 @@ export class SimpleThirdComponent implements ThirdComponent {
 
     }
 
+    check(): void {
+        if (!this.op) throw new Error('Please install plugin ' + this.pluginId);
+    }
+    
     bind(op: any, prop: PlutoProps): ThirdComponent {
         this.op = op;
         this.api = op.api;
@@ -33,7 +39,9 @@ export class SimpleThirdComponent implements ThirdComponent {
 
     load(params: ModParams): void { }
 
-    execute(block: any): void { }
+    execute(block: any): void {
+        this.check();
+    }
 
     executeAll(): void {
         for (const block of this.codes.values()) {

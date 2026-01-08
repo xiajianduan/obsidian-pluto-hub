@@ -1,22 +1,24 @@
 import { Notice } from "obsidian";
-import { SimpleThirdComponent } from "./SimpleThirdComponent";
+import { SimpleComponent } from "./SimpleComponent";
 
-export class TemplaterComponent extends SimpleThirdComponent {
-    
+export class TemplaterComponent extends SimpleComponent {
+
     get pluginId(): string {
         return 'templater-obsidian';
     }
-    
+
     patch(): void {
-        this.op.templater.functions_generator.internal_functions.generate_params = function(params: any) {
-            let t: any = {};
-            for (let r of this.modules_array) {
-                t[r.getName()] = r.static_object;
-            }
-            return {...t, params};
-        };
+        if (this.op.templater) {
+            this.op.templater.functions_generator.internal_functions.generate_params = function (params: any) {
+                let t: any = {};
+                for (let r of this.modules_array) {
+                    t[r.getName()] = r.static_object;
+                }
+                return { ...t, params };
+            };
+        }
     }
-    load(params: ModParams): void {
+    async load(params: ModParams): Promise<void> {
         const { module, file, started } = params;
         const name = module.name;
         const block = {
@@ -25,16 +27,18 @@ export class TemplaterComponent extends SimpleThirdComponent {
         };
         this.register(`${name}-${file.name}`, block);
         // 运行代码
-        if (started) this.execute(block);
+        if (started) await this.execute(block);
     }
-    execute(block: any): void {
+    async execute(block: any): Promise<void> {
         this.check();
         const mod = {
             name: block.name,
             configPath: this.configPath,
-            configFile: `${this.configPath}/${block.name}.json`
+            configFile: `${this.configPath}/${block.name}.yaml`
         };
-        const current = this.op.templater.functions_generator.internal_functions.generate_params(mod);
-        this.op.templater.parser.parse_commands(block.code, current);
+        if (this.op.templater) {
+            const current = this.op.templater.functions_generator.internal_functions.generate_params(mod);
+            await this.op.templater.parser.parse_commands(block.code, current);
+        }
     }
 }

@@ -32,7 +32,7 @@ export class BoardRenderer {
             .setButtonText(t('pluto.hub.dashboard.add-module'))
             .setClass('btn_nob')
             .onClick(async () => {
-                const promise = pluto.form.prompt(t('pluto.hub.module-name-prompt'), true);
+                const promise = pluto.form.create({type: 'G'});
                 promise.then(async (name) => {
                     await this.moduleAction.create(name);
                     this.resolver.borad();
@@ -145,15 +145,17 @@ export class BoardRenderer {
                     card.style.filter = 'grayscale(1)';
                 }
             };
-
-            // 导出按钮
+            // 删除按钮
             new ButtonComponent(cardHeader)
-                .setIcon('download')
-                .setTooltip(t('pluto.hub.dashboard.export-tooltip'))
-                .setClass('mod-export-btn')
+                .setIcon('trash')
+                .setTooltip(t('pluto.hub.dashboard.delete-tooltip'))
+                .setClass('mod-tooltip-btn')
                 .onClick(async (e) => {
                     e.stopPropagation();
-                    await this.moduleAction.export(mod.name);
+                    if (confirm(`Delete ${mod.name}? This cannot be undone.`)) {
+                        await this.moduleAction.delete(mod.id);
+                        this.resolver.borad();
+                    }
                 });
 
             // 模块名称
@@ -166,23 +168,29 @@ export class BoardRenderer {
             new ButtonComponent(cardActions)
                 .setIcon('pencil')
                 .setTooltip(t('pluto.hub.dashboard.edit-tooltip'))
-                .setClass('mod-export-btn')
+                .setClass('mod-tooltip-btn')
                 .onClick(async (e) => {
                     e.stopPropagation();
                     this.resolver.edit(mod.id);
                 });
-
-            // 删除按钮
+            // 导出按钮
             new ButtonComponent(cardActions)
-                .setIcon('trash')
-                .setTooltip(t('pluto.hub.dashboard.delete-tooltip'))
-                .setClass('mod-export-btn')
+                .setIcon('download')
+                .setTooltip(t('pluto.hub.dashboard.export-tooltip'))
+                .setClass('mod-tooltip-btn')
                 .onClick(async (e) => {
                     e.stopPropagation();
-                    if (confirm(`Delete ${mod.name}? This cannot be undone.`)) {
-                        await this.moduleAction.delete(mod.id);
-                        this.resolver.borad();
-                    }
+                    await this.moduleAction.export(mod.name);
+                });
+            // 设置按钮
+            new ButtonComponent(cardActions)
+                .setIcon('settings')
+                .setTooltip(t('pluto.hub.dashboard.settings-tooltip'))
+                .setClass('mod-tooltip-btn')
+                .onClick(async (e) => {
+                    e.stopPropagation();
+                    const result = await pluto.form.openSetting(mod);
+                    await this.moduleAction.save(result as unknown as MiniModule);
                 });
 
             // 点击卡片：切换到编辑状态
@@ -208,7 +216,8 @@ export class BoardRenderer {
                         // 读取文件内容
                         const buffer = await readFileAsArrayBuffer(file);
                         // 导入模块
-                        await ModStorage.importModule(this.plugin, buffer);
+                        const modules = await ModStorage.importModule(this.plugin, buffer);
+                        CoreManager.runModules(modules, true);
                         new Notice(t('pluto.hub.import-success'));
                         this.resolver.borad();
                     } catch (e) {
@@ -227,6 +236,6 @@ export class BoardRenderer {
         const backupFolder = this.plugin.settings.backupFolderName;
         const backupFile = `${backupFolder}/${name}.ops`;
         await ModStorage.backupAllModules(this.plugin, backupFile);
-        new Notice(t('pluto.hub.export.all-success'));
+        new Notice(t('pluto.hub.export.all-success') + backupFile);
     }
 }

@@ -1,11 +1,11 @@
 import { CoreManager } from "exec/CoreManager";
-import { App } from "obsidian";
+import { App, parseYaml } from "obsidian";
 import { ThirdFactory } from "third/ThirdFactory";
 import * as obsidian from "obsidian";
 import { ImageConverter } from "core/ImageConverter";
 import PlutoHubPlugin from "main";
 import { VIEW_TYPE_BOARD } from "view/PlutoBoardView";
-import { find_tfile } from "utils/helper";
+import { find_tfile, getAvailablePlugins } from "utils/helper";
 import { ViewManager } from "core/ViewManager";
 import { FormManager } from "modal/FormManager";
 
@@ -36,6 +36,10 @@ export class Pluto implements IPluto {
         this.images = new ImageConverter(this.app);
         this.helper = {
             find_tfile: find_tfile.bind(this, this.app),
+            stringifyYaml: obsidian.stringifyYaml.bind(obsidian),
+            parseYaml: parseYaml.bind(obsidian),
+            getAvailablePlugins: getAvailablePlugins.bind(this),
+            flushComponents: this.third?.react?.op?.requestComponentUpdate.bind(this.third.react.op),
             obsidian,
         };
         this.core = CoreManager.createCoreExecutor(settings.configPath);
@@ -90,6 +94,20 @@ export class Pluto implements IPluto {
         let resourcePath = this.app.vault.adapter.getResourcePath(path);
         const file = resourcePath.split("?")[0]!;
         return import(file);
+    }
+
+    getConfig(name: string) {
+        const config = this.third.assets[name].yaml.get("config.yaml");
+        if(config) return config;
+        return this.third.assets[name].json.get("data.json");
+    }
+
+    async getConfigLive(name: string) {
+        const content = await app.vault.adapter.read(`${pluto.self.settings.configPath}/${name}.yaml`);
+        const config = parseYaml(content);
+        this.third.assets[name].yaml.set("config.yaml", config);
+        if(config) return config;
+        
     }
 
     getModule(name: string) {

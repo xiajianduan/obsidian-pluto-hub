@@ -1,5 +1,6 @@
 import PlutoHubPlugin from 'main';
 import * as pako from 'pako';
+import { MODULE_ORDER } from 'utils/const';
 import { base64ToBlobUrl, promptMessage } from 'utils/helper';
 
 export class ModStorage {
@@ -77,8 +78,10 @@ export class ModStorage {
         return {
             id: fileName,
             name: fileName,
+            type: '',
+            order: MODULE_ORDER,
             enabled: false,
-            files: [{ name: 'main.js', type: 'js', content: '' }]
+            files: [{ name: 'main.js', type: 'js', content: 'new Notice(params.name);' }]
         };
     }
 
@@ -122,7 +125,7 @@ export class ModStorage {
     }
 
     // 导入功能：支持单个模块或全量导入
-    static async importModule(plugin: PlutoHubPlugin, buffer: ArrayBuffer): Promise<void> {
+    static async importModule(plugin: PlutoHubPlugin, buffer: ArrayBuffer): Promise<MiniModule[]> {
         const uint8 = new Uint8Array(buffer);
         const jsonStr = pako.inflate(uint8, { to: 'string' });
         const data = JSON.parse(jsonStr);
@@ -133,14 +136,15 @@ export class ModStorage {
             const module = data as MiniModule;
             // 保存ModuleBundle到磁盘
             await this.saveModule(plugin, module);
+            return [module];
         } else if (data.length) {
             // 全量备份导入
             const importedModules = data as MiniModule[];
-            
             // 保存所有MiniModule
             for (const importedModule of importedModules) {
                 await this.saveModule(plugin, importedModule);
             }
+            return importedModules;
         } else {
             throw new Error("Invalid import file format");
         }

@@ -1,7 +1,7 @@
 import { Notice } from "obsidian";
 
 // 创建一个简单的ThirdComponent实现，用于其他插件
-export class SimpleThirdComponent implements ThirdComponent {
+export class SimpleComponent implements ThirdComponent {
 
     op: any;
     api: any;
@@ -13,7 +13,7 @@ export class SimpleThirdComponent implements ThirdComponent {
     }
 
     get pluginId(): string {
-        return 'obsidian-pluto-hub';
+        return pluto.self.manifest.id;
     }
 
     patch(): void {
@@ -37,15 +37,15 @@ export class SimpleThirdComponent implements ThirdComponent {
         this.codes.set(key, code);
     }
 
-    load(params: ModParams): void { }
+    async load(params: ModParams): Promise<void> { }
 
-    execute(block: any): void {
+    async execute(block: any): Promise<void> {
         this.check();
     }
 
-    executeAll(): void {
+    async executeAll(): Promise<void> {
         for (const block of this.codes.values()) {
-            this.execute(block);
+            await this.execute(block);
         }
     }
 }

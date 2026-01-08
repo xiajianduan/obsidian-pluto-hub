@@ -1,23 +1,37 @@
-import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
+import { parseYaml } from "obsidian";
+import { SimpleExecutor } from "./SimpleExecutor";
 
-export class SandboxExecutor extends SimpleCoreExecutor {
+export class SandboxExecutor extends SimpleExecutor {
 
     excutable(type: string): boolean {
         return type === 'js';
     }
 
-    async execute(module: MiniModule) {
-        const mainJs = module.files.find(f => f.name === 'main.js');
-        if (!mainJs) return this.execModule(module);
-        const def = this.load({ module, file: mainJs, started: true });
-        const main = new def.Main();
-        main.start();
-        this.execModule(module);
-        main.finish?.();
+    async execute(module: MiniModule, started: boolean) {
+        const bootJs = module.tmpFiles!.find(f => f.name === 'boot.js');
+        if (bootJs) {
+            const def = this.load({ module, file: bootJs, started: true });
+            if (def) {
+                const boot = new def.Boot();
+                boot.start();
+                this.execModule(module);
+                boot.finish?.();
+            }
+        }else {
+            this.execModule(module);
+        }
+        const Config = pluto.third.modules[module.name]?.Config;
+        if(Config) {
+            const config = new Config();
+            config.init(async (content: any)=> {
+                const created = await this.createConfigFile(module.name, content, started);
+                if(created) config.finish?.();
+            });
+        }
     }
 
     private execModule(module: MiniModule) {
-        const jsFiles = module.files.filter(f => this.excutable(f.type) && f.name !== 'main.js');
+        const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
         const object = jsFiles.reduce((prev: any, file) => {
             const result = this.load({ module, file, started: true });
             return Object.assign(prev, result);
@@ -40,7 +54,7 @@ export class SandboxExecutor extends SimpleCoreExecutor {
             params: {
                 ...module,
                 configPath: this.configPath,
-                configFile: `${this.configPath}/${module.name}.json`
+                configFile: `${this.configPath}/${module.name}.yaml`
             },
             // 允许 JS 访问同模块下的其他文件
             getFile: (name: string) => module.files.find(f => f.name === name)?.content,

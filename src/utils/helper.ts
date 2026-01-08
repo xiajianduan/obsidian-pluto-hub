@@ -94,18 +94,16 @@ export async function readFileAsText(file: File): Promise<string> {
 }
 export async function promptMessage(message: any, holder?: any): Promise<string | null> {
     return new Promise((resolve) => {
-        // 优先使用 QuickAdd 的 inputPrompt 方法
-        if (pluto.third.qa?.api.inputPrompt) {
-            pluto.third.qa.api.inputPrompt(message, holder).then(resolve);
-        } else {
-            // 如果 QuickAdd 不可用，回退到原生的 prompt 方法
-            const input = prompt(message, holder);
-            resolve(input);
-        }
+        pluto.form.prompt(message, true, holder).then(resolve);
     });
 }
 
 export function find_tfile(app: App, name: string): TFile | null {
     const normalizedName = normalizePath(name);
     return app.metadataCache.getFirstLinkpathDest(normalizedName, "");
+}
+export function getAvailablePlugins(): any[] {
+    const manifests = app.plugins.manifests;
+    delete manifests['obsidian-pluto-hub'];
+    return Object.values(app.plugins.manifests);
 }

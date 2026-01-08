@@ -1,6 +1,6 @@
-import { SimpleThirdComponent } from "./SimpleThirdComponent";
+import { SimpleComponent } from "./SimpleComponent";
 
-export class DvaComponent extends SimpleThirdComponent {
+export class DvaComponent extends SimpleComponent {
     get pluginId(): string {
         return 'dataview';
     }

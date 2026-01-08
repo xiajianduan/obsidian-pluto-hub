@@ -1,6 +1,7 @@
 import PlutoHubPlugin from "main";
 import { Notice } from "obsidian";
 import { ModStorage } from "storage";
+import { MODULE_ORDER } from "utils/const";
 import { downloadImageToBase64 } from "utils/helper";
 import { t } from "utils/translation";
 
@@ -45,6 +46,8 @@ export class ModuleAction {
         const newMod: MiniModule = {
             id: newId,
             name: name,
+            type: 'G',
+            order: MODULE_ORDER,
             enabled: true,
             bgColor: bgColor,
             files: moduleFiles

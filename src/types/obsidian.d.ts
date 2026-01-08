@@ -1,11 +1,16 @@
-import { Plugin } from 'obsidian';
+import { PluginManifest } from "obsidian";
 
 declare module 'obsidian' {
     interface App {
-        plugins: Plugin;
+        plugins: Plugins;
     }
-    interface Plugin {
-        plugins: Record<string, any>;
+    interface Plugins {
+        plugins: Record<string, PlutoPlugin>;
+        manifests: Record<string, PluginManifest>;
+    }
+    export interface PlutoPlugin {
+        settings: PlutoSettings;
+        manifest: PluginManifest;
     }
     interface ViewStateResult {
         layout: any;

@@ -1,16 +1,16 @@
-import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
+import { SimpleExecutor } from "./SimpleExecutor";
 
-export class JsonExecutor extends SimpleCoreExecutor {
+export class JsonExecutor extends SimpleExecutor {
 
     excutable(type: string): boolean {
         return type === 'json';
     }
         
-    execute(module: MiniModule, started: boolean): void {
-        module.files.filter(f => this.excutable(f.type)).forEach(file => {
+    async execute(module: MiniModule, started: boolean): Promise<void> {
+        for (const file of module.tmpFiles!) {
             const config = JSON.parse(file.content);
             // 将配置挂载到 pluto.assets[模块名]
             pluto.third.assets[module.name].json.set(file.name, config);
-        });
+        };
     }
 }

@@ -1,12 +1,12 @@
-import { SimpleThirdComponent } from "./SimpleThirdComponent";
+import { SimpleComponent } from "./SimpleComponent";
 
-export class ReactComponent extends SimpleThirdComponent {
+export class ReactComponent extends SimpleComponent {
 
     get pluginId(): string {
         return 'obsidian-react-components';
     }
 
-    load(params: ModParams): void {
+    async load(params: ModParams): Promise<void> {
         const { module, file, yaml, started } = params;
         const modelName = module.name;
         const suppressComponentRefresh = yaml['suppress-component-refresh'] || true;
@@ -24,7 +24,7 @@ export class ReactComponent extends SimpleThirdComponent {
                 };
                 this.register(name, block);
                 // 运行代码
-                if (started) this.execute(block);
+                if (started) await this.execute(block);
             }
         }
     }
@@ -41,7 +41,7 @@ export class ReactComponent extends SimpleThirdComponent {
         return list;
     }
 
-    execute(block: any): void {
+    async execute(block: any): Promise<void> {
         this.check();
         this.op.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
     }

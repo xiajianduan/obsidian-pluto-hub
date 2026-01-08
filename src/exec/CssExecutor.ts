@@ -1,15 +1,15 @@
-import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
+import { SimpleExecutor } from "./SimpleExecutor";
 
-export class CssExecutor extends SimpleCoreExecutor {
+export class CssExecutor extends SimpleExecutor {
 
     excutable(type: string): boolean {
         return type === 'css';
     }
         
-    execute(module: MiniModule, started: boolean): void {
-        module.files.filter(f => this.excutable(f.type)).forEach(file => {  
+    async execute(module: MiniModule, started: boolean): Promise<void> {
+        for (const file of module.tmpFiles!) {  
             this.injectStyle(`${module.id}-${file.name}`, file.content);
-        });
+        };
     }
 
     // 注入 CSS 样式到文档头部

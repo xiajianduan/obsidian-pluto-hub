@@ -1,7 +1,7 @@
 import { DvaComponent } from "./DvaComponent";
 import { QaComponent } from "./QaComponent";
 import { ReactComponent } from "./ReactComponent";
-import { SimpleThirdComponent } from "./SimpleThirdComponent";
+import { SimpleComponent } from "./SimpleComponent";
 import { TemplaterComponent } from "./TemplaterComponent";
 
 // ThirdComponent工厂类，用于根据prop创建相应的组件实例
@@ -16,7 +16,7 @@ export class ThirdFactory {
 
     static create(prop: PlutoProps, configPath: string): ThirdComponent {
         // 从映射对象中获取对应的组件类，如果不存在则使用SimpleThirdComponent
-        const ComponentClass = this.componentMap[prop] || SimpleThirdComponent;
+        const ComponentClass = this.componentMap[prop] || SimpleComponent;
         return new ComponentClass(configPath);
     }
 

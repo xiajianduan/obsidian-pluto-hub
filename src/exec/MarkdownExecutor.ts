@@ -1,14 +1,14 @@
-import { SimpleCoreExecutor } from "./SimpleCoreExecutor";
+import { SimpleExecutor } from "./SimpleExecutor";
 import { getFrontMatterInfo, parseYaml } from "obsidian";
 
-export class MarkdownExecutor extends SimpleCoreExecutor {
+export class MarkdownExecutor extends SimpleExecutor {
 
     excutable(type: string): boolean {
         return type === 'md';
     }
 
-    execute(module: MiniModule, started: boolean): void {
-        module.files.filter(f => this.excutable(f.type)).forEach(file => {
+    async execute(module: MiniModule, started: boolean): Promise<void> {
+        for (const file of module.tmpFiles!) {
             const info = getFrontMatterInfo(file.content);
             const frontmatter = info.frontmatter;
             if (!frontmatter) return;
@@ -16,8 +16,8 @@ export class MarkdownExecutor extends SimpleCoreExecutor {
             const plutoLanguage = yaml['pluto-language'];
             if (plutoLanguage) {
                 const prop = plutoLanguage as PlutoProps;
-                pluto.third[prop].load({ module, file, yaml, started });
+                await pluto.third[prop].load({ module, file, yaml, started });
             }
-        });
+        };
     }
 }

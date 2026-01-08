@@ -1,17 +1,22 @@
 # Changes Log
 
-## [1.1.5] - 2026-01-08
+## [1.1.5] - 2026-01-09
 
 ### Added
 - `src/core/ViewManager.ts` - 新增了视图管理器，优化视图系统
 - `src/modal/FormField.tsx` - 新增了表单字段组件
 - `src/modal/FormManager.ts` - 新增了表单管理器
 - `src/modal/FormModal.tsx` - 新增了React表单弹窗组件
+- `src/modal/FormJson.ts` - 新增了表单JSON处理组件
 - `src/modal/PlutoFormModal.tsx` - 新增了Pluto表单弹窗实现
 - `src/types/form.d.ts` - 新增了表单相关类型定义
 - `src/view/FormModal.ts` - 实现了动态表单模态框，支持openForm方法
 - `src/view/PlutoFileView.ts` - 重命名自PlutoHomeView.ts，优化文件视图
 - `src/view/PlutoTextView.ts` - 新增了文本视图
+- `src/exec/SimpleExecutor.ts` - 新增了简单执行器，替代SimpleCoreExecutor
+- `src/exec/YamlExecutor.ts` - 新增了YAML执行器，支持YAML文件处理
+- `src/utils/array.ts` - 新增了数组扩展工具，添加groupBy方法
+- `src/utils/const.ts` - 新增了常量定义文件
 
 ### Improved
 - 重构了视图系统，优化了视图管理逻辑
@@ -23,6 +28,13 @@
 - 优化了模块卡片布局，使用auto-fit实现响应式网格
 - 增强了第三方组件的错误检查机制
 - 优化了模块存储逻辑，移除了pako压缩开关
+- 重构执行器系统，将SimpleCoreExecutor重命名为SimpleExecutor
+- 新增YAML执行器，支持YAML文件处理
+- 优化第三方组件实现，重命名SimpleThirdComponent为SimpleComponent
+- 增强表单功能，新增FormJson组件
+- 扩展数组方法，添加groupBy功能
+- 优化提示信息，使用自定义表单提示替代QuickAdd依赖
+- Templater组件配置文件从JSON改为YAML
 
 ### Files Modified
 - `package.json` - 更新了依赖配置
@@ -38,11 +50,10 @@
 - `src/exec/JsonExecutor.ts` - 优化了JSON执行器
 - `src/exec/MarkdownExecutor.ts` - 优化了Markdown执行器
 - `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器
-- `src/exec/SimpleCoreExecutor.ts` - 优化了简单核心执行器
 - `src/i18n/en.ts` - 更新了国际化字符串
 - `src/i18n/zh-cn.ts` - 更新了国际化字符串
 - `src/main.ts` - 添加了路径检查方法
-- `src/modal/FormField.tsx` - 优化了表单字段组件
+- `src/modal/FormField.tsx` - 优化了表单字段组件，将dropdown类型改为select
 - `src/modal/FormManager.ts` - 优化了表单管理器
 - `src/modal/FormModal.tsx` - 优化了React表单弹窗组件
 - `src/modal/PlutoFormModal.tsx` - 优化了Pluto表单弹窗实现
@@ -50,21 +61,27 @@
 - `src/settings.ts` - 更新了默认设置和UI，移除了usePako和columns设置
 - `src/storage.ts` - 优化了路径处理和方法重命名，移除了pako压缩逻辑
 - `src/styles.css` - 添加了表单相关样式，优化了卡片布局
+- `src/third/DvaComponent.ts` - 优化了Dva组件
+- `src/third/QaComponent.ts` - 优化了Qa组件
 - `src/third/ReactComponent.ts` - 优化了React组件，添加了错误检查
-- `src/third/SimpleThirdComponent.ts` - 优化了简单第三方组件，添加了check方法
-- `src/third/TemplaterComponent.ts` - 优化了Templater组件，添加了错误检查
-- `src/third/ThirdFactory.ts` - 移除了FormComponent支持
-- `src/types/form.d.ts` - 更新了表单字段定义，isRequired改为required，title改为可选
-- `src/types/global.d.ts` - 更新了全局类型定义，移除了form组件支持
+- `src/third/SimpleComponent.ts` - 重命名自SimpleThirdComponent，优化了简单组件实现
+- `src/third/TemplaterComponent.ts` - 优化了Templater组件，添加了错误检查，配置文件改为YAML
+- `src/third/ThirdFactory.ts` - 移除了FormComponent支持，更新了组件映射
+- `src/types/form.d.ts` - 更新了表单字段定义，isRequired改为required，title改为可选，dropdown改为select
+- `src/types/global.d.ts` - 更新了全局类型定义，移除了form组件支持，扩展了Array接口
 - `src/types/obsidian.d.ts` - 更新了Obsidian相关类型定义
-- `src/utils/helper.ts` - 新增了辅助工具函数
+- `src/utils/helper.ts` - 新增了辅助工具函数，优化了提示信息处理
 - `src/view/PlutoBoardView.ts` - 优化了看板视图，修改了onOpen方法调用
 - `src/view/PlutoTextView.ts` - 优化了文本视图
 - `tsconfig.json` - 更新了TypeScript配置
 
+### Renamed
+- `src/third/SimpleThirdComponent.ts` -> `src/third/SimpleComponent.ts` - 重命名简单第三方组件
+
 ### Deleted
 - `src/types/pluto.d.ts` - 删除了过时的类型定义
 - `src/third/FormComponent.ts` - 删除了FormComponent组件
+- `src/exec/SimpleCoreExecutor.ts` - 删除了SimpleCoreExecutor，由SimpleExecutor替代
 
 ## [1.1.4] - 2026-01-06
 

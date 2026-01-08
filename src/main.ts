@@ -1,10 +1,11 @@
-import { Plugin } from 'obsidian';
+import { Plugin, PlutoPlugin } from 'obsidian';
 import { ModStorage } from './storage';
 import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
 import { Pluto } from './pluto';
+import { Arrays } from 'utils/array';
 
-export default class PlutoHubPlugin extends Plugin {
+export default class PlutoHubPlugin extends Plugin implements PlutoPlugin {
 
     settings: PlutoSettings;
 
@@ -45,6 +46,8 @@ export default class PlutoHubPlugin extends Plugin {
     async initializePlugin() {
         // 添加自定义 Ribbon 图标
         this.addCustomRibbonIcon();
+        // 加载数组扩展函数
+        Arrays.loadFunctions();
         // 初始化并挂载全局 Pluto 对象
         new Pluto(this).boot();
     }

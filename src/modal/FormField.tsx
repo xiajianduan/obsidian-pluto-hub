@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormField as FormFieldType, FormValues } from '../types/form';
+import { FormField as FormFieldType } from '../types/form';
 
 // 单个表单字段组件（适配所有输入类型）
 interface FormFieldProps {
@@ -63,7 +63,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
             required={field.required}
           />
         );
-      case 'dropdown':
+      case 'select':
         return (
           <select
             className="form-dropdown"
@@ -74,7 +74,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
             }}
             required={field.required}
           >
-            <option value="">请选择{field.label}</option>
+            {/* <option value="">请选择{field.label}</option> */}
             {input.options?.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}

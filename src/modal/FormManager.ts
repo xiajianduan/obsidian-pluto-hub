@@ -1,6 +1,7 @@
 import { FormModalConfig, FormValues } from "types/form";
 import { PlutoFormModal } from "modal/PlutoFormModal";
 import { App } from "obsidian";
+import { FormJson } from "./FormJson";
 
 export class FormManager {
 
@@ -11,16 +12,20 @@ export class FormManager {
     }
 
     async prompt(name: string, required: boolean = true, title: string = ''): Promise<string> {
-        const values = await this.openJson({
-                title,
-                fields: [{
-                input: { type: 'text', hidden: false },
-                name: "name",
-                label: name,
-                required
-            }]
-        }, {});
+        const config = FormJson.input(title, name, required);
+        const values = await this.openJson(config, {});
         return values["name"] as string;
+    }
+
+    async create(module: any): Promise<string> {
+        const config = FormJson.create();
+        const values = await this.openJson(config, module);
+        return values["name"] as string;
+    }
+
+    async openSetting(module: any): Promise<FormValues> {
+        const config = FormJson.setting(module.name);
+        return await this.openJson(config, module as FormValues);
     }
 
     async openYaml(config: FormModalConfig, defaultValues: FormValues = {}): Promise<FormValues> {

@@ -11,7 +11,7 @@ export class MarkdownExecutor extends SimpleExecutor {
         for (const file of module.tmpFiles!) {
             const info = getFrontMatterInfo(file.content);
             const frontmatter = info.frontmatter;
-            if (!frontmatter) return;
+            if (!frontmatter) continue;
             const yaml = parseYaml(frontmatter);
             const plutoLanguage = yaml['pluto-language'];
             if (plutoLanguage) {

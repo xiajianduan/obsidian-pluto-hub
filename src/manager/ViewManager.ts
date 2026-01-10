@@ -15,7 +15,7 @@ export class ViewManager {
         plugin.registerView(VIEW_TYPE_TEXT, leaf=> new PlutoTextView(leaf));
     }
 
-    preview(props: any) {
+    viewfile(props: any) {
         const file = pluto.helper.find_tfile(props.click);
         const leaf = this.plugin.app.workspace.getLeaf("tab");
         leaf.setViewState({
@@ -29,15 +29,15 @@ export class ViewManager {
         });
     }
         
-    textview(props: any) {
+    viewtext(props: any) {
         const leaf = this.plugin.app.workspace.getLeaf("tab");
         leaf.setViewState({
             type: VIEW_TYPE_TEXT,
             state: {
                 title: props.name,
                 icon: props.id,
-                text: props.text,
-                file: props.path,
+                text: pluto.third.assets[props.app].page.get(props.click),
+                file: props.app,
                 mode: "preview"
             },
         });

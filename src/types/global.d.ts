@@ -1,5 +1,8 @@
-import { FormManager } from "modal/FormManager";
-import { App, PluginManifest, PlutoPlugin } from "obsidian";
+import { CoreManager } from "manager/CoreManager";
+import { FormManager } from "manager/FormManager";
+import ThemeManager from "manager/ThemeManager";
+import { ViewManager } from "manager/ViewManager";
+import { App, PlutoPlugin } from "obsidian";
 
 export { }; // 使文件成为模块
 declare global {
@@ -31,14 +34,17 @@ declare global {
         quality: number;
     }
     export interface IPluto {
+        app: App;
         web: any;
         images: any;
         third: Third;
-        core: Core;
         helper: any;
-        form: FormManager;
         skin: any;
         self: PlutoPlugin;
+        coreManager: CoreManager;
+        formManager: FormManager;
+        viewManager: ViewManager;
+        themeManager: ThemeManager;
     }
     export interface Third {
         assets: any;
@@ -56,6 +62,7 @@ declare global {
         markdown: CoreExecutor;
         sandbox: CoreExecutor;
         yaml: CoreExecutor;
+        page: CoreExecutor;
     }
 
     export interface ThirdComponent {
@@ -103,7 +110,6 @@ declare global {
     export interface CoreExecutor {
 
         codes: Map<string, any>;
-        configPath: string;
 
         excutable(type: string): boolean;
         /**

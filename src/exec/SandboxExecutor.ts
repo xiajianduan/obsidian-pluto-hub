@@ -1,4 +1,3 @@
-import { parseYaml } from "obsidian";
 import { SimpleExecutor } from "./SimpleExecutor";
 
 export class SandboxExecutor extends SimpleExecutor {
@@ -17,15 +16,16 @@ export class SandboxExecutor extends SimpleExecutor {
                 this.execModule(module);
                 boot.finish?.();
             }
-        }else {
+        } else {
             this.execModule(module);
         }
         const Config = pluto.third.modules[module.name]?.Config;
-        if(Config) {
+        if (Config) {
             const config = new Config();
-            config.init(async (content: any)=> {
+            config.init(async (content: any) => {
                 const created = await this.createConfigFile(module.name, content, started);
-                if(created) config.finish?.();
+                if (created) config.finish?.();
+                return started;
             });
         }
     }
@@ -47,14 +47,15 @@ export class SandboxExecutor extends SimpleExecutor {
         // 创建模块导出对象
         const moduleExports: Record<string, any> = {};
         const exports = moduleExports;
+        const configPath = pluto.self.settings.configPath;
 
         const context = {
             pluto,
             // 将模块信息暴露给脚本
             params: {
                 ...module,
-                configPath: this.configPath,
-                configFile: `${this.configPath}/${module.name}.yaml`
+                configPath,
+                configFile: `${configPath}/${module.name}.yaml`
             },
             // 允许 JS 访问同模块下的其他文件
             getFile: (name: string) => module.files.find(f => f.name === name)?.content,

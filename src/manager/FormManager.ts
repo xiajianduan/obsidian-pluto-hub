@@ -1,15 +1,8 @@
 import { FormModalConfig, FormValues } from "types/form";
 import { PlutoFormModal } from "modal/PlutoFormModal";
-import { App } from "obsidian";
-import { FormJson } from "./FormJson";
+import { FormJson } from "../modal/FormJson";
 
 export class FormManager {
-
-    app: App;
-
-    constructor(app: App) {
-        this.app = app;
-    }
 
     async prompt(name: string, required: boolean = true, title: string = ''): Promise<string> {
         const config = FormJson.input(title, name, required);
@@ -30,7 +23,7 @@ export class FormManager {
 
     async openYaml(config: FormModalConfig, defaultValues: FormValues = {}): Promise<FormValues> {
         return new Promise((resolve, reject) => {
-            new PlutoFormModal(this.app, config, defaultValues, (values) => {
+            new PlutoFormModal(config, defaultValues, (values) => {
                 console.log('表单提交值:', values);
                 resolve(values);
             }, () => {
@@ -41,7 +34,7 @@ export class FormManager {
 
     async openJson(config: FormModalConfig, defaultValues: FormValues = {}): Promise<FormValues> {
         return new Promise((resolve, reject) => {
-            new PlutoFormModal(this.app, config, defaultValues, (values) => {
+            new PlutoFormModal(config, defaultValues, (values) => {
                 console.log('表单提交值:', values);
                 resolve(values);
             }, () => {

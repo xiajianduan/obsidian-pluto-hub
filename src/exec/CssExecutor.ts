@@ -1,3 +1,4 @@
+import { parseYaml } from "obsidian";
 import { SimpleExecutor } from "./SimpleExecutor";
 
 export class CssExecutor extends SimpleExecutor {
@@ -9,6 +10,7 @@ export class CssExecutor extends SimpleExecutor {
     async execute(module: MiniModule, started: boolean): Promise<void> {
         for (const file of module.tmpFiles!) {  
             this.injectStyle(`${module.id}-${file.name}`, file.content);
+            this.setSettings(module.name, file.content);
         };
     }
 
@@ -21,5 +23,13 @@ export class CssExecutor extends SimpleExecutor {
             document.head.appendChild(el);
         }
         el.textContent = code;
+    }
+
+    // 设置 CSS 变量
+    setSettings(name: string, code: string) {
+        const matches = code.match(/\/\* @settings([\s\S]+?)\*\//);
+        if (!matches) return;
+        const settings = parseYaml(matches[1]!);
+        pluto.third.assets[name].css.set(settings.id, settings);
     }
 }

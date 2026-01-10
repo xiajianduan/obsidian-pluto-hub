@@ -11,12 +11,11 @@ export class PlutoFormModal extends Modal {
     private onCancel: (values: FormValues) => void;
     private root: any;
 
-    constructor(app: App,
-        config: FormModalConfig,
+    constructor(config: FormModalConfig,
         defaultValues: FormValues = {},
         onSubmit: (values: FormValues) => void,
         onCancel: (values: FormValues) => void) {
-        super(app);
+        super(pluto.app);
         this.config = config;
         this.defaultValues = defaultValues;
         this.onSubmit = onSubmit;

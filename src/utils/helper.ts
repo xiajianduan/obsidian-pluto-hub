@@ -94,7 +94,7 @@ export async function readFileAsText(file: File): Promise<string> {
 }
 export async function promptMessage(message: any, holder?: any): Promise<string | null> {
     return new Promise((resolve) => {
-        pluto.form.prompt(message, true, holder).then(resolve);
+        pluto.formManager.prompt(message, true, holder).then(resolve);
     });
 }
 

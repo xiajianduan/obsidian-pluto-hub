@@ -1,4 +1,4 @@
-import { CoreManager } from "exec/CoreManager";
+import { CoreManager } from "manager/CoreManager";
 import { App, parseYaml } from "obsidian";
 import { ThirdFactory } from "third/ThirdFactory";
 import * as obsidian from "obsidian";
@@ -6,29 +6,35 @@ import { ImageConverter } from "core/ImageConverter";
 import PlutoHubPlugin from "main";
 import { VIEW_TYPE_BOARD } from "view/PlutoBoardView";
 import { find_tfile, getAvailablePlugins } from "utils/helper";
-import { ViewManager } from "core/ViewManager";
-import { FormManager } from "modal/FormManager";
+import { ViewManager } from "manager/ViewManager";
+import { FormManager } from "manager/FormManager";
+import ThemeManager from "manager/ThemeManager";
 
 export class Pluto implements IPluto {
     app: App;
     config: any;
     web: any;
     images: any;
-    core: any;
     third: Third;
     self: PlutoHubPlugin;
     helper: any;
-    view: ViewManager;
-    form: any;
     skin: any;
+    themeManager: ThemeManager;
+    viewManager: ViewManager;
+    coreManager: CoreManager;
+    formManager: FormManager;
+
+
 
     constructor(plugin: PlutoHubPlugin) {
         this.app = plugin.app;
         this.config = {};
         this.self = plugin;
         window.pluto = this;
-        this.view = new ViewManager();
-        this.form = new FormManager(this.app);
+        this.viewManager = new ViewManager();
+        this.formManager = new FormManager();
+        this.themeManager = new ThemeManager();
+        this.coreManager = new CoreManager();
     }
 
     boot() {
@@ -42,14 +48,13 @@ export class Pluto implements IPluto {
             flushComponents: this.third?.react?.op?.requestComponentUpdate.bind(this.third.react.op),
             obsidian,
         };
-        this.core = CoreManager.createCoreExecutor(settings.configPath);
         this.third = ThirdFactory.createThirdComponent(settings.configPath);
         const plugin = this.self;
         // 注册视图
-        this.view.build(plugin);
+        this.viewManager.build(plugin);
         // 在布局准备就绪时加载所有模块
         plugin.app.workspace.onLayoutReady(async () => {
-            await CoreManager.runAllEnabled(plugin);
+            await this.coreManager.runAllEnabled(plugin);
             // 动态检测并绑定第三方插件依赖
             this.bindPluginDependencies();
         });
@@ -97,7 +102,7 @@ export class Pluto implements IPluto {
     }
 
     getConfig(name: string) {
-        const config = this.third.assets[name].yaml.get("config.yaml");
+        const config = this.third.assets[name].yaml.get(name);
         if(config) return config;
         return this.third.assets[name].json.get("data.json");
     }
@@ -105,7 +110,7 @@ export class Pluto implements IPluto {
     async getConfigLive(name: string) {
         const content = await app.vault.adapter.read(`${pluto.self.settings.configPath}/${name}.yaml`);
         const config = parseYaml(content);
-        this.third.assets[name].yaml.set("config.yaml", config);
+        this.third.assets[name].yaml.set(name, config);
         if(config) return config;
         
     }

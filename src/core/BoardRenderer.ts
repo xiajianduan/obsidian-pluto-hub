@@ -4,7 +4,7 @@ import { readFileAsArrayBuffer } from "utils/helper";
 import { t } from "utils/translation";
 import { ModuleAction } from "./ModuleAction";
 import PlutoHubPlugin from "main";
-import { CoreManager } from "exec/CoreManager";
+import { CoreManager } from "manager/CoreManager";
 import { ViewResolver } from "./ViewResolver";
 
 export class BoardRenderer {
@@ -32,7 +32,7 @@ export class BoardRenderer {
             .setButtonText(t('pluto.hub.dashboard.add-module'))
             .setClass('btn_nob')
             .onClick(async () => {
-                const promise = pluto.form.create({type: 'G'});
+                const promise = pluto.formManager.create({type: 'G'});
                 promise.then(async (name) => {
                     await this.moduleAction.create(name);
                     this.resolver.borad();
@@ -54,7 +54,7 @@ export class BoardRenderer {
             .setButtonText(t('pluto.hub.dashboard.export-all'))
             .setClass('btn_nob')
             .onClick(async () => {
-                pluto.form.prompt(t('pluto.hub.export.all-label'), true).then(async (name) => {
+                pluto.formManager.prompt(t('pluto.hub.export.all-label'), true).then(async (name) => {
                     await this.showExportAllDialog(name);
                 }).catch(e => {
                     new Notice(e.message);
@@ -133,7 +133,7 @@ export class BoardRenderer {
                 }
                 await ModStorage.saveModule(this.plugin, mod);
                 if (mod.enabled) {
-                    CoreManager.runBundle(mod, true);
+                    pluto.coreManager.runBundle(mod, true);
                     card.style.filter = '';
                 } else {
                     // 如果模块被禁用，移除该模块的所有样式
@@ -189,7 +189,7 @@ export class BoardRenderer {
                 .setClass('mod-tooltip-btn')
                 .onClick(async (e) => {
                     e.stopPropagation();
-                    const result = await pluto.form.openSetting(mod);
+                    const result = await pluto.formManager.openSetting(mod);
                     await this.moduleAction.save(result as unknown as MiniModule);
                 });
 
@@ -217,7 +217,7 @@ export class BoardRenderer {
                         const buffer = await readFileAsArrayBuffer(file);
                         // 导入模块
                         const modules = await ModStorage.importModule(this.plugin, buffer);
-                        CoreManager.runModules(modules, true);
+                        pluto.coreManager.runModules(modules, true);
                         new Notice(t('pluto.hub.import-success'));
                         this.resolver.borad();
                     } catch (e) {

@@ -1,6 +1,5 @@
 import { FormModalConfig } from "types/form";
 import { t } from "utils/translation";
-
 export class FormJson {
 
     static input(title: string, name: string, required: boolean): FormModalConfig {
@@ -49,7 +48,7 @@ export class FormJson {
             name: "form-module",
             fields: [{
                 name: "type",
-                label: "类型",
+                label: "分类",
                 required: true,
                 input: {
                     type: "select",
@@ -61,6 +60,27 @@ export class FormJson {
                         {
                             value: "I",
                             label: "重要"
+                        }
+                    ]
+                },
+            }, {
+                name: "position",
+                label: "配置位置",
+                required: true,
+                input: {
+                    type: "select",
+                    options: [
+                        {
+                            value: "Z",
+                            label: "压缩文件"
+                        },
+                        {
+                            value: "L",
+                            label: "本地目录"
+                        },
+                        {
+                            value: "S",
+                            label: "浏览存储"
                         }
                     ]
                 },

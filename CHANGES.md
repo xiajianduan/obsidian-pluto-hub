@@ -15,6 +15,8 @@
 - `src/view/PlutoTextView.ts` - 新增了文本视图
 - `src/exec/SimpleExecutor.ts` - 新增了简单执行器，替代SimpleCoreExecutor
 - `src/exec/YamlExecutor.ts` - 新增了YAML执行器，支持YAML文件处理
+- `src/exec/PageExecutor.ts` - 新增了Page执行器，支持page类型文件处理
+- `src/manager/ThemeManager.ts` - 新增了主题管理器，支持多种主题切换
 - `src/utils/array.ts` - 新增了数组扩展工具，添加groupBy方法
 - `src/utils/const.ts` - 新增了常量定义文件
 
@@ -30,11 +32,17 @@
 - 优化了模块存储逻辑，移除了pako压缩开关
 - 重构执行器系统，将SimpleCoreExecutor重命名为SimpleExecutor
 - 新增YAML执行器，支持YAML文件处理
+- 新增Page执行器，支持page类型文件处理
 - 优化第三方组件实现，重命名SimpleThirdComponent为SimpleComponent
 - 增强表单功能，新增FormJson组件
 - 扩展数组方法，添加groupBy功能
 - 优化提示信息，使用自定义表单提示替代QuickAdd依赖
 - Templater组件配置文件从JSON改为YAML
+- 重构了管理器结构，将CoreManager、FormManager、ViewManager统一移动到manager目录，提高代码组织性
+- 新增主题管理功能，支持多种主题切换和自定义主题
+- 优化了Pluto核心类的结构，将管理器统一命名为Manager后缀
+- 优化了YamlExecutor和SandboxExecutor的实现
+- 增强了FormJson的表单配置功能
 
 ### Files Modified
 - `package.json` - 更新了依赖配置
@@ -45,11 +53,23 @@
 - `src/core/ViewManager.ts` - 优化了视图管理器
 - `src/core/ViewResolver.ts` - 方法重命名和优化
 - `src/exec/CoreManager.ts` - 方法调用更新
-- `src/exec/CssExecutor.ts` - 优化了CSS执行器
+- `src/exec/CssExecutor.ts` - 优化了CSS执行器，增强了功能
 - `src/exec/ImageExecutor.ts` - 优化了图片执行器
 - `src/exec/JsonExecutor.ts` - 优化了JSON执行器
 - `src/exec/MarkdownExecutor.ts` - 优化了Markdown执行器
-- `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器
+- `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器实现
+- `src/exec/SimpleExecutor.ts` - 优化了简单执行器实现
+- `src/exec/YamlExecutor.ts` - 优化了YAML执行器，增强了功能
+- `src/manager/CoreManager.ts` - 移动到manager目录，优化了核心管理器实现
+- `src/manager/FormManager.ts` - 移动到manager目录，优化了表单管理器
+- `src/manager/ViewManager.ts` - 移动到manager目录，优化了视图管理器
+- `src/modal/FormJson.ts` - 增强了表单JSON配置功能
+- `src/modal/PlutoFormModal.tsx` - 优化了Pluto表单弹窗实现
+- `src/pluto.ts` - 重构了管理器结构，统一使用Manager后缀命名，新增主题管理器
+- `src/third/DvaComponent.ts` - 优化了Dva组件实现
+- `src/types/global.d.ts` - 更新了全局类型定义，添加了Manager类型和page执行器类型
+- `src/utils/helper.ts` - 优化了辅助工具函数
+- `src/view/PlutoTextView.ts` - 优化了文本视图
 - `src/i18n/en.ts` - 更新了国际化字符串
 - `src/i18n/zh-cn.ts` - 更新了国际化字符串
 - `src/main.ts` - 添加了路径检查方法
@@ -77,11 +97,15 @@
 
 ### Renamed
 - `src/third/SimpleThirdComponent.ts` -> `src/third/SimpleComponent.ts` - 重命名简单第三方组件
+- `src/exec/CoreManager.ts` -> `src/manager/CoreManager.ts` - 将核心管理器移动到manager目录
+- `src/modal/FormManager.ts` -> `src/manager/FormManager.ts` - 将表单管理器移动到manager目录
+- `src/core/ViewManager.ts` -> `src/manager/ViewManager.ts` - 将视图管理器移动到manager目录
 
 ### Deleted
 - `src/types/pluto.d.ts` - 删除了过时的类型定义
 - `src/third/FormComponent.ts` - 删除了FormComponent组件
 - `src/exec/SimpleCoreExecutor.ts` - 删除了SimpleCoreExecutor，由SimpleExecutor替代
+- `src/exec/CoreManager.ts` - 移动到manager目录（已重命名）
 
 ## [1.1.4] - 2026-01-06
 

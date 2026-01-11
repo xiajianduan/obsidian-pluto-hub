@@ -36,8 +36,8 @@ export class ViewManager {
             state: {
                 title: props.name,
                 icon: props.id,
-                text: pluto.third.assets[props.app].page.get(props.click),
-                file: props.app,
+                file: props.click,
+                app: props.name,
                 mode: "preview"
             },
         });

@@ -29,6 +29,7 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
+		"monkey-around": "^3.0.0",
 		"obsidian": "latest",
 		"pako": "^2.1.0"
 	}

@@ -89,9 +89,6 @@ export class ModuleAction {
 
         // 重新加载模块
         // this.plugin.runAllEnabled();
-
-        // 显示保存成功通知
-        new Notice(t('pluto.hub.editor.module-saved'));
     }
 
     async export(moduleKey: string) {

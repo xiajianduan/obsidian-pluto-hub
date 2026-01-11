@@ -52,6 +52,7 @@ export class CoreManager {
             }
         } catch (e: any) {
             new Notice(e.message);
+            navigator.clipboard.writeText(e.stack);
             console.info(`%c[Pluto Hub] ${e}`, 'color: red');
         }
 

@@ -37,14 +37,18 @@ export class PlutoTextView extends ItemView {
     }
 
     async render() {
-        const { text } = this.state;
+        const { app, file } = this.state;
+        if(!pluto.third.assets[app]) {
+            await sleep(12000);
+        }
+        const markdown = pluto.third.assets[app].page.get(file);
         this.content = this.containerEl.querySelector(".view-content")!;
         const contentEl = this.content.createEl("div", { cls: "markdown-preview-view markdown-rendered node-insert-event is-readable-line-width allow-fold-headings allow-fold-lists show-indentation-guide" });
         let render = MarkdownRenderer.render(
             this.app,
-            text,
+            markdown,
             contentEl,
-            this.state.file, //文件路径，可选
+            `${app}/${file}`, //文件路径，可选
             this //组件上下文
         );
     }

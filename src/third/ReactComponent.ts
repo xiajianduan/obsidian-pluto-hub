@@ -1,9 +1,22 @@
+import { around } from "monkey-around";
 import { SimpleComponent } from "./SimpleComponent";
 
 export class ReactComponent extends SimpleComponent {
 
     get pluginId(): string {
         return 'obsidian-react-components';
+    }
+    patch(): void {
+        around(pluto.third.react.op, {
+            getPropertyValue(oldMethod) {
+                return (propertyName: string, file: string) => {
+                    if (propertyName === 'react-components-namespace' && !file) {
+                        return 'Global';
+                    }
+                    return oldMethod.apply(this, [propertyName, file]);
+                }
+            }
+        });
     }
 
     async load(params: ModParams): Promise<void> {
@@ -28,7 +41,7 @@ export class ReactComponent extends SimpleComponent {
             }
         }
     }
-    
+
     getMatches(regex: RegExp, str: string): RegExpExecArray[] {
         let result: RegExpExecArray | null;
         const list: RegExpExecArray[] = [];
@@ -43,6 +56,7 @@ export class ReactComponent extends SimpleComponent {
 
     async execute(block: any): Promise<void> {
         this.check();
+        if(!block.started) await sleep(1000);
         this.op.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
     }
 }

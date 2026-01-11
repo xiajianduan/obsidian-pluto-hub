@@ -74,8 +74,7 @@ export class Pluto implements IPluto {
             const component: ThirdComponent = this.third[prop];
             const op = this.app.plugins.plugins[component.pluginId];
             if (op) {
-                await sleep(1000); // 等待 1 秒，确保插件完全加载
-                component.bind(op, prop).executeAll();
+                await component.bind(op, prop).executeAll();
                 return true;
             }
             return false;
@@ -89,7 +88,7 @@ export class Pluto implements IPluto {
             if (await tryBind()) {
                 clearInterval(timer); // 绑定成功后停止轮询
             }
-        }, 3000);
+        }, 1000);
 
         // 设置一个超时保护，防止无限轮询（30 秒后停止）
         setTimeout(() => clearInterval(timer), 30000);

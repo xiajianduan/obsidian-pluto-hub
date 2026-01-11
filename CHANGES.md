@@ -1,6 +1,6 @@
 # Changes Log
 
-## [1.1.5] - 2026-01-09
+## [1.1.5] - 2026-01-11
 
 ### Added
 - `src/core/ViewManager.ts` - 新增了视图管理器，优化视图系统
@@ -43,11 +43,17 @@
 - 优化了Pluto核心类的结构，将管理器统一命名为Manager后缀
 - 优化了YamlExecutor和SandboxExecutor的实现
 - 增强了FormJson的表单配置功能
+- 实现了模块卡片拖拽排序功能，支持直观调整模块顺序
+- 优化了插件绑定机制，移除了不必要的延迟，提高了插件加载速度
+- 优化了Dashboard Header和搜索输入框样式，添加了半透明背景和模糊效果
+- 重构了模块卡片布局，从grid改为flex，优化了间距和阴影效果
+- 增强了错误处理机制，添加了错误堆栈复制功能
+- 优化了视图管理器的状态处理，调整了参数顺序
 
 ### Files Modified
 - `package.json` - 更新了依赖配置
-- `src/core/BoardRenderer.ts` - 优化了看板渲染器和导出路径处理
-- `src/core/EditorRenderer.ts` - 优化了导出路径处理
+- `src/core/BoardRenderer.ts` - 实现了模块卡片拖拽排序功能，优化了看板渲染器和导出路径处理
+- `src/core/EditorRenderer.ts` - 优化了导出路径处理，添加了保存成功通知
 - `src/core/MirrorRenderer.ts` - 优化了镜像渲染器实现
 - `src/core/ModuleAction.ts` - 方法重命名
 - `src/core/ViewManager.ts` - 优化了视图管理器
@@ -60,12 +66,12 @@
 - `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器实现
 - `src/exec/SimpleExecutor.ts` - 优化了简单执行器实现
 - `src/exec/YamlExecutor.ts` - 优化了YAML执行器，增强了功能
-- `src/manager/CoreManager.ts` - 移动到manager目录，优化了核心管理器实现
+- `src/manager/CoreManager.ts` - 优化了核心管理器实现，添加了错误堆栈复制功能
 - `src/manager/FormManager.ts` - 移动到manager目录，优化了表单管理器
-- `src/manager/ViewManager.ts` - 移动到manager目录，优化了视图管理器
+- `src/manager/ViewManager.ts` - 优化了视图管理器，调整了状态参数顺序
 - `src/modal/FormJson.ts` - 增强了表单JSON配置功能
 - `src/modal/PlutoFormModal.tsx` - 优化了Pluto表单弹窗实现
-- `src/pluto.ts` - 重构了管理器结构，统一使用Manager后缀命名，新增主题管理器
+- `src/pluto.ts` - 重构了管理器结构，统一使用Manager后缀命名，新增主题管理器，优化了插件绑定机制，移除了不必要的延迟，调整了轮询间隔
 - `src/third/DvaComponent.ts` - 优化了Dva组件实现
 - `src/types/global.d.ts` - 更新了全局类型定义，添加了Manager类型和page执行器类型
 - `src/utils/helper.ts` - 优化了辅助工具函数
@@ -80,12 +86,12 @@
 - `src/pluto.ts` - 实现了FormModal动态表单模态框，支持openForm方法
 - `src/settings.ts` - 更新了默认设置和UI，移除了usePako和columns设置
 - `src/storage.ts` - 优化了路径处理和方法重命名，移除了pako压缩逻辑
-- `src/styles.css` - 添加了表单相关样式，优化了卡片布局
+- `src/styles.css` - 优化了Dashboard Header、搜索输入框和模块卡片样式，添加了拖拽相关样式
 - `src/third/DvaComponent.ts` - 优化了Dva组件
 - `src/third/QaComponent.ts` - 优化了Qa组件
-- `src/third/ReactComponent.ts` - 优化了React组件，添加了错误检查
+- `src/third/ReactComponent.ts` - 优化了React组件，添加了错误检查、patch方法和started状态检查
 - `src/third/SimpleComponent.ts` - 重命名自SimpleThirdComponent，优化了简单组件实现
-- `src/third/TemplaterComponent.ts` - 优化了Templater组件，添加了错误检查，配置文件改为YAML
+- `src/third/TemplaterComponent.ts` - 优化了Templater组件，添加了错误检查和parser状态检查，配置文件改为YAML
 - `src/third/ThirdFactory.ts` - 移除了FormComponent支持，更新了组件映射
 - `src/types/form.d.ts` - 更新了表单字段定义，isRequired改为required，title改为可选，dropdown改为select
 - `src/types/global.d.ts` - 更新了全局类型定义，移除了form组件支持，扩展了Array接口

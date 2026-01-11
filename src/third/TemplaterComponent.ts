@@ -38,6 +38,7 @@ export class TemplaterComponent extends SimpleComponent {
         };
         if (this.op.templater) {
             const current = this.op.templater.functions_generator.internal_functions.generate_params(mod);
+            if(!this.op.templater.parser) await sleep(3000);
             await this.op.templater.parser.parse_commands(block.code, current);
         }
     }

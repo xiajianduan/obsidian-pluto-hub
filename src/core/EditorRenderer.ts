@@ -120,6 +120,8 @@ export class EditorRenderer {
                 // 保存当前文件内容
                 this.saveCurrentEditorContent(module);
                 await this.moduleAction.save(module);
+                // 显示保存成功通知
+                new Notice(t('pluto.hub.editor.module-saved'));
             });
 
         // 删除按钮（移到导航栏）

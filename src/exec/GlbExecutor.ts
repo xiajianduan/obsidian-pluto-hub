@@ -1,17 +1,16 @@
+import { base64ToBlob, base64ToBlobUrl, readFileAsBase64 } from "utils/helper";
 import { SimpleExecutor } from "./SimpleExecutor";
-import { base64ToBlob, base64ToBlobUrl, isImageFile, readFileAsBase64 } from "utils/helper";
 
-export class ImageExecutor extends SimpleExecutor {
+export class GlbExecutor extends SimpleExecutor {
 
     excutable(type: string): boolean {
-        return isImageFile(type);
+        return type === 'glb';
     }
 
-    async execute(module: MiniModule): Promise<void> {
+    async execute(module: MiniModule, started: boolean): Promise<void> {
         for (const file of module.tmpFiles!) {
             // 将配置挂载到 pluto.assets[模块名]
-            const blobUrl = base64ToBlobUrl(file.content, file.type);
-            file.blobUrl = blobUrl;
+            const blobUrl = base64ToBlobUrl(file.content, `model/gltf-binary`);
             pluto.third.assets[module.name][file.name] = blobUrl;
         };
     }

@@ -9,7 +9,7 @@ export class PageExecutor extends SimpleExecutor {
     async execute(module: MiniModule, started: boolean): Promise<void> {
         for (const file of module.tmpFiles!) {
             // 将配置挂载到 pluto.assets[模块名]
-            pluto.third.assets[module.name].page.set(file.name, file.content);
+            pluto.third.assets[module.name][file.name] = file.content;
         };
     }
 }

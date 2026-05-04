@@ -17,12 +17,12 @@ export class YamlExecutor extends SimpleExecutor {
             }
             if (file.name === 'css.yaml') {
                 const css = parseYaml(file.content);
-                pluto.third.assets[module.name].yaml.set(file.name, css);
+                pluto.third.assets[module.name][file.name] = css;
                 for (const key of Object.keys(css)) {
                     //key值格式为 pluto-background@@bg-work
-                    //取值方法 pluto.third.assets['默认皮肤'].css.get('pluto-background').settings.find(t=> t.id==='bg-work')
+                    //取值方法 pluto.third.assets['默认皮肤']['pluto-background'].settings.find(t=> t.id==='bg-work')
                     const vars = key.split('@@');
-                    const target = pluto.third.assets[module.name].css.get(vars[0]!);
+                    const target = pluto.third.assets[module.name][vars[0]!];
                     const object = target.settings.find((t: any) => t.id === vars[1]!);
                     //格式为 {id: 'bg-work', title: 'Activate Image Background', title.zh: '开启背景', type: 'class-toggle', default: false}
                     if (object.type === 'class-toggle' && css[key]) {
@@ -34,7 +34,7 @@ export class YamlExecutor extends SimpleExecutor {
                 return;
             }
             file.content = parseYaml(file.content);
-            pluto.third.assets[module.name].yaml.set(file.name, file.content);
+            pluto.third.assets[module.name][file.name] = file.content;
             return;
         };
     }

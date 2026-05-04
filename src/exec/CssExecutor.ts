@@ -30,6 +30,6 @@ export class CssExecutor extends SimpleExecutor {
         const matches = code.match(/\/\* @settings([\s\S]+?)\*\//);
         if (!matches) return;
         const settings = parseYaml(matches[1]!);
-        pluto.third.assets[name].css.set(settings.id, settings);
+        pluto.third.assets[name][settings.id] = settings;
     }
 }

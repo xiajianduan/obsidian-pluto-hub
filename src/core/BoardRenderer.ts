@@ -4,7 +4,6 @@ import { readFileAsArrayBuffer } from "utils/helper";
 import { t } from "utils/translation";
 import { ModuleAction } from "./ModuleAction";
 import PlutoHubPlugin from "main";
-import { CoreManager } from "manager/CoreManager";
 import { ViewResolver } from "./ViewResolver";
 
 export class BoardRenderer {

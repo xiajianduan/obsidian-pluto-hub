@@ -10,7 +10,7 @@ export class JsonExecutor extends SimpleExecutor {
         for (const file of module.tmpFiles!) {
             const config = JSON.parse(file.content);
             // 将配置挂载到 pluto.assets[模块名]
-            pluto.third.assets[module.name].json.set(file.name, config);
+            pluto.third.assets[module.name][file.name] = config;
         };
     }
 }

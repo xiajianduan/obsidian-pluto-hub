@@ -34,7 +34,7 @@ export class ViewManager {
         leaf.setViewState({
             type: VIEW_TYPE_TEXT,
             state: {
-                title: props.name,
+                title: props.label,
                 icon: props.id,
                 file: props.click,
                 app: props.name,

@@ -121,6 +121,10 @@ declare global {
          * 执行所有注册的组件
          */
         executeAll(): Promise<void>;
+
+        read(file: File): Promise<string>;
+
+        write(filePath: string, content: string, type: string): Promise<void>;
     }
 
     // 定义模块的元数据接口

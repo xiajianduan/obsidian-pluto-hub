@@ -1,4 +1,5 @@
 import { parseYaml } from "obsidian";
+import { readFileAsText } from "utils/helper";
 
 // 创建一个简单的CoreExecutor实现，用于其他插件
 export class SimpleExecutor implements CoreExecutor {
@@ -23,13 +24,20 @@ export class SimpleExecutor implements CoreExecutor {
             if (!await app.vault.adapter.exists(configFile)) {
                 await app.vault.adapter.write(configFile, content);
                 let yaml = parseYaml(content);
-                pluto.third.assets[name].yaml.set(name, yaml);
+                pluto.third.assets[name][name] = yaml;
                 return true;
             }
         }
         content = await app.vault.adapter.read(configFile);
         let yaml = parseYaml(content);
-        pluto.third.assets[name].yaml.set(name, yaml);
+        pluto.third.assets[name][name] = yaml;
         return false;
+    }
+
+    async read(file: File): Promise<string> {
+        return await readFileAsText(file);
+    }
+    async write(filePath: string, content: string, type: string): Promise<void> {
+        return await app.vault.adapter.write(filePath, content);
     }
 }

@@ -8,10 +8,13 @@ import PlutoHubPlugin from "main";
 import { Notice } from "obsidian";
 import { YamlExecutor } from "../exec/YamlExecutor";
 import { PageExecutor } from "exec/PageExecutor";
+import { GlbExecutor } from "exec/GlbExecutor";
+import { t } from "utils/translation";
 
 
 // CoreComponent工厂类，用于根据prop创建相应的组件实例
 export class CoreManager {
+
     static core: Core;
     // 使用映射对象替代switch case，根据prop创建相应的组件实例
     private componentMap: Record<string, any> = {
@@ -19,9 +22,11 @@ export class CoreManager {
         'yaml': YamlExecutor,
         'json': JsonExecutor,
         'jpg': ImageExecutor,
+        'gif': ImageExecutor,
         'md': MarkdownExecutor,
         'js': SandboxExecutor,
         'page': PageExecutor,
+        'glb': GlbExecutor,
     };
 
     create(prop: string): CoreExecutor {
@@ -29,16 +34,9 @@ export class CoreManager {
         const ComponentClass = this.componentMap[prop];
         return new ComponentClass();
     }
-    
+
     async runBundle(module: MiniModule, started: boolean): Promise<void> {
-        const entry = {
-            json: new Map(),
-            images: new Map(),
-            yaml: new Map(),
-            css: new Map(),
-            page: new Map(),
-        };
-        pluto.third.assets[module.name] = entry;
+        pluto.third.assets[module.name] = {};
         try {
             const filesByType = module.files.groupBy(file => file.type);
             for (const key of Object.keys(this.componentMap)) {
@@ -55,7 +53,6 @@ export class CoreManager {
             navigator.clipboard.writeText(e.stack);
             console.info(`%c[Pluto Hub] ${e}`, 'color: red');
         }
-
     }
 
     async runModules(modules: MiniModule[], started: boolean) {
@@ -77,5 +74,62 @@ export class CoreManager {
         // 从存储中加载所有模块
         const modules = await ModStorage.loadAllFromStorage(plugin);
         this.runModules(modules, false);
+    }
+
+    async importFile(bundle: MiniModule, files: File[], callback: Function) {
+        let importedCount = 0;
+        let failedCount = 0;
+
+        // 遍历所有选中的文件
+        for (const file of files) {
+            try {
+                // 确定文件类型
+                let type: string;
+                const lastDotIndex = file.name.lastIndexOf('.');
+                if (lastDotIndex > 0) {
+                    type = file.name.substring(lastDotIndex + 1).toLowerCase();
+                } else {
+                    // 如果没有扩展名，使用默认类型
+                    type = 'text';
+                }
+
+                // 根据文件类型选择读取方式
+                const executor = this.create(type);
+                let content = await executor.read(file);
+
+                // 检查文件名是否已存在
+                if (bundle.files.some(f => f.name === file.name)) {
+                    failedCount++;
+                    continue; // 跳过已存在的文件
+                }
+
+                // 创建新文件并添加到bundle
+                const newFile: ModFile = {
+                    name: file.name,
+                    type: type,
+                    content: content
+                };
+                bundle.files.push(newFile);
+                importedCount++;
+            } catch (error) {
+                failedCount++;
+                console.error('File import failed:', error);
+            }
+        }
+        callback(importedCount, failedCount);
+    }
+
+    exportModule(folder: string, module: MiniModule) {
+        for (const file of module.files) {
+            const filePath = `${folder}/${file.name}`;
+            const executor = this.create(file.type);
+            try {
+                executor.write(filePath, file.content, file.type);
+            } catch (e) {
+                console.error(`Failed to export file ${file.name}:`, e);
+                new Notice(t('pluto.hub.export.file-failure').replace('{filename}', file.name));
+            }
+        }
+        new Notice(t('pluto.hub.export.all-files-success').replace('{modname}', module.name));
     }
 }

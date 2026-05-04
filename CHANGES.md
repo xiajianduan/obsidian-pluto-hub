@@ -1,6 +1,6 @@
 # Changes Log
 
-## [1.1.5] - 2026-01-11
+## [1.1.5] - 2026-01-12
 
 ### Added
 - `src/core/ViewManager.ts` - 新增了视图管理器，优化视图系统
@@ -16,6 +16,7 @@
 - `src/exec/SimpleExecutor.ts` - 新增了简单执行器，替代SimpleCoreExecutor
 - `src/exec/YamlExecutor.ts` - 新增了YAML执行器，支持YAML文件处理
 - `src/exec/PageExecutor.ts` - 新增了Page执行器，支持page类型文件处理
+- `src/exec/GlbExecutor.ts` - 新增了GLB执行器，支持GLB文件处理
 - `src/manager/ThemeManager.ts` - 新增了主题管理器，支持多种主题切换
 - `src/utils/array.ts` - 新增了数组扩展工具，添加groupBy方法
 - `src/utils/const.ts` - 新增了常量定义文件
@@ -33,6 +34,7 @@
 - 重构执行器系统，将SimpleCoreExecutor重命名为SimpleExecutor
 - 新增YAML执行器，支持YAML文件处理
 - 新增Page执行器，支持page类型文件处理
+- 新增GLB执行器，支持GLB文件处理
 - 优化第三方组件实现，重命名SimpleThirdComponent为SimpleComponent
 - 增强表单功能，新增FormJson组件
 - 扩展数组方法，添加groupBy功能
@@ -49,6 +51,11 @@
 - 重构了模块卡片布局，从grid改为flex，优化了间距和阴影效果
 - 增强了错误处理机制，添加了错误堆栈复制功能
 - 优化了视图管理器的状态处理，调整了参数顺序
+- 优化了CoreManager，新增了importFile和exportModule方法，支持批量导入导出文件
+- 优化了配置文件访问方式，移除了yaml/json的get方法调用，改用直接属性访问
+- 优化了PlutoTextView的页面获取方式，从page.get改为直接属性访问
+- 为CoreExecutor接口添加了read和write方法，增强了执行器的文件操作能力
+- 优化了ViewManager的标题属性，从props.name改为props.label
 
 ### Files Modified
 - `package.json` - 更新了依赖配置
@@ -60,22 +67,24 @@
 - `src/core/ViewResolver.ts` - 方法重命名和优化
 - `src/exec/CoreManager.ts` - 方法调用更新
 - `src/exec/CssExecutor.ts` - 优化了CSS执行器，增强了功能
+- `src/exec/GlbExecutor.ts` - 新增了GLB执行器，支持GLB文件处理
 - `src/exec/ImageExecutor.ts` - 优化了图片执行器
 - `src/exec/JsonExecutor.ts` - 优化了JSON执行器
 - `src/exec/MarkdownExecutor.ts` - 优化了Markdown执行器
 - `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器实现
 - `src/exec/SimpleExecutor.ts` - 优化了简单执行器实现
 - `src/exec/YamlExecutor.ts` - 优化了YAML执行器，增强了功能
-- `src/manager/CoreManager.ts` - 优化了核心管理器实现，添加了错误堆栈复制功能
+- `src/exec/PageExecutor.ts` - 优化了Page执行器
+- `src/manager/CoreManager.ts` - 优化了核心管理器实现，添加了错误堆栈复制功能，新增了importFile和exportModule方法
 - `src/manager/FormManager.ts` - 移动到manager目录，优化了表单管理器
-- `src/manager/ViewManager.ts` - 优化了视图管理器，调整了状态参数顺序
+- `src/manager/ViewManager.ts` - 优化了视图管理器，调整了状态参数顺序，优化了标题属性
 - `src/modal/FormJson.ts` - 增强了表单JSON配置功能
 - `src/modal/PlutoFormModal.tsx` - 优化了Pluto表单弹窗实现
-- `src/pluto.ts` - 重构了管理器结构，统一使用Manager后缀命名，新增主题管理器，优化了插件绑定机制，移除了不必要的延迟，调整了轮询间隔
+- `src/pluto.ts` - 重构了管理器结构，统一使用Manager后缀命名，新增主题管理器，优化了插件绑定机制，移除了不必要的延迟，调整了轮询间隔，优化了配置文件访问方式
 - `src/third/DvaComponent.ts` - 优化了Dva组件实现
-- `src/types/global.d.ts` - 更新了全局类型定义，添加了Manager类型和page执行器类型
+- `src/types/global.d.ts` - 更新了全局类型定义，添加了Manager类型和page执行器类型，为CoreExecutor添加了read和write方法
 - `src/utils/helper.ts` - 优化了辅助工具函数
-- `src/view/PlutoTextView.ts` - 优化了文本视图
+- `src/view/PlutoTextView.ts` - 优化了文本视图，优化了页面获取方式
 - `src/i18n/en.ts` - 更新了国际化字符串
 - `src/i18n/zh-cn.ts` - 更新了国际化字符串
 - `src/main.ts` - 添加了路径检查方法

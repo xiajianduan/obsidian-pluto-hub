@@ -120,6 +120,7 @@ export class EditorRenderer {
                 // 保存当前文件内容
                 this.saveCurrentEditorContent(module);
                 await this.moduleAction.save(module);
+                pluto.coreManager.runBundle(module, true);
                 // 显示保存成功通知
                 new Notice(t('pluto.hub.editor.module-saved'));
             });
@@ -202,35 +203,7 @@ export class EditorRenderer {
             this.saveCurrentEditorContent(module);
 
             // 导出每个文件
-            for (const file of module.files) {
-                const filePath = `${folder}/${file.name}`;
-                const adapter = this.plugin.app.vault.adapter;
-
-                if (isImageFile(file.type)) {
-                    // 处理图片文件
-                    try {
-                        const blob = base64ToBlob(file.content, file.type);
-                        if (blob) {
-                            await adapter.writeBinary(filePath, await blob.arrayBuffer());
-                        } else {
-                            throw new Error('Failed to convert base64 to blob');
-                        }
-                    } catch (e) {
-                        console.error(`Failed to export image file ${file.name}:`, e);
-                        new Notice(t('pluto.hub.export.file-failure').replace('{filename}', file.name));
-                    }
-                } else {
-                    // 处理文本文件
-                    try {
-                        await adapter.write(filePath, file.content);
-                    } catch (e) {
-                        console.error(`Failed to export text file ${file.name}:`, e);
-                        new Notice(t('pluto.hub.export.file-failure').replace('{filename}', file.name));
-                    }
-                }
-            }
-
-            new Notice(t('pluto.hub.export.all-files-success').replace('{modname}', mod.name));
+            pluto.coreManager.exportModule(folder, mod);
         } catch (e) {
             console.error("Failed to export files:", e);
             new Notice(t('pluto.hub.export.all-files-failure'));
@@ -328,71 +301,27 @@ export class EditorRenderer {
             const target = e.target as HTMLInputElement;
             if (target.files && target.files.length > 0) {
                 const files = Array.from(target.files);
-                let importedCount = 0;
-                let failedCount = 0;
+                pluto.coreManager.importFile(bundle, files, async(importedCount: number, failedCount: number) => {
+                    if (importedCount > 0) {
+                        // 保存更改
+                        await this.moduleAction.save(bundle);
 
-                // 遍历所有选中的文件
-                for (const file of files) {
-                    try {
-                        // 确定文件类型
-                        let type: string;
-                        const lastDotIndex = file.name.lastIndexOf('.');
-                        if (lastDotIndex > 0) {
-                            type = file.name.substring(lastDotIndex + 1).toLowerCase();
-                        } else {
-                            // 如果没有扩展名，使用默认类型
-                            type = 'text';
+                        // 重新渲染文件侧边栏和编辑器
+                        this.currentFileIndex = bundle.files.length - 1;
+                        this.renderFileSidebar(el.querySelector('.pluto-file-sidebar')!, bundle, editorContainer);
+
+                        // 重新渲染编辑器并选中最后导入的文件
+                        this.mirrorRenderer.destroy();
+                        const lastFile = bundle.files[this.currentFileIndex];
+                        if (lastFile) {
+                            this.mirrorRenderer.render(editorContainer, lastFile);
                         }
 
-                        // 根据文件类型选择读取方式
-                        let content: string;
-                        if (isImageFile(type)) {
-                            // 图片文件使用 base64 编码
-                            content = await readFileAsBase64(file);
-                        } else {
-                            // 文本文件使用普通文本读取
-                            content = await readFileAsText(file);
-                        }
-
-                        // 检查文件名是否已存在
-                        if (bundle.files.some(f => f.name === file.name)) {
-                            failedCount++;
-                            continue; // 跳过已存在的文件
-                        }
-
-                        // 创建新文件并添加到bundle
-                        const newFile: ModFile = {
-                            name: file.name,
-                            type: type,
-                            content: content
-                        };
-                        bundle.files.push(newFile);
-                        importedCount++;
-                    } catch (error) {
-                        failedCount++;
-                        console.error('File import failed:', error);
+                        new Notice(`${importedCount} ${t('pluto.hub.editor.files-imported')}${failedCount > 0 ? `, ${failedCount} ${t('pluto.hub.editor.files-failed')}` : ''}`);
+                    } else {
+                        new Notice(t('pluto.hub.editor.no-files-imported'));
                     }
-                }
-
-                if (importedCount > 0) {
-                    // 保存更改
-                    await this.moduleAction.save(bundle);
-
-                    // 重新渲染文件侧边栏和编辑器
-                    this.currentFileIndex = bundle.files.length - 1;
-                    this.renderFileSidebar(el.querySelector('.pluto-file-sidebar')!, bundle, editorContainer);
-
-                    // 重新渲染编辑器并选中最后导入的文件
-                    this.mirrorRenderer.destroy();
-                    const lastFile = bundle.files[this.currentFileIndex];
-                    if (lastFile) {
-                        this.mirrorRenderer.render(editorContainer, lastFile);
-                    }
-
-                    new Notice(`${importedCount} ${t('pluto.hub.editor.files-imported')}${failedCount > 0 ? `, ${failedCount} ${t('pluto.hub.editor.files-failed')}` : ''}`);
-                } else {
-                    new Notice(t('pluto.hub.editor.no-files-imported'));
-                }
+                });
             }
         };
 

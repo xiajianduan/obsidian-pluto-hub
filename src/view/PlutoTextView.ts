@@ -41,7 +41,7 @@ export class PlutoTextView extends ItemView {
         if(!pluto.third.assets[app]) {
             await sleep(12000);
         }
-        const markdown = pluto.third.assets[app].page.get(file);
+        const markdown = pluto.third.assets[app][file];
         this.content = this.containerEl.querySelector(".view-content")!;
         const contentEl = this.content.createEl("div", { cls: "markdown-preview-view markdown-rendered node-insert-event is-readable-line-width allow-fold-headings allow-fold-lists show-indentation-guide" });
         let render = MarkdownRenderer.render(

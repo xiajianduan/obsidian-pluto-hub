@@ -101,15 +101,15 @@ export class Pluto implements IPluto {
     }
 
     getConfig(name: string) {
-        const config = this.third.assets[name].yaml.get(name);
+        const config = this.third.assets[name][name];
         if(config) return config;
-        return this.third.assets[name].json.get("data.json");
+        return this.third.assets[name]["data.json"];
     }
 
     async getConfigLive(name: string) {
         const content = await app.vault.adapter.read(`${pluto.self.settings.configPath}/${name}.yaml`);
         const config = parseYaml(content);
-        this.third.assets[name].yaml.set(name, config);
+        this.third.assets[name][name] = config;
         if(config) return config;
         
     }

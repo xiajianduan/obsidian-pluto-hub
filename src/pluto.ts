@@ -9,32 +9,32 @@ import { find_tfile, getAvailablePlugins } from "utils/helper";
 import { ViewManager } from "manager/ViewManager";
 import { FormManager } from "manager/FormManager";
 import ThemeManager from "manager/ThemeManager";
+import { ConfigManager } from "manager/ConfigManager";
+import { PluginContext } from "core/PluginContext";
 
 export class Pluto implements IPluto {
     app: App;
-    config: any;
     web: any;
     images: any;
     third: Third;
-    self: PlutoHubPlugin;
+    self: obsidian.PlutoPlugin;
     helper: any;
     skin: any;
     themeManager: ThemeManager;
     viewManager: ViewManager;
     coreManager: CoreManager;
     formManager: FormManager;
+    configManager: ConfigManager;
 
-
-
-    constructor(plugin: PlutoHubPlugin) {
-        this.app = plugin.app;
-        this.config = {};
-        this.self = plugin;
+    constructor() {
+        this.app = PluginContext.plugin.app;
+        this.self = PluginContext.plugin;
         window.pluto = this;
         this.viewManager = new ViewManager();
         this.formManager = new FormManager();
         this.themeManager = new ThemeManager();
         this.coreManager = new CoreManager();
+        this.configManager = new ConfigManager();
     }
 
     boot() {
@@ -51,10 +51,10 @@ export class Pluto implements IPluto {
         this.third = ThirdFactory.createThirdComponent(settings.configPath);
         const plugin = this.self;
         // 注册视图
-        this.viewManager.build(plugin);
+        this.viewManager.build();
         // 在布局准备就绪时加载所有模块
         plugin.app.workspace.onLayoutReady(async () => {
-            await this.coreManager.runAllEnabled(plugin);
+            await this.coreManager.runAllEnabled();
             // 动态检测并绑定第三方插件依赖
             this.bindPluginDependencies();
         });
@@ -98,20 +98,6 @@ export class Pluto implements IPluto {
         let resourcePath = this.app.vault.adapter.getResourcePath(path);
         const file = resourcePath.split("?")[0]!;
         return import(file);
-    }
-
-    getConfig(name: string) {
-        const config = this.third.assets[name][name];
-        if(config) return config;
-        return this.third.assets[name]["data.json"];
-    }
-
-    async getConfigLive(name: string) {
-        const content = await app.vault.adapter.read(`${pluto.self.settings.configPath}/${name}.yaml`);
-        const config = parseYaml(content);
-        this.third.assets[name][name] = config;
-        if(config) return config;
-        
     }
 
     getModule(name: string) {

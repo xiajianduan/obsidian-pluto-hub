@@ -1,17 +1,21 @@
+import { PluginContext } from 'core/PluginContext';
 import PlutoHubPlugin from 'main';
+import { PlutoPlugin } from 'obsidian';
 import * as pako from 'pako';
 import { MODULE_ORDER } from 'utils/const';
-import { base64ToBlobUrl, promptMessage } from 'utils/helper';
+import { base64ToBlobUrl } from 'utils/helper';
 
 export class ModStorage {
     // 获取模块存储目录路径
-    static getModulesDir(plugin: PlutoHubPlugin): string {
+    static getModulesDir(): string {
+        const plugin = PluginContext.plugin;
         return plugin.settings.moduleStoragePath;
     }
 
     // 获取单个模块的存储路径（使用模块名称作为文件名）
-    static getModulePath(plugin: PlutoHubPlugin, moduleName: string): string {
-        const dir = plugin.settings.moduleStoragePath;;
+    static getModulePath(moduleName: string): string {
+        const plugin = PluginContext.plugin;
+        const dir = plugin.settings.moduleStoragePath;
         // 清理文件名，移除可能导致问题的字符，但允许中文字符
         const safeName = moduleName.replace(/[^a-zA-Z0-9_\u4e00-\u9fa5-]/g, '_');
         return `${dir}/${safeName}.ops`;
@@ -36,8 +40,10 @@ export class ModStorage {
     }
 
     // 保存单个模块
-    static async saveModule(plugin: PlutoHubPlugin, module: MiniModule): Promise<void> {
-        const path = this.getModulePath(plugin, module.name);
+    static async saveModule(module: MiniModule): Promise<void> {
+        const plugin = PluginContext.plugin;
+        const dir = plugin.settings.moduleStoragePath;
+        const path = this.getModulePath(module.name);
         // 移除bgUrl字段，因为它不应该被序列化
         delete module.bgUrl;
         // 移除files数组中的blobUrl字段，因为它不应该被序列化
@@ -48,7 +54,8 @@ export class ModStorage {
     }
 
     // 加载单个模块
-    static async loadModule(plugin: PlutoHubPlugin, fileName: string): Promise<MiniModule> {
+    static async loadModule(fileName: string): Promise<MiniModule> {
+        const plugin = PluginContext.plugin;
         const modulesDir = plugin.settings.moduleStoragePath;
         // 检查fileName是否已经是完整路径
         const filePath = fileName.startsWith('/') || fileName.startsWith('.obsidian') 
@@ -79,6 +86,7 @@ export class ModStorage {
             id: fileName,
             name: fileName,
             type: '',
+            position: '',
             order: MODULE_ORDER,
             enabled: false,
             files: [{ name: 'main.js', type: 'js', content: 'new Notice(params.name);' }]
@@ -86,9 +94,10 @@ export class ModStorage {
     }
 
     // 全量备份：将所有模块（包括MiniModule和ModuleBundle）压缩为一个pako文件
-    static async backupAllModules(plugin: PlutoHubPlugin, targetPath: string): Promise<void> {
+    static async backupAllModules(targetPath: string): Promise<void> {
+        const plugin = PluginContext.plugin;
         // 从存储中加载所有模块
-        const modules = await this.loadAllFromStorage(plugin);
+        const modules = await this.loadAllFromStorage();
         // 压缩并导出
         const jsonStr = JSON.stringify(modules);
         const binary = pako.deflate(jsonStr);
@@ -96,15 +105,17 @@ export class ModStorage {
     }
 
     // 单模块导出
-    static async exportModule(plugin: PlutoHubPlugin, moduleKey: string, targetPath: string): Promise<void> {
-        const bundle = await this.loadModule(plugin, moduleKey);
+    static async exportModule(moduleKey: string, targetPath: string): Promise<void> {
+        const plugin = PluginContext.plugin;
+        const bundle = await this.loadModule(moduleKey);
         const jsonStr = JSON.stringify(bundle);
         const binary = pako.deflate(jsonStr);
         await plugin.app.vault.adapter.writeBinary(targetPath, binary.buffer);
     }
 
     // 从存储路径读取所有模块
-    static async loadAllFromStorage(plugin: PlutoHubPlugin): Promise<MiniModule[]> {
+    static async loadAllFromStorage(): Promise<MiniModule[]> {
+        const plugin = PluginContext.plugin;
         const modulesDir = plugin.settings.moduleStoragePath;
         const adapter = plugin.app.vault.adapter;
         
@@ -116,7 +127,7 @@ export class ModStorage {
         const loadedModules: MiniModule[] = [];
         
         for (const fileName of moduleFiles) {
-            const module = await this.loadModule(plugin, fileName);
+            const module = await this.loadModule(fileName);
             loadedModules.push(module);
         }
         
@@ -125,7 +136,8 @@ export class ModStorage {
     }
 
     // 导入功能：支持单个模块或全量导入
-    static async importModule(plugin: PlutoHubPlugin, buffer: ArrayBuffer): Promise<MiniModule[]> {
+    static async importModule(buffer: ArrayBuffer): Promise<MiniModule[]> {
+        const plugin = PluginContext.plugin;
         const uint8 = new Uint8Array(buffer);
         const jsonStr = pako.inflate(uint8, { to: 'string' });
         const data = JSON.parse(jsonStr);
@@ -135,14 +147,14 @@ export class ModStorage {
             // 单个模块导入
             const module = data as MiniModule;
             // 保存ModuleBundle到磁盘
-            await this.saveModule(plugin, module);
+            await this.saveModule(module);
             return [module];
         } else if (data.length) {
             // 全量备份导入
             const importedModules = data as MiniModule[];
             // 保存所有MiniModule
             for (const importedModule of importedModules) {
-                await this.saveModule(plugin, importedModule);
+                await this.saveModule(importedModule);
             }
             return importedModules;
         } else {

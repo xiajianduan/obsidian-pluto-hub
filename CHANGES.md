@@ -1,5 +1,44 @@
 # Changes Log
 
+## [1.1.6] - 2026-05-06
+
+### Added
+- `src/core/PluginContext.ts` - 新增了插件上下文，提供全局插件实例访问
+- `src/manager/ConfigManager.ts` - 新增了配置管理器，统一管理配置
+- `README.md` - 全面更新了README文档，完善了功能说明和项目结构
+
+### Improved
+- 重构了插件初始化逻辑，使用PluginContext统一管理插件实例
+- 优化了CoreManager的实现，改进了模块运行和更新逻辑
+- 优化了YamlExecutor、SandboxExecutor、SimpleExecutor的实现
+- 改进了存储管理，优化了模块保存和加载逻辑
+- 增强了类型定义，完善了global.d.ts和obsidian.d.ts
+- 更新了README文档，补充了最新功能说明、项目结构和使用指南
+- 优化了ViewManager的视图构建和状态管理逻辑
+- 改进了BoardRenderer和ModuleAction的实现
+- 更新了TypeScript配置，优化了编译选项
+
+### Files Modified
+- `package.json` - 更新了版本号到1.1.6
+- `manifest.json` - 更新了版本号到1.1.6
+- `README.md` - 全面更新了文档，完善了功能说明、快速开始、高级用法等内容
+- `src/core/BoardRenderer.ts` - 优化了看板渲染器实现
+- `src/core/ModuleAction.ts` - 优化了模块操作管理器
+- `src/core/PluginContext.ts` - 新增了插件上下文管理
+- `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器实现
+- `src/exec/SimpleExecutor.ts` - 优化了简单执行器实现
+- `src/exec/YamlExecutor.ts` - 优化了YAML执行器实现
+- `src/main.ts` - 优化了插件初始化逻辑
+- `src/manager/ConfigManager.ts` - 新增了配置管理器
+- `src/manager/CoreManager.ts` - 优化了核心管理器实现
+- `src/manager/ViewManager.ts` - 优化了视图管理器
+- `src/pluto.ts` - 重构了Pluto核心类，优化了初始化和插件绑定逻辑
+- `src/storage.ts` - 优化了存储管理
+- `src/types/global.d.ts` - 更新了全局类型定义
+- `src/types/obsidian.d.ts` - 更新了Obsidian类型定义
+- `tsconfig.json` - 更新了TypeScript配置
+- `versions.json` - 更新了版本信息
+
 ## [1.1.5] - 2026-01-12
 
 ### Added

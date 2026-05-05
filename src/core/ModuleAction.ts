@@ -17,7 +17,7 @@ export class ModuleAction {
      * 加载所有模块的辅助方法，避免重复调用ModStorage.loadAllModulesFromStorage
      */
     async loadAll(): Promise<MiniModule[]> {
-        return await ModStorage.loadAllFromStorage(this.plugin);
+        return await ModStorage.loadAllFromStorage();
     }
 
     async create(name: string) {
@@ -47,14 +47,15 @@ export class ModuleAction {
             id: newId,
             name: name,
             type: 'G',
+            position: "Z",
             order: MODULE_ORDER,
             enabled: true,
             bgColor: bgColor,
-            files: moduleFiles
+            files: moduleFiles,
         };
 
         // 保存到磁盘
-        await ModStorage.saveModule(this.plugin, newMod);
+        await ModStorage.saveModule(newMod);
     }
 
     async delete(id: string) {
@@ -64,7 +65,7 @@ export class ModuleAction {
 
         if (mod) {
             // 2. 从磁盘移除文件
-            const path = ModStorage.getModulePath(this.plugin, mod.name);
+            const path = ModStorage.getModulePath(mod.name);
             if (await this.plugin.app.vault.adapter.exists(path)) {
                 await this.plugin.app.vault.adapter.remove(path);
             }
@@ -85,7 +86,7 @@ export class ModuleAction {
         }
 
         // 保存到磁盘
-        await ModStorage.saveModule(this.plugin, module);
+        await ModStorage.saveModule(module);
 
         // 重新加载模块
         // this.plugin.runAllEnabled();
@@ -96,9 +97,8 @@ export class ModuleAction {
         const allModules = await this.loadAll();
         const mod = allModules.find(m => m.name === moduleKey);
         if (!mod) return;
-
         try {
-            await ModStorage.exportModule(this.plugin, moduleKey, `${mod.name}.ops`);
+            await ModStorage.exportModule(moduleKey, `${mod.name}.ops`);
             new Notice(t('pluto.hub.export.module-success'));
         } catch (e) {
             console.error("Failed to export module:", e);

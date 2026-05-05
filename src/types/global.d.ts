@@ -132,6 +132,7 @@ declare global {
         id: string;
         name: string;
         type: string;
+        position: string;
         order: number;
         enabled: boolean;
         bgColor?: string; // 用于存储随机渐变色

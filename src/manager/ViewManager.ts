@@ -1,3 +1,4 @@
+import { PluginContext } from "core/PluginContext";
 import PlutoHubPlugin from "main";
 import { VIEW_TYPE_BOARD, PlutoBoardView } from "view/PlutoBoardView";
 import { PlutoFileView, VIEW_TYPE_FILE } from "view/PlutoFileView";
@@ -7,12 +8,12 @@ export class ViewManager {
 
     plugin: PlutoHubPlugin;
 
-    async build(plugin: PlutoHubPlugin) {
-        this.plugin = plugin;
+    async build() {
+        this.plugin = PluginContext.plugin;
         // 注册 PlutoBoardView 视图
-        plugin.registerView(VIEW_TYPE_BOARD, (leaf) => new PlutoBoardView(leaf, plugin));
-        plugin.registerView(VIEW_TYPE_FILE, leaf=> new PlutoFileView(leaf));
-        plugin.registerView(VIEW_TYPE_TEXT, leaf=> new PlutoTextView(leaf));
+        this.plugin.registerView(VIEW_TYPE_BOARD, (leaf) => new PlutoBoardView(leaf, this.plugin));
+        this.plugin.registerView(VIEW_TYPE_FILE, leaf=> new PlutoFileView(leaf));
+        this.plugin.registerView(VIEW_TYPE_TEXT, leaf=> new PlutoTextView(leaf));
     }
 
     viewfile(props: any) {

@@ -4,7 +4,6 @@ import { ImageExecutor } from "../exec/ImageExecutor";
 import { JsonExecutor } from "../exec/JsonExecutor";
 import { MarkdownExecutor } from "../exec/MarkdownExecutor";
 import { ModStorage } from "storage";
-import PlutoHubPlugin from "main";
 import { Notice } from "obsidian";
 import { YamlExecutor } from "../exec/YamlExecutor";
 import { PageExecutor } from "exec/PageExecutor";
@@ -67,13 +66,32 @@ export class CoreManager {
     }
 
     // 运行所有启用的模块
-    async runAllEnabled(plugin: PlutoHubPlugin) {
+    async runAllEnabled() {
         // 清理所有 Pluto 注入的旧样式，防止重复累积
         document.querySelectorAll('[id^="pluto-css-"]').forEach(el => el.remove());
 
         // 从存储中加载所有模块
-        const modules = await ModStorage.loadAllFromStorage(plugin);
+        const modules = await this.getAllModules();
         this.runModules(modules, false);
+    }
+
+    async getAllModules() {
+        return await ModStorage.loadAllFromStorage();
+    }
+
+    async updateModules(oldSegment: string, newSegment: string) {
+        const targetTypes = ['js', 'md'];
+        const modules = await this.getAllModules();
+        for (const module of modules) {
+            const jsFilesToUpdate = module.files.filter(
+                file => targetTypes.includes(file.type) && file.content.includes(oldSegment)
+            );
+            if (jsFilesToUpdate.length === 0) continue;
+            for (const file of jsFilesToUpdate) {
+                file.content = file.content.replaceAll(oldSegment, newSegment);
+            }
+            await ModStorage.saveModule(module);
+        }
     }
 
     async importFile(bundle: MiniModule, files: File[], callback: Function) {

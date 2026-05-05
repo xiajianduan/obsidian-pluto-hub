@@ -1,9 +1,9 @@
 import { Plugin, PlutoPlugin } from 'obsidian';
-import { ModStorage } from './storage';
 import { DEFAULT_SETTINGS, PlutoSettingTab } from 'settings';
 import { t } from 'utils/translation';
 import { Pluto } from './pluto';
 import { Arrays } from 'utils/array';
+import { PluginContext } from 'core/PluginContext';
 
 export default class PlutoHubPlugin extends Plugin implements PlutoPlugin {
 
@@ -13,7 +13,8 @@ export default class PlutoHubPlugin extends Plugin implements PlutoPlugin {
         await this.loadSettings();
         // 从存储路径加载所有模块
         await this.checkAndCreatePath();
-        await ModStorage.loadAllFromStorage(this);
+        // 初始化插件上下文
+        await PluginContext.init(this);
         await this.initializePlugin();
         // 初始化 i18n 翻译函数
         this.i18n();
@@ -49,7 +50,7 @@ export default class PlutoHubPlugin extends Plugin implements PlutoPlugin {
         // 加载数组扩展函数
         Arrays.loadFunctions();
         // 初始化并挂载全局 Pluto 对象
-        new Pluto(this).boot();
+        new Pluto().boot();
     }
 
     addCustomRibbonIcon() {

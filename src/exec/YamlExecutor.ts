@@ -12,7 +12,7 @@ export class YamlExecutor extends SimpleExecutor {
         for (const file of module.tmpFiles!) {
             // 将配置挂载到 pluto.assets[模块名]
             if (file.name === 'config.yaml' || file.name === 'nav.yaml') {
-                await this.createConfigFile(module.name, file.content, started);
+                await this.createConfigFile(module.name, module.position, file.content, started);
                 return;
             }
             if (file.name === 'css.yaml') {

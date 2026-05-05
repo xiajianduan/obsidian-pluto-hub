@@ -136,7 +136,7 @@ export class BoardRenderer {
                     mod.enabled = true;
                     cboxEl.classList.add('is-enabled');
                 }
-                await ModStorage.saveModule(this.plugin, mod);
+                await ModStorage.saveModule(mod);
                 if (mod.enabled) {
                     pluto.coreManager.runBundle(mod, true);
                     card.style.filter = '';
@@ -368,7 +368,7 @@ export class BoardRenderer {
             // 异步保存所有受影响的模块（不阻塞 UI）
             setTimeout(async () => {
                 for (const moduleToSave of modulesWithoutDragged) {
-                    await ModStorage.saveModule(this.plugin, moduleToSave);
+                    await ModStorage.saveModule(moduleToSave);
                 }
             }, 0);
         });
@@ -390,7 +390,7 @@ export class BoardRenderer {
                         // 读取文件内容
                         const buffer = await readFileAsArrayBuffer(file);
                         // 导入模块
-                        const modules = await ModStorage.importModule(this.plugin, buffer);
+                        const modules = await ModStorage.importModule(buffer);
                         pluto.coreManager.runModules(modules, true);
                         new Notice(t('pluto.hub.import-success'));
                         this.resolver.borad();
@@ -409,7 +409,7 @@ export class BoardRenderer {
         // 使用配置中的备份目录
         const backupFolder = this.plugin.settings.backupFolderName;
         const backupFile = `${backupFolder}/${name}.ops`;
-        await ModStorage.backupAllModules(this.plugin, backupFile);
+        await ModStorage.backupAllModules(backupFile);
         new Notice(t('pluto.hub.export.all-success') + backupFile);
     }
 }

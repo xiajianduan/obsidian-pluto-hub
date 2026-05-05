@@ -11,6 +11,7 @@ declare module 'obsidian' {
     export interface PlutoPlugin {
         settings: PlutoSettings;
         manifest: PluginManifest;
+        app: App;
     }
     interface ViewStateResult {
         layout: any;

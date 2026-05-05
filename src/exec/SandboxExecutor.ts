@@ -22,11 +22,7 @@ export class SandboxExecutor extends SimpleExecutor {
         const Config = pluto.third.modules[module.name]?.Config;
         if (Config) {
             const config = new Config();
-            config.init(async (content: any) => {
-                const created = await this.createConfigFile(module.name, content, started);
-                if (created) config.finish?.();
-                return started;
-            });
+            if(started) config.start();
         }
     }
 

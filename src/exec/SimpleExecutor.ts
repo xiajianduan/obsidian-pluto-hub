@@ -18,7 +18,12 @@ export class SimpleExecutor implements CoreExecutor {
         }
     }
 
-    async createConfigFile(name: string, content: any, started: boolean): Promise<boolean> {
+    async createConfigFile(name: string, position: string, content: any, started: boolean): Promise<boolean> {
+        if(position === "Z") {
+            let yaml = parseYaml(content);
+            pluto.third.assets[name][name] = yaml;
+            return false;
+        }
         const configFile = `${pluto.self.settings.configPath}/${name}.yaml`;
         if (started) {
             if (!await app.vault.adapter.exists(configFile)) {

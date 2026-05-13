@@ -2,16 +2,19 @@ import { SimpleExecutor } from "./SimpleExecutor";
 
 export class SandboxExecutor extends SimpleExecutor {
 
+    private static instances = new Map<string, any>();
+
     excutable(type: string): boolean {
         return type === 'js';
     }
 
-    async execute(module: MiniModule, started: boolean) {
+    async execute(module: MiniModule) {
         const bootJs = module.tmpFiles!.find(f => f.name === 'boot.js');
         if (bootJs) {
-            const def = this.load({ module, file: bootJs, started: true });
+            const def = this.load({ ...module, file: bootJs });
             if (def) {
                 const boot = new def.Boot();
+                SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
                 boot.start();
                 this.execModule(module);
                 boot.finish?.();
@@ -19,17 +22,12 @@ export class SandboxExecutor extends SimpleExecutor {
         } else {
             this.execModule(module);
         }
-        const Config = pluto.third.modules[module.name]?.Config;
-        if (Config) {
-            const config = new Config();
-            if(started) config.start();
-        }
     }
 
     private execModule(module: MiniModule) {
         const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
         const object = jsFiles.reduce((prev: any, file) => {
-            const result = this.load({ module, file, started: true });
+            const result = this.load({ ...module, tmpFiles: module.tmpFiles!, file });
             return Object.assign(prev, result);
         }, {});
         // 如果有模块导出结果，将其挂载到 pluto.modules
@@ -39,7 +37,7 @@ export class SandboxExecutor extends SimpleExecutor {
     }
 
     load(params: ModParams): any {
-        const { module, file } = params;
+        const { id, name, tmpFiles, file } = params;
         // 创建模块导出对象
         const moduleExports: Record<string, any> = {};
         const exports = moduleExports;
@@ -49,12 +47,13 @@ export class SandboxExecutor extends SimpleExecutor {
             pluto,
             // 将模块信息暴露给脚本
             params: {
-                ...module,
+                id,
+                name,
                 configPath,
-                configFile: `${configPath}/${module.name}.yaml`
+                configFile: `${configPath}/${name}.yaml`
             },
             // 允许 JS 访问同模块下的其他文件
-            getFile: (name: string) => module.files.find(f => f.name === name)?.content,
+            getFile: (name: string) => tmpFiles!.find(f => f.name === name)?.content,
             // 添加 CommonJS 模块导出支持
             module: { exports: moduleExports },
             exports: exports,
@@ -83,6 +82,21 @@ export class SandboxExecutor extends SimpleExecutor {
         } else if (Object.keys(moduleExports).length > 0) {
             // 其次使用 module.exports 或 exports
             return moduleExports;
+        }
+    }
+
+    async install(context: BatchContext): Promise<void> {
+        const boot = SandboxExecutor.instances.get(context.id);
+        if (boot) {
+            boot.install?.(context);
+        }
+    }
+
+    async uninstall(context: BatchContext): Promise<void> {
+        const boot = SandboxExecutor.instances.get(context.id);
+        if (boot) {
+            boot.uninstall?.(context);
+            SandboxExecutor.instances.delete(context.id);  // 清理实例实例
         }
     }
 }

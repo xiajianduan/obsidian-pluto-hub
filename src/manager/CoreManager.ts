@@ -22,6 +22,7 @@ export class CoreManager {
         'json': JsonExecutor,
         'jpg': ImageExecutor,
         'gif': ImageExecutor,
+        'webp': ImageExecutor,
         'md': MarkdownExecutor,
         'js': SandboxExecutor,
         'page': PageExecutor,
@@ -33,8 +34,28 @@ export class CoreManager {
         const ComponentClass = this.componentMap[prop];
         return new ComponentClass();
     }
+    async installBundle(module: MiniModule): Promise<void> {
+        try {
+            const filesByType = module.files.groupBy(file => file.type);
+            for (const key of Object.keys(this.componentMap)) {
+                const files = filesByType[key];
+                if (files && files.length > 0) {
+                    const executor = this.create(key);
+                    module.tmpFiles = files;
+                    await executor.execute(module);
+                    delete module.tmpFiles;
+                    await executor.install({ ...module, files });
+                }
+            }
+            delete pluto.third.modules?.[module.name];
+        } catch (e: any) {
+            new Notice(e.message);
+            navigator.clipboard.writeText(e.stack);
+            console.info(`%c[Pluto Hub] ${e}`, 'color: red');
+        }
+    }
 
-    async runBundle(module: MiniModule, started: boolean): Promise<void> {
+    async runBundle(module: MiniModule): Promise<void> {
         pluto.third.assets[module.name] = {};
         try {
             const filesByType = module.files.groupBy(file => file.type);
@@ -43,7 +64,7 @@ export class CoreManager {
                 if (files && files.length > 0) {
                     const executor = this.create(key);
                     module.tmpFiles = files;
-                    await executor.execute(module, started);
+                    await executor.execute(module);
                     delete module.tmpFiles;
                 }
             }
@@ -53,15 +74,41 @@ export class CoreManager {
             console.info(`%c[Pluto Hub] ${e}`, 'color: red');
         }
     }
+    async uninstallBundle(module: MiniModule): Promise<void> {
+        try {
+            const filesByType = module.files.groupBy(file => file.type);
+            for (const key of Object.keys(this.componentMap)) {
+                const files = filesByType[key];
+                if (files && files.length > 0) {
+                    const executor = this.create(key);
+                    module.tmpFiles = files;
+                    await executor.execute(module);
+                    delete module.tmpFiles;
+                    await executor.uninstall({ ...module, files });
+                }
+            }
+            delete pluto.third.modules?.[module.name];
+        } catch (e: any) {
+            new Notice(e.message);
+            navigator.clipboard.writeText(e.stack);
+            console.info(`%c[Pluto Hub] ${e}`, 'color: red');
+        }
+    }
 
-    async runModules(modules: MiniModule[], started: boolean) {
+    async runBundles(modules: MiniModule[]) {
         const sorted = modules.filter(mod => mod.enabled).sort((a, b) => a.order - b.order);
         for (const mod of sorted) {
             if (mod.type === 'I') {
-                await this.runBundle(mod, started);
+                await this.runBundle(mod);
             } else {
-                this.runBundle(mod, started);
+                this.runBundle(mod);
             }
+        }
+    }
+    async installBundles(modules: MiniModule[]) {
+        const sorted = modules.filter(mod => mod.enabled).sort((a, b) => a.order - b.order);
+        for (const mod of sorted) {
+            await this.installBundle(mod);
         }
     }
 
@@ -72,7 +119,7 @@ export class CoreManager {
 
         // 从存储中加载所有模块
         const modules = await this.getAllModules();
-        this.runModules(modules, false);
+        this.runBundles(modules);
     }
 
     async getAllModules() {

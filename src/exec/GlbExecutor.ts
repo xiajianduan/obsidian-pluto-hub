@@ -7,7 +7,7 @@ export class GlbExecutor extends SimpleExecutor {
         return type === 'glb';
     }
 
-    async execute(module: MiniModule, started: boolean): Promise<void> {
+    async execute(module: MiniModule): Promise<void> {
         for (const file of module.tmpFiles!) {
             // 将配置挂载到 pluto.assets[模块名]
             const blobUrl = base64ToBlobUrl(file.content, `model/gltf-binary`);

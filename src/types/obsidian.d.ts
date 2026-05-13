@@ -3,8 +3,13 @@ import { PluginManifest } from "obsidian";
 declare module 'obsidian' {
     interface App {
         plugins: Plugins;
+        vault: Vault;
     }
-    interface Plugins {
+    interface Vault {
+        readJson<T>(filePath: string): Promise<T>;
+        readRaw(filePath: string): Promise<string>;
+    }
+       interface Plugins {
         plugins: Record<string, PlutoPlugin>;
         manifests: Record<string, PluginManifest>;
     }

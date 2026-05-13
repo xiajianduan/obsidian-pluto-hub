@@ -120,7 +120,7 @@ export class EditorRenderer {
                 // 保存当前文件内容
                 this.saveCurrentEditorContent(module);
                 await this.moduleAction.save(module);
-                pluto.coreManager.runBundle(module, true);
+                pluto.coreManager.installBundle(module);
                 // 显示保存成功通知
                 new Notice(t('pluto.hub.editor.module-saved'));
             });

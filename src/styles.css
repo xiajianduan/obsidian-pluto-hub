@@ -257,7 +257,6 @@
     display: flex;
     flex: 1;
     gap: 10px;
-    overflow: hidden;
     border: 1px solid var(--background-modifier-border);
     border-radius: 8px;
 }

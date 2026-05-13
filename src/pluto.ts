@@ -45,7 +45,7 @@ export class Pluto implements IPluto {
             stringifyYaml: obsidian.stringifyYaml.bind(obsidian),
             parseYaml: parseYaml.bind(obsidian),
             getAvailablePlugins: getAvailablePlugins.bind(this),
-            flushComponents: this.third?.react?.op?.requestComponentUpdate.bind(this.third.react.op),
+            flushComponents: this.third?.react?.requestComponentUpdate.bind(this.third.react),
             obsidian,
         };
         this.third = ThirdFactory.createThirdComponent(settings.configPath);
@@ -56,14 +56,7 @@ export class Pluto implements IPluto {
         plugin.app.workspace.onLayoutReady(async () => {
             await this.coreManager.runAllEnabled();
             // 动态检测并绑定第三方插件依赖
-            this.bindPluginDependencies();
-        });
-    }
-
-    // 绑定第三方插件依赖
-    bindPluginDependencies() {
-        Object.keys(ThirdFactory.componentMap).forEach((prop: PlutoProps) => {
-            this.bindPlugin(prop);
+            ThirdFactory.loop((prop: PlutoProps) => this.bindPlugin(prop));
         });
     }
 

@@ -6,7 +6,7 @@ export class JsonExecutor extends SimpleExecutor {
         return type === 'json';
     }
         
-    async execute(module: MiniModule, started: boolean): Promise<void> {
+    async execute(module: MiniModule): Promise<void> {
         for (const file of module.tmpFiles!) {
             const config = JSON.parse(file.content);
             // 将配置挂载到 pluto.assets[模块名]

@@ -49,10 +49,10 @@ declare global {
     export interface Third {
         assets: any;
         modules: any;
-        dva: ThirdComponent;
-        react: ThirdComponent;
-        qa: ThirdComponent;
-        templater: ThirdComponent;
+        dva: any;
+        react: any;
+        qa: any;
+        templater: any;
     }
 
     export interface Core {
@@ -66,11 +66,10 @@ declare global {
     }
 
     export interface ThirdComponent {
-        op: any;
-        api: any;
-        codes: Map<string, any>;
 
         get pluginId(): string;
+        get prop(): PlutoProps;
+        codes: Map<string, any>;
         /**
          * 补丁组件，用于修改组件的行为
          */
@@ -91,7 +90,7 @@ declare global {
          * @param key 组件的唯一键名
          * @param code 组件的代码配置对象
          */
-        register(key: string, code: any): void;
+        register(name: string, key: string, block: any): void;
         /**
          * 加载组件
          * @param params 组件加载参数对象
@@ -108,15 +107,23 @@ declare global {
         executeAll(): Promise<void>;
     }
     export interface CoreExecutor {
-
-        codes: Map<string, any>;
+        /**
+         * 安装组件注册
+         * @param context 组件上下文对象
+         */
+        install(context: BatchContext): Promise<void>;
+        /**
+         * 卸载组件注册
+         * @param context 组件上下文对象
+         */
+        uninstall(context: BatchContext): Promise<void>;
 
         excutable(type: string): boolean;
         /**
          * 执行组件注册
          * @param block 组件代码块对象
          */
-        execute(module: MiniModule, started: boolean): Promise<void>;
+        execute(module: MiniModule): Promise<void>;
         /**
          * 执行所有注册的组件
          */
@@ -146,11 +153,18 @@ declare global {
         content: string;
         blobUrl?: string; // 用于存储图片 Blob URL
     }
+    export interface BatchContext {
+        id: string;
+        name: string;
+        position: string;
+        files: ModFile[];
+    }
     export interface ModParams {
-        module: MiniModule;
+        id: string;
+        name: string;
+        tmpFiles?: ModFile[];
         file: ModFile;
         yaml?: any;
-        started: boolean;
     }
 }
 

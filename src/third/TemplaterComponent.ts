@@ -8,8 +8,8 @@ export class TemplaterComponent extends SimpleComponent {
     }
 
     patch(): void {
-        if (this.op.templater) {
-            this.op.templater.functions_generator.internal_functions.generate_params = function (params: any) {
+        if (this.self.templater) {
+            this.self.templater.functions_generator.internal_functions.generate_params = function (params: any) {
                 let t: any = {};
                 for (let r of this.modules_array) {
                     t[r.getName()] = r.static_object;
@@ -19,15 +19,12 @@ export class TemplaterComponent extends SimpleComponent {
         }
     }
     async load(params: ModParams): Promise<void> {
-        const { module, file, started } = params;
-        const name = module.name;
+        const { name, file } = params;
         const block = {
             code: file.content,
-            name: name
+            name: name  
         };
-        this.register(`${name}-${file.name}`, block);
-        // 运行代码
-        if (started) await this.execute(block);
+        this.register(name, block);
     }
     async execute(block: any): Promise<void> {
         this.check();
@@ -36,10 +33,11 @@ export class TemplaterComponent extends SimpleComponent {
             configPath: this.configPath,
             configFile: `${this.configPath}/${block.name}.yaml`
         };
-        if (this.op.templater) {
-            const current = this.op.templater.functions_generator.internal_functions.generate_params(mod);
-            if(!this.op.templater.parser) await sleep(3000);
-            await this.op.templater.parser.parse_commands(block.code, current);
+        const templater = this.self.templater;
+        if (templater) {
+            const current = templater.functions_generator.internal_functions.generate_params(mod);
+            if(!templater.parser) await sleep(3000);
+            await templater.parser.parse_commands(block.code, current);
         }
     }
 }

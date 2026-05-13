@@ -20,7 +20,7 @@ export class BoardRenderer {
         this.contentEl = resolver.contentEl;
         this.moduleAction = resolver.moduleAction;
     }
-    
+
     /**
      * 渲染仪表盘界面，显示所有模块列表和搜索功能
      * @param el 渲染仪表盘的容器元素
@@ -32,7 +32,7 @@ export class BoardRenderer {
             .setButtonText(t('pluto.hub.dashboard.add-module'))
             .setClass('btn_nob')
             .onClick(async () => {
-                const promise = pluto.formManager.create({type: 'G'});
+                const promise = pluto.formManager.create({ type: 'G' });
                 promise.then(async (name) => {
                     await this.moduleAction.create(name);
                     this.resolver.borad();
@@ -101,7 +101,7 @@ export class BoardRenderer {
         grid.empty();
         filteredModules.forEach((mod: MiniModule, index: number) => {
             const card = grid.createDiv({ cls: 'pluto-card' });
-            
+
             // 添加拖拽功能
             card.draggable = true;
             card.dataset.modId = mod.id;
@@ -126,10 +126,10 @@ export class BoardRenderer {
             // 启用/禁用开关
             const cboxEl = cardHeader.createDiv({ cls: 'checkbox-container' });
             cboxEl.createEl('input', { type: 'checkbox' });
-            if(mod.enabled) cboxEl.classList.add('is-enabled');
+            if (mod.enabled) cboxEl.classList.add('is-enabled');
             cboxEl.onclick = async (e) => {
                 e.stopPropagation();
-                if(mod.enabled) {
+                if (mod.enabled) {
                     mod.enabled = false;
                     cboxEl.classList.remove('is-enabled');
                 } else {
@@ -138,15 +138,11 @@ export class BoardRenderer {
                 }
                 await ModStorage.saveModule(mod);
                 if (mod.enabled) {
-                    pluto.coreManager.runBundle(mod, true);
+                    pluto.coreManager.installBundle(mod);
                     card.style.filter = '';
                 } else {
                     // 如果模块被禁用，移除该模块的所有样式
-                    document.querySelectorAll(`[id^="pluto-css-${mod.id}-"]`).forEach(el => el.remove());
-                    // 从pluto.modules中移除该模块的导出
-                    if (pluto.third.modules) {
-                        delete pluto.third.modules[mod.name];
-                    }
+                    pluto.coreManager.uninstallBundle(mod);
                     card.style.filter = 'grayscale(1)';
                 }
             };
@@ -194,10 +190,15 @@ export class BoardRenderer {
                 .setClass('mod-tooltip-btn')
                 .onClick(async (e) => {
                     e.stopPropagation();
-                    const result = await pluto.formManager.openSetting(mod);
-                    await this.moduleAction.save(result as unknown as MiniModule);
-                    // 显示保存成功通知
-                    new Notice(t('pluto.hub.editor.module-saved'));
+                    pluto.formManager.openSetting(mod)
+                        .then(async (result) => {
+                            await this.moduleAction.save(result as unknown as MiniModule);
+                            // 显示保存成功通知
+                            new Notice(t('pluto.hub.editor.module-saved'));
+                        }).catch(e => {
+                            console.log(e.message);
+                            return;
+                        });
                 });
 
             // 点击卡片：切换到编辑状态
@@ -228,7 +229,7 @@ export class BoardRenderer {
         let orderChanged = false;
         const currentOrder = Array.from(grid.children).map(c => (c as HTMLElement).dataset.modId);
         const newOrderIds = newOrder.map(m => m.id);
-        if (currentOrder.length !== newOrderIds.length || 
+        if (currentOrder.length !== newOrderIds.length ||
             currentOrder.some((id, idx) => id !== newOrderIds[idx])) {
             orderChanged = true;
         }
@@ -239,7 +240,7 @@ export class BoardRenderer {
 
         // 启用过渡动画类
         grid.classList.add('reordering');
-        
+
         // 使用双重 requestAnimationFrame 确保浏览器准备好渲染和样式应用
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -252,7 +253,7 @@ export class BoardRenderer {
                         fragment.appendChild(card);
                     }
                 });
-                
+
                 // 清空并重新添加（使用 fragment 可以减少重排）
                 grid.empty();
                 grid.appendChild(fragment);
@@ -277,7 +278,7 @@ export class BoardRenderer {
                 e.preventDefault();
                 return;
             }
-            
+
             this.draggedModId = mod.id;
             card.classList.add('dragging', 'selected');
             if (e.dataTransfer) {
@@ -302,7 +303,7 @@ export class BoardRenderer {
             if (e.dataTransfer) {
                 e.dataTransfer.dropEffect = 'move';
             }
-            
+
             if (this.draggedModId && this.draggedModId !== mod.id) {
                 card.classList.add('drag-over');
             }
@@ -332,7 +333,7 @@ export class BoardRenderer {
             const sortedAllModules = [...allModules].sort((a, b) => a.order - b.order);
             const targetIndex = sortedAllModules.findIndex(m => m.id === mod.id);
             const draggedIndex = sortedAllModules.findIndex(m => m.id === this.draggedModId);
-            
+
             if (draggedIndex === -1 || targetIndex === -1) {
                 return;
             }
@@ -340,7 +341,7 @@ export class BoardRenderer {
             // 重新计算所有模块的 order
             // 从 sortedAllModules 中移除被拖拽的模块
             const modulesWithoutDragged = sortedAllModules.filter(m => m.id !== this.draggedModId);
-            
+
             // 在目标位置插入被拖拽的模块
             modulesWithoutDragged.splice(targetIndex, 0, draggedMod);
 
@@ -391,7 +392,7 @@ export class BoardRenderer {
                         const buffer = await readFileAsArrayBuffer(file);
                         // 导入模块
                         const modules = await ModStorage.importModule(buffer);
-                        pluto.coreManager.runModules(modules, true);
+                        pluto.coreManager.installBundles(modules);
                         new Notice(t('pluto.hub.import-success'));
                         this.resolver.borad();
                     } catch (e) {

@@ -1,5 +1,52 @@
 # Changes Log
 
+## [1.1.7] - 2026-05-14
+
+### Added
+- `AGENTS.md` - 新增了插件开发指南文档，包含项目概述、环境工具、文件约定、测试、安全性、代码规范等内容
+- `BatchContext` 类型 - 新增了批处理上下文类型，用于组件安装和卸载
+- ThirdFactory实例管理 - 新增了instances Map来管理第三方组件实例
+- ThirdFactory辅助方法 - 新增了loop()和getInstance()方法
+
+### Improved
+- 重构了ThirdFactory，新增实例管理和辅助方法
+- 优化了第三方组件接口，新增prop属性，调整了register方法参数
+- 重构了CoreExecutor接口，新增install和uninstall方法，调整了execute方法参数
+- 优化了ModParams类型定义，调整了参数结构
+- 更新了Obsidian类型定义，新增Vault接口和相关方法
+- 优化了所有执行器的实现（CssExecutor、JsonExecutor、MarkdownExecutor、SandboxExecutor、SimpleExecutor、YamlExecutor、PageExecutor、GlbExecutor）
+- 改进了CoreManager、ConfigManager、FormManager的实现
+- 优化了BoardRenderer和EditorRenderer的渲染逻辑
+- 更新了样式文件styles.css
+- 优化了所有第三方组件（DvaComponent、ReactComponent、SimpleComponent、TemplaterComponent）的实现
+
+### Files Modified
+- `package.json` - 更新了版本号到1.1.7
+- `manifest.json` - 更新了版本号到1.1.7
+- `AGENTS.md` - 新增了插件开发指南文档
+- `src/core/BoardRenderer.ts` - 优化了看板渲染器
+- `src/core/EditorRenderer.ts` - 优化了编辑器渲染器
+- `src/exec/CssExecutor.ts` - 优化了CSS执行器
+- `src/exec/GlbExecutor.ts` - 优化了GLB执行器
+- `src/exec/JsonExecutor.ts` - 优化了JSON执行器
+- `src/exec/MarkdownExecutor.ts` - 优化了Markdown执行器
+- `src/exec/PageExecutor.ts` - 优化了Page执行器
+- `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器
+- `src/exec/SimpleExecutor.ts` - 优化了简单执行器
+- `src/exec/YamlExecutor.ts` - 优化了YAML执行器
+- `src/manager/ConfigManager.ts` - 优化了配置管理器
+- `src/manager/CoreManager.ts` - 优化了核心管理器
+- `src/manager/FormManager.ts` - 优化了表单管理器
+- `src/pluto.ts` - 优化了Pluto核心类
+- `src/styles.css` - 更新了样式文件
+- `src/third/DvaComponent.ts` - 优化了Dva组件
+- `src/third/ReactComponent.ts` - 优化了React组件
+- `src/third/SimpleComponent.ts` - 优化了Simple组件
+- `src/third/TemplaterComponent.ts` - 优化了Templater组件
+- `src/third/ThirdFactory.ts` - 重构了ThirdFactory，新增实例管理
+- `src/types/global.d.ts` - 更新了全局类型定义，新增BatchContext，优化了接口定义
+- `src/types/obsidian.d.ts` - 更新了Obsidian类型定义，新增Vault接口
+
 ## [1.1.6] - 2026-05-06
 
 ### Added

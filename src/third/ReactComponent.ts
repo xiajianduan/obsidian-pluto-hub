@@ -6,8 +6,12 @@ export class ReactComponent extends SimpleComponent {
     get pluginId(): string {
         return 'obsidian-react-components';
     }
+    get prop(): PlutoProps {
+        return 'react';
+    }
+    
     patch(): void {
-        around(pluto.third.react.op, {
+        around(this.self, {
             getPropertyValue(oldMethod) {
                 return (propertyName: string, file: string) => {
                     if (propertyName === 'react-components-namespace' && !file) {
@@ -20,24 +24,23 @@ export class ReactComponent extends SimpleComponent {
     }
 
     async load(params: ModParams): Promise<void> {
-        const { module, file, yaml, started } = params;
-        const modelName = module.name;
+        const { name, file, yaml } = params;
         const suppressComponentRefresh = yaml['suppress-component-refresh'] || true;
-        const prefix = `const name = "${modelName}";\n`;
+        const prefix = `const name = "${name}";\n`;
         const matches = this.getMatches(/^\s*?```jsx:component:(.*)\n((.|\n)*?)\n^\s*?```$/gm, file.content);
         for (const match of matches) {
             if (match && match.length === 4) {
                 const namespace = yaml['react-components-namespace'] || 'Global';
-                const name = match[1] || modelName;
+                const blockName = match[1] || name;
                 const block = {
                     code: prefix + match[2],
-                    name: name,
+                    name: blockName,
                     namespace: namespace,
                     suppressRefresh: suppressComponentRefresh
                 };
                 this.register(name, block);
                 // 运行代码
-                if (started) await this.execute(block);
+                // if (started) await this.execute(block);
             }
         }
     }
@@ -56,7 +59,7 @@ export class ReactComponent extends SimpleComponent {
 
     async execute(block: any): Promise<void> {
         this.check();
-        if(!block.started) await sleep(1000);
-        this.op.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
+        await sleep(1000);
+        this.self.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
     }
 }

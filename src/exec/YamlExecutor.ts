@@ -1,6 +1,5 @@
 import { parseYaml } from "obsidian";
 import { SimpleExecutor } from "./SimpleExecutor";
-import ThemeManager from "manager/ThemeManager";
 
 export class YamlExecutor extends SimpleExecutor {
 
@@ -8,11 +7,11 @@ export class YamlExecutor extends SimpleExecutor {
         return type === 'yaml';
     }
 
-    async execute(module: MiniModule, started: boolean): Promise<void> {
+    async execute(module: MiniModule): Promise<void> {
         for (const file of module.tmpFiles!) {
             // 将配置挂载到 pluto.assets[模块名]
             if (file.name === 'config.yaml' || file.name === 'nav.yaml') {
-                await this.createConfigFile(module.name, module.position, file.content, started);
+                await this.readConfigFile(module.name, module.position, file.content);
                 return;
             }
             if (file.name === 'css.yaml') {
@@ -38,5 +37,35 @@ export class YamlExecutor extends SimpleExecutor {
             return;
         };
     }
+    async install(context: BatchContext): Promise<void> {
+        for (const file of context.files) {
+            if (file.name === 'config.yaml' || file.name === 'nav.yaml') {
+                const name = context.name;
+                if (context.position === "Z") {
+                    let yaml = parseYaml(file.content);
+                    pluto.third.assets[name][name] = yaml;
+                } else {
+                    const configFile = `${pluto.self.settings.configPath}/${name}.yaml`;
+                    if (!await app.vault.adapter.exists(configFile)) {
+                        await app.vault.adapter.write(configFile, file.content);
+                        let yaml = parseYaml(file.content);
+                        pluto.third.assets[name][name] = yaml;
+                    }
+                }
 
+            }
+        }
+    }
+
+    async readConfigFile(name: string, position: string, content: string): Promise<void> {
+        if (position === "Z") {
+            let yaml = parseYaml(content);
+            pluto.third.assets[name][name] = yaml;
+        } else {
+            const configFile = `${pluto.self.settings.configPath}/${name}.yaml`;
+            content = await app.vault.adapter.read(configFile);
+            let yaml = parseYaml(content);
+            pluto.third.assets[name][name] = yaml;
+        }
+    }
 }

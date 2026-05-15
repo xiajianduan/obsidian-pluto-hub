@@ -3,7 +3,7 @@
 	"name": "Pluto Hub",
 	"version": "2.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "A powerful Obsidian plugin that allows users to manage, edit, and run local code modules, providing rich extensibility for Obsidian.",
+	"description": "A powerful plugin that allows users to manage, edit, and run local code modules, providing rich extensibility.",
 	"author": "xiajianduan",
 	"authorUrl": "https://github.com/xiajianduan",
 	"fundingUrl": "https://buymeacoffee.com/1553599299u",

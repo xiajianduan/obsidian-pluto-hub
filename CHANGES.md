@@ -4,16 +4,19 @@
 
 ### Added
 - 添加了扩展模块使用文档说明
+- 添加了与其他插件集成的文档说明
+- 添加了示例仓库链接
 
 ### Improved
 - 插件 ID 从 obsidian-pluto-hub 更改为 pluto-hub，符合官方命名规范
+- 优化了第三方插件集成文档描述
+- 更新了 README.md 和 README_zh.md 文档内容
 
 ### Files Modified
 - `manifest.json` - 更新插件 ID 和版本号
-- `README.md` - 添加外部模块使用说明
-- `README_zh.md` - 添加扩展模块使用说明
-
-
+- `README.md` - 添加外部模块使用说明和示例仓库链接
+- `README_zh.md` - 添加扩展模块使用说明和示例仓库链接
+- `LICENSE` - 更新为 MIT 许可证
 ## [1.1.8] - 2026-05-15
 
 ### Added

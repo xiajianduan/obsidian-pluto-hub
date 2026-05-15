@@ -1,55 +1,24 @@
-**[English](./README.md)** | **[中文](./README_zh.md)**
+**English** | **[中文](./README_zh.md)**
 
-# Pluto Hub - Obsidian Code Snippet Marketplace
+# Pluto Hub - Obsidian Code Module Marketplace
 
-Pluto Hub is a powerful Obsidian plugin that allows users to manage, edit, and run local code modules, providing rich extensibility for Obsidian.
+Pluto Hub is a powerful plugin that allows users to manage, edit, and run local code modules, providing rich extensibility.
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/xiajianduan/obsidian-pluto-hub?style=flat-square)](https://github.com/xiajianduan/obsidian-pluto-hub/releases)
 [![GitHub stars](https://img.shields.io/github/stars/xiajianduan/obsidian-pluto-hub?style=flat-square)](https://github.com/xiajianduan/obsidian-pluto-hub/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/xiajianduan/obsidian-pluto-hub?style=flat-square)](https://github.com/xiajianduan/obsidian-pluto-hub/issues)
 [![license](https://img.shields.io/github/license/xiajianduan/obsidian-pluto-hub?style=flat-square)](LICENSE)
 
+## 📚 Example Vault
+
+Want to see Pluto Hub in action? Check out the example vault:
+
+[![Example Vault](https://img.shields.io/badge/Example%20Vault-GitHub-blue?style=flat-square)](https://github.com/xiajianduan/pluto-hub-vault)
+
 ## Features
 
 ### 🎨 Preview
 <img src="./assets/pluto.webp" alt="Interface Preview" width="600">
-
-### 🛠 Custom Modules
-|Module Icon|Module Name|Module Description|Module Preview|
-|--|--|--|--
-|<img src="./assets/module/默认皮肤.png" alt="Default Skin" width="40">|Default Skin|`pluto.themeManager.nextTheme()`|<img src="./assets/skin/熔岩灯影.webp" alt="Lava Lamp Preview" width="200">|
-|<img src="./assets/module/主页冥王.png" alt="Home Pluto" width="40">|Home Pluto|`right.page` `home.page`|<img src="./assets/sample/主页冥王.webp" alt="Home Pluto Preview" width="200">|
-|<img src="./assets/module/主题小猫.png" alt="Theme Cat" width="40">|Theme Cat|Switches cats based on time, component`jsx:<AnimationCute/>`|<img src="./assets/sample/主题小猫.webp" alt="Theme Cat Preview" width="80">|
-|<img src="./assets/module/模块工具.png" alt="Module Tools" width="40">|Module Tools|Basic tools|/|
-|<img src="./assets/module/模块核心.png" alt="Module Core" width="40">|Module Core|Module core functionality|/|
-|<img src="./assets/module/模块功能.png" alt="Module Functions" width="40">|Module Functions|Custom functions|/|
-|<img src="./assets/module/配置规则.png" alt="Config Rules" width="40">|Config Rules|Configuration rules management|/|
-|<img src="./assets/module/启动插件.png" alt="Start Plugins" width="40">|Start Plugins|Plugins|/|
-|<img src="./assets/module/插件配置.png" alt="Plugin Config" width="40">|Plugin Config|/|/|
-|<img src="./assets/module/配置皮肤.png" alt="Config Skin" width="40">|Config Skin|/|/|
-|<img src="./assets/module/配置补全.png" alt="Config Complete" width="40">|Config Complete|/|/|
-|<img src="./assets/module/配置表格.png" alt="Config Table" width="40">|Config Table|/|/|
-|<img src="./assets/module/定制属性.png" alt="Custom Properties" width="40">|Custom Properties|/|/|
-|<img src="./assets/module/定制注脚.png" alt="Custom Footnotes" width="40">|Custom Footnotes|/|/|
-|<img src="./assets/module/定制选项.png" alt="Custom Options" width="40">|Custom Options|/|/|
-|<img src="./assets/module/定制预览.png" alt="Custom Preview" width="40">|Custom Preview|/|/|
-|<img src="./assets/module/控件太极.png" alt="Control Taiji" width="40">|Control Taiji|/|/|
-|<img src="./assets/module/控件按钮.png" alt="Control Button" width="40">|Control Button|/|/|
-|<img src="./assets/module/控件时钟.png" alt="Control Clock" width="40">|Control Clock|/|/|
-|<img src="./assets/module/控件模型.png" alt="Control Model" width="40">|Control Model|/|/|
-|<img src="./assets/module/控件画廊.png" alt="Control Gallery" width="40">|Control Gallery|/|/|
-|<img src="./assets/module/控件皮肤.png" alt="Control Skin" width="40">|Control Skin|/|/|
-|<img src="./assets/module/控件窗口.png" alt="Control Window" width="40">|Control Window|/|/|
-|<img src="./assets/module/控件经络.png" alt="Control Meridian" width="40">|Control Meridian|/|/|
-|<img src="./assets/module/控件音乐.png" alt="Control Music" width="40">|Control Music|/|/|
-|<img src="./assets/module/样式个人.png" alt="Style Personal" width="40">|Style Personal|/|/|
-|<img src="./assets/module/样式代码.png" alt="Style Code" width="40">|Style Code|/|/|
-|<img src="./assets/module/样式彩虹.png" alt="Style Rainbow" width="40">|Style Rainbow|/|/|
-|<img src="./assets/module/样式按钮.png" alt="Style Button" width="40">|Style Button|/|/|
-|<img src="./assets/module/样式标注.png" alt="Style Label" width="40">|Style Label|/|/|
-|<img src="./assets/module/菜单命令.png" alt="Menu Command" width="40">|Menu Command|/|/|
-|<img src="./assets/module/菜单下载.png" alt="Menu Download" width="40">|Menu Download|/|/|
-
 
 ### 📦 Module Management
 - Grid card layout: Beautiful module display interface with custom theme colors
@@ -109,7 +78,7 @@ Pluto Hub is a powerful Obsidian plugin that allows users to manage, edit, and r
 ### Manual Installation
 
 1. Download the latest version files: `main.js`, `styles.css`, `manifest.json`
-2. Copy to your Obsidian vault plugin directory: `<Vault>/.obsidian/plugins/obsidian-pluto-hub/`
+2. Copy to your Obsidian vault plugin directory: `<Vault>/.obsidian/plugins/pluto-hub/`
 3. Restart Obsidian
 4. Enable the plugin in Settings
 
@@ -124,33 +93,22 @@ Pluto Hub is a powerful Obsidian plugin that allows users to manage, edit, and r
 5. Enter code in `main.js`:
 
 ```javascript
-return {
-    hello: function() {
-        console.log('Hello from Pluto Hub!');
-        return 'Hello Pluto!';
-    }
-};
+function hello() {
+    console.log('Hello from Pluto Hub!');
+    return 'Hello Pluto!';
+}
 ```
 
 6. Click "Save all changes" to save
 
-### Use Modules
-
-```javascript
-pluto["My First Module"].hello();
-// Outputs "Hello from Pluto Hub!" and returns "Hello Pluto!"
-```
-
 ### Use Dynamic Forms
 
 ```javascript
-await pluto.formManager.openForm({
+await pluto.formManager.openJson({
     title: "My Form",
-    fields: [
-        { id: "name", type: "text", label: "Name", required: true },
-        { id: "age", type: "number", label: "Age" },
-        { id: "gender", type: "select", label: "Gender", options: ["Male", "Female", "Other"] }
-    ]
+    fields: [{
+        name: "name", label: "Name", required: true, input: { type: 'text', hidden: false }
+    }]
 });
 ```
 
@@ -159,16 +117,9 @@ await pluto.formManager.openForm({
 ### JavaScript Module
 
 ```javascript
-return {
-    greet: function(name) {
-        return `Hello, ${name}!`;
-    },
-    version: "1.0.0",
-    config: {
-        theme: "dark",
-        fontSize: 16
-    }
-};
+function greet(name) {
+    return `Hello, ${name}!`;
+}
 ```
 
 ### CSS Module
@@ -177,12 +128,6 @@ return {
 .my-custom-class {
     color: var(--interactive-accent);
     font-weight: bold;
-}
-
-.note-card {
-    background-color: var(--background-secondary);
-    border-radius: var(--radius-s);
-    padding: var(--size-4);
 }
 ```
 
@@ -231,151 +176,13 @@ settings:
 - `pluto.getModule(name)` - Get module by name
 - `pluto.registerModule(name, exports)` - Register a module
 - `pluto.importJs(path)` - Dynamically import JavaScript files
+## Integration with Other Plugins
 
-### Third-Party Plugin Mapping
+If the following plugins are installed, this plugin provides additional programmable interfaces:
 
-| Plugin | Pluto Object Path |
-|--------|------------------|
-| React Components | `pluto.third.react` |
-| Templater | `pluto.third.templater` |
-| Dataview | `pluto.third.dv` |
-| DVA | `pluto.third.dva` |
-| QA | `pluto.third.qa` |
-| Simple Component | `pluto.third.simple` |
-
-## Project Structure
-
-```
-src/
-├── main.ts                # Plugin main entry
-├── pluto.ts               # Pluto core functionality
-├── settings.ts             # Plugin settings
-├── storage.ts              # Storage management
-├── core/                  # Core modules
-│   ├── BoardRenderer.ts   # Board renderer
-│   ├── EditorRenderer.ts  # Editor renderer
-│   ├── ImageConverter.ts  # Image converter
-│   ├── MirrorRenderer.ts  # Mirror renderer
-│   ├── ModuleAction.ts    # Module action manager
-│   ├── PluginContext.ts   # Plugin context
-│   └── ViewResolver.ts    # View resolver
-├── manager/               # Managers
-│   ├── ConfigManager.ts   # Configuration manager
-│   ├── CoreManager.ts     # Core manager
-│   ├── FormManager.ts     # Form manager
-│   ├── ThemeManager.ts    # Theme manager
-│   └── ViewManager.ts     # View manager
-├── exec/                   # Executors
-│   ├── CssExecutor.ts     # CSS executor
-│   ├── GlbExecutor.ts     # GLB executor
-│   ├── ImageExecutor.ts   # Image executor
-│   ├── JsonExecutor.ts    # JSON executor
-│   ├── MarkdownExecutor.ts # Markdown executor
-│   ├── PageExecutor.ts    # Page executor
-│   ├── SandboxExecutor.ts # Sandbox executor
-│   ├── SimpleExecutor.ts  # Simple executor
-│   └── YamlExecutor.ts    # YAML executor
-├── modal/                 # Modal components
-│   ├── FormField.tsx      # Form field component
-│   ├── FormJson.ts        # Form JSON handler
-│   ├── FormModal.tsx      # React form modal
-│   └── PlutoFormModal.tsx # Pluto form modal
-├── i18n/                  # Internationalization
-│   ├── en.ts              # English translations
-│   └── zh-cn.ts           # Chinese translations
-├── third/                 # Third-party components
-│   ├── DvaComponent.ts    # DVA component
-│   ├── QaComponent.ts     # QA component
-│   ├── ReactComponent.ts  # React component
-│   ├── SimpleComponent.ts # Simple component
-│   ├── TemplaterComponent.ts # Templater component
-│   └── ThirdFactory.ts    # Third-party component factory
-├── types/                 # TypeScript type definitions
-│   ├── form.d.ts          # Form types
-│   ├── global.d.ts        # Global types
-│   └── obsidian.d.ts      # Obsidian types
-├── utils/                 # Utility functions
-│   ├── array.ts           # Array utilities
-│   ├── const.ts           # Constants
-│   ├── helper.ts          # Helper functions
-│   └── translation.ts     # Translation utilities
-└── view/                  # View components
-    ├── PlutoBoardView.ts  # Board view
-    ├── PlutoFileView.ts   # File view
-    └── PlutoTextView.ts   # Text view
-```
-
-## Development Guide
-
-### Environment Setup
-
-- Node.js 16+
-- npm or yarn
-
-### Build Process
-
-```bash
-# Clone repository
-git clone https://github.com/xiajianduan/obsidian-pluto-hub.git
-
-# Install dependencies
-npm install
-
-# Development mode
-npm run dev
-
-# Production build
-npm run build
-
-# Code linting
-npm run lint
-```
-
-## Advanced Usage
-
-### Module Communication
-
-```javascript
-// Module A
-export const sharedData = { value: 42 };
-
-// Module B
-console.log(pluto["Module A"].sharedData.value);
-pluto["Module A"].sharedData.value = 100;
-```
-
-### Dynamic Resource Loading
-
-```javascript
-// Load external script
-const script = document.createElement('script');
-script.src = 'https://cdn.example.com/library.js';
-document.head.appendChild(script);
-
-// Load external stylesheet
-const link = document.createElement('link');
-link.rel = 'stylesheet';
-link.href = 'https://cdn.example.com/styles.css';
-document.head.appendChild(link);
-```
-
-### Using Forms
-
-```javascript
-const result = await pluto.formManager.openForm({
-    title: "User Info",
-    fields: [
-        { id: "username", type: "text", label: "Username", required: true },
-        { id: "email", type: "text", label: "Email" },
-        { id: "age", type: "number", label: "Age" },
-        { id: "newsletter", type: "checkbox", label: "Subscribe to newsletter" }
-    ]
-});
-
-if (result) {
-    console.log("User info:", result);
-}
-```
+- **React Components**: Accessible via `pluto.third.react`
+- **Templater**: Accessible via `pluto.third.templater`
+- **Dataview**: Accessible via `pluto.third.dva`
 
 ## Using External Modules
 
@@ -423,11 +230,11 @@ Support @mzs:
 
 ### Alipay Donation
 
-<img src="assets/fund1.png" alt="Alipay" width="200"/>
+<img src="assets/fund1.png" alt="Alipay" width="150"/>
 
 ### WeChat Donation
 
-<img src="assets/fund2.png" alt="WeChat" width="200"/>
+<img src="assets/fund2.png" alt="WeChat" width="150"/>
 
 ### Other Methods
 

@@ -24,3 +24,7 @@ data.json
 
 #lock
 package-lock.json
+
+# Trae AI
+.trae
+.claude

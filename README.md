@@ -1,121 +1,169 @@
-# Pluto Hub - Obsidian 代码片段商城
+**[English](./README.md)** | **[中文](./README_zh.md)**
 
-Pluto Hub 是一个强大的 Obsidian 插件，允许用户管理、编辑和运行本地代码模块，为 Obsidian 提供了丰富的扩展能力。
+# Pluto Hub - Obsidian Code Snippet Marketplace
 
-## 功能特性
+Pluto Hub is a powerful Obsidian plugin that allows users to manage, edit, and run local code modules, providing rich extensibility for Obsidian.
 
-### 📦 模块管理
-- **Grid 卡片布局**：美观的模块展示界面，支持自定义主题色
-- **拖拽排序**：支持直观调整模块顺序
-- **启用/禁用控制**：灵活控制模块的运行状态
-- **导入/导出功能**：支持单个模块或全量模块的备份与恢复
-- **批量导入导出**：支持一次性导入多个文件或导出多个模块
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/xiajianduan/obsidian-pluto-hub?style=flat-square)](https://github.com/xiajianduan/obsidian-pluto-hub/releases)
+[![GitHub stars](https://img.shields.io/github/stars/xiajianduan/obsidian-pluto-hub?style=flat-square)](https://github.com/xiajianduan/obsidian-pluto-hub/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/xiajianduan/obsidian-pluto-hub?style=flat-square)](https://github.com/xiajianduan/obsidian-pluto-hub/issues)
+[![license](https://img.shields.io/github/license/xiajianduan/obsidian-pluto-hub?style=flat-square)](LICENSE)
 
-### 💻 代码编辑器
-- **CodeMirror 6 集成**：支持 JS、CSS、JSON、YAML、Markdown 等多种格式的语法高亮
-- **多文件支持**：每个模块可以包含多个文件
-- **实时编辑**：修改后立即生效
-- **Obsidian 原生样式**：使用 Obsidian 官方 CSS 变量，保持视觉一致性
+## Features
 
-### 🌟 主题系统
-- **多种主题支持**：内置多种主题风格
-- **自定义主题**：支持自定义主题配置
-- **主题管理器**：统一管理主题设置
+### 🎨 Preview
+<img src="./assets/pluto.webp" alt="Interface Preview" width="600">
 
-### 📝 动态表单
-- **表单配置**：支持通过 JSON 配置动态表单
-- **表单字段**：支持文本、下拉、复选框等多种字段类型
-- **表单验证**：支持必填项验证
+### 🛠 Custom Modules
+|Module Icon|Module Name|Module Description|Module Preview|
+|--|--|--|--
+|<img src="./assets/module/默认皮肤.png" alt="Default Skin" width="40">|Default Skin|`pluto.themeManager.nextTheme()`|<img src="./assets/skin/熔岩灯影.webp" alt="Lava Lamp Preview" width="200">|
+|<img src="./assets/module/主页冥王.png" alt="Home Pluto" width="40">|Home Pluto|`right.page` `home.page`|<img src="./assets/sample/主页冥王.webp" alt="Home Pluto Preview" width="200">|
+|<img src="./assets/module/主题小猫.png" alt="Theme Cat" width="40">|Theme Cat|Switches cats based on time, component`jsx:<AnimationCute/>`|<img src="./assets/sample/主题小猫.webp" alt="Theme Cat Preview" width="80">|
+|<img src="./assets/module/模块工具.png" alt="Module Tools" width="40">|Module Tools|Basic tools|/|
+|<img src="./assets/module/模块核心.png" alt="Module Core" width="40">|Module Core|Module core functionality|/|
+|<img src="./assets/module/模块功能.png" alt="Module Functions" width="40">|Module Functions|Custom functions|/|
+|<img src="./assets/module/配置规则.png" alt="Config Rules" width="40">|Config Rules|Configuration rules management|/|
+|<img src="./assets/module/启动插件.png" alt="Start Plugins" width="40">|Start Plugins|Plugins|/|
+|<img src="./assets/module/插件配置.png" alt="Plugin Config" width="40">|Plugin Config|/|/|
+|<img src="./assets/module/配置皮肤.png" alt="Config Skin" width="40">|Config Skin|/|/|
+|<img src="./assets/module/配置补全.png" alt="Config Complete" width="40">|Config Complete|/|/|
+|<img src="./assets/module/配置表格.png" alt="Config Table" width="40">|Config Table|/|/|
+|<img src="./assets/module/定制属性.png" alt="Custom Properties" width="40">|Custom Properties|/|/|
+|<img src="./assets/module/定制注脚.png" alt="Custom Footnotes" width="40">|Custom Footnotes|/|/|
+|<img src="./assets/module/定制选项.png" alt="Custom Options" width="40">|Custom Options|/|/|
+|<img src="./assets/module/定制预览.png" alt="Custom Preview" width="40">|Custom Preview|/|/|
+|<img src="./assets/module/控件太极.png" alt="Control Taiji" width="40">|Control Taiji|/|/|
+|<img src="./assets/module/控件按钮.png" alt="Control Button" width="40">|Control Button|/|/|
+|<img src="./assets/module/控件时钟.png" alt="Control Clock" width="40">|Control Clock|/|/|
+|<img src="./assets/module/控件模型.png" alt="Control Model" width="40">|Control Model|/|/|
+|<img src="./assets/module/控件画廊.png" alt="Control Gallery" width="40">|Control Gallery|/|/|
+|<img src="./assets/module/控件皮肤.png" alt="Control Skin" width="40">|Control Skin|/|/|
+|<img src="./assets/module/控件窗口.png" alt="Control Window" width="40">|Control Window|/|/|
+|<img src="./assets/module/控件经络.png" alt="Control Meridian" width="40">|Control Meridian|/|/|
+|<img src="./assets/module/控件音乐.png" alt="Control Music" width="40">|Control Music|/|/|
+|<img src="./assets/module/样式个人.png" alt="Style Personal" width="40">|Style Personal|/|/|
+|<img src="./assets/module/样式代码.png" alt="Style Code" width="40">|Style Code|/|/|
+|<img src="./assets/module/样式彩虹.png" alt="Style Rainbow" width="40">|Style Rainbow|/|/|
+|<img src="./assets/module/样式按钮.png" alt="Style Button" width="40">|Style Button|/|/|
+|<img src="./assets/module/样式标注.png" alt="Style Label" width="40">|Style Label|/|/|
+|<img src="./assets/module/菜单命令.png" alt="Menu Command" width="40">|Menu Command|/|/|
+|<img src="./assets/module/菜单下载.png" alt="Menu Download" width="40">|Menu Download|/|/|
 
-### 🌐 全局挂载
-- **pluto 对象**：所有模块的输出都挂载到 `window.pluto` 全局对象
-- **配置管理**：JSON 和 YAML 配置文件自动解析
-- **CSS 注入**：模块中的 CSS 自动注入到文档头部
 
-### 🤝 依赖管理
-- **第三方插件集成**：自动检测并映射第三方插件依赖
-- **动态依赖绑定**：支持 React Components、Templater、Dataview、DVA、QA 等插件的依赖管理
+### 📦 Module Management
+- Grid card layout: Beautiful module display interface with custom theme colors
+- Drag-and-drop sorting: Intuitive module order adjustment
+- Enable/disable control: Flexible module running state control
+- Import/export functionality: Single module or full backup and restore
+- Batch import/export: Import multiple files or export multiple modules at once
 
-### 📁 多种文件类型支持
-- JavaScript (`.js`)
-- CSS (`.css`)
-- JSON (`.json`)
-- YAML (`.yaml`/`.yml`)
-- Markdown (`.md`)
-- 图片 (`.jpg`/`.gif`/`.png`)
-- GLB 3D 模型 (`.glb`)
-- Page 页面 (`.page`)
+### 💻 Code Editor
+- CodeMirror 6 integration: Syntax highlighting for JS, CSS, JSON, YAML, Markdown and more
+- Multi-file support: Each module can contain multiple files
+- Real-time editing: Changes take effect immediately
+- Obsidian native style: Uses official Obsidian CSS variables for visual consistency
 
-## 安装方法
+### 🌟 Theme System
+- Multiple theme support: Built-in various theme styles
+- Custom themes: Custom theme configuration support
+- Theme manager: Unified theme settings management
 
-### 从 Obsidian 社区插件市场安装
-1. 打开 Obsidian 设置
-2. 点击 "社区插件"
-3. 搜索 "Pluto Hub"
-4. 点击 "安装" 按钮
-5. 安装完成后点击 "启用"
+### 📝 Dynamic Forms
+- Form configuration: Dynamic form configuration via JSON
+- Form fields: Support for text, dropdown, checkbox and other field types
+- Form validation: Required field validation support
 
-### 手动安装
-1. 下载最新版本的插件文件（`main.js`、`styles.css`、`manifest.json`）
-2. 复制到你的 Obsidian 库的插件目录：`VaultFolder/.obsidian/plugins/obsidian-pluto-hub/`
-3. 重启 Obsidian
-4. 在设置中启用插件
+### 🌐 Global Mount
+- pluto object: All module outputs are mounted to `window.pluto` global object
+- Configuration management: JSON and YAML configuration files are automatically parsed
+- CSS injection: Module CSS is automatically injected into document head
 
-## 快速开始
+### 🤝 Dependency Management
+- Third-party plugin integration: Automatic detection and mapping of third-party plugin dependencies
+- Dynamic dependency binding: Support for React Components, Templater, Dataview, DVA, QA plugins
 
-### 创建第一个模块
-1. 点击左侧边栏的 Pluto Hub 图标打开仪表盘
-2. 点击 "Add Module" 按钮
-3. 输入模块名称，如 "My First Module"
-4. 点击创建的模块卡片进入编辑器
-5. 在 `main.js` 中输入你的代码，例如：
-   ```javascript
-   // My First Module
-   return {
-       hello: function() {
-           console.log('Hello from Pluto Hub!');
-           return 'Hello Pluto!';
-       }
-   };
-   ```
-6. 点击 "Save all changes" 按钮保存
+### 📁 Multiple File Type Support
 
-### 使用模块
-在 Obsidian 的控制台或其他模块中，你可以通过 `window.pluto` 访问你的模块：
+| Type | Extension | Description |
+|------|-----------|-------------|
+| JavaScript | `.js` | Sandbox execution, module export support |
+| CSS | `.css` | Automatic injection into document head |
+| JSON | `.json` | Configuration parsing |
+| YAML | `.yaml` / `.yml` | Configuration parsing |
+| Markdown | `.md` | Content rendering |
+| Image | `.jpg` / `.gif` / `.png` | Image processing |
+| GLB | `.glb` | 3D model support |
+| Page | `.page` | Page component |
+
+## Installation
+
+### Install from Community Plugins
+
+1. Open Obsidian Settings
+2. Go to "Community Plugins"
+3. Search for "Pluto Hub"
+4. Click "Install"
+5. Enable the plugin
+
+### Manual Installation
+
+1. Download the latest version files: `main.js`, `styles.css`, `manifest.json`
+2. Copy to your Obsidian vault plugin directory: `<Vault>/.obsidian/plugins/obsidian-pluto-hub/`
+3. Restart Obsidian
+4. Enable the plugin in Settings
+
+## Quick Start
+
+### Create Your First Module
+
+1. Click the Pluto Hub icon in the left sidebar to open the dashboard
+2. Click the "Add Module" button
+3. Enter a module name, like "My First Module"
+4. Click the module card to enter the editor
+5. Enter code in `main.js`:
+
 ```javascript
-pluto["My First Module"].hello(); // 输出 "Hello from Pluto Hub!" 并返回 "Hello Pluto!"
+return {
+    hello: function() {
+        console.log('Hello from Pluto Hub!');
+        return 'Hello Pluto!';
+    }
+};
 ```
 
-### 使用动态表单
+6. Click "Save all changes" to save
+
+### Use Modules
+
 ```javascript
-// 使用 pluto.formManager.openForm 打开表单
+pluto["My First Module"].hello();
+// Outputs "Hello from Pluto Hub!" and returns "Hello Pluto!"
+```
+
+### Use Dynamic Forms
+
+```javascript
 await pluto.formManager.openForm({
-    title: "我的表单",
+    title: "My Form",
     fields: [
-        { id: "name", type: "text", label: "姓名", required: true },
-        { id: "age", type: "number", label: "年龄" },
-        { id: "gender", type: "select", label: "性别", options: ["男", "女", "其他"] }
+        { id: "name", type: "text", label: "Name", required: true },
+        { id: "age", type: "number", label: "Age" },
+        { id: "gender", type: "select", label: "Gender", options: ["Male", "Female", "Other"] }
     ]
 });
 ```
 
-## 模块定义
+## Module Definition
 
-### JavaScript 模块
-JavaScript 模块可以返回一个对象，该对象会被挂载到 `window.pluto` 上：
+### JavaScript Module
 
 ```javascript
-// 模块的 main.js
 return {
-    // 导出的函数
     greet: function(name) {
         return `Hello, ${name}!`;
     },
-    
-    // 导出的变量
     version: "1.0.0",
-    
-    // 导出的对象
     config: {
         theme: "dark",
         fontSize: 16
@@ -123,17 +171,14 @@ return {
 };
 ```
 
-### CSS 模块
-CSS 文件会被自动注入到文档头部：
+### CSS Module
 
 ```css
-/* 模块的 styles.css */
 .my-custom-class {
     color: var(--interactive-accent);
     font-weight: bold;
 }
 
-/* 使用 Obsidian 原生 CSS 变量 */
 .note-card {
     background-color: var(--background-secondary);
     border-radius: var(--radius-s);
@@ -141,11 +186,9 @@ CSS 文件会被自动注入到文档头部：
 }
 ```
 
-### JSON 和 YAML 配置
-JSON 和 YAML 文件会被解析为配置对象：
+### JSON Configuration
 
 ```json
-// config.json
 {
     "apiKey": "your-api-key",
     "baseUrl": "https://api.example.com",
@@ -156,8 +199,9 @@ JSON 和 YAML 文件会被解析为配置对象：
 }
 ```
 
+### YAML Configuration
+
 ```yaml
-# config.yaml
 apiKey: your-api-key
 baseUrl: https://api.example.com
 settings:
@@ -165,243 +209,230 @@ settings:
   theme: light
 ```
 
-### Markdown 模块
-Markdown 文件可以被渲染和处理：
+## Pluto Object
 
-```markdown
-# 我的 Markdown 模块
+### Core Properties
 
-这是一个 Markdown 文件，可以被 Pluto Hub 处理。
-```
+| Property | Description |
+|----------|-------------|
+| `pluto.app` | Obsidian app instance |
+| `pluto.self` | Pluto Hub plugin instance |
+| `pluto.coreManager` | Core manager, responsible for running modules |
+| `pluto.viewManager` | View manager |
+| `pluto.formManager` | Form manager |
+| `pluto.themeManager` | Theme manager |
+| `pluto.configManager` | Configuration manager |
+| `pluto.third` | Third-party components |
+| `pluto.images` | Image converter |
+| `pluto.helper` | Helper utility functions |
 
-## Pluto 对象
+### Core Methods
 
-### 全局对象
-所有模块的输出都挂载到 `window.pluto` 对象上：
+- `pluto.getModule(name)` - Get module by name
+- `pluto.registerModule(name, exports)` - Register a module
+- `pluto.importJs(path)` - Dynamically import JavaScript files
 
-```javascript
-// 访问模块
-pluto["Module Name"].functionName();
+### Third-Party Plugin Mapping
 
-// 访问配置
-pluto.configManager.getConfig();
-```
+| Plugin | Pluto Object Path |
+|--------|------------------|
+| React Components | `pluto.third.react` |
+| Templater | `pluto.third.templater` |
+| Dataview | `pluto.third.dv` |
+| DVA | `pluto.third.dva` |
+| QA | `pluto.third.qa` |
+| Simple Component | `pluto.third.simple` |
 
-### 核心属性和方法
-- `pluto.app`: Obsidian 应用实例
-- `pluto.self`: Pluto Hub 插件实例
-- `pluto.coreManager`: 核心管理器，负责运行模块
-- `pluto.viewManager`: 视图管理器
-- `pluto.formManager`: 表单管理器，负责打开和管理表单
-- `pluto.themeManager`: 主题管理器
-- `pluto.configManager`: 配置管理器
-- `pluto.third`: 第三方组件
-- `pluto.images`: 图片转换器
-- `pluto.helper`: 辅助工具函数
+## Project Structure
 
-### 核心方法
-- `pluto.getModule(name)`: 获取指定名称的模块
-- `pluto.registerModule(name, exports)`: 注册模块
-- `pluto.importJs(path)`: 动态导入 JavaScript 文件
-
-### 第三方插件映射
-Pluto Hub 会自动映射常用的第三方插件：
-
-| 插件名称 | Pluto 对象路径 | 说明 |
-|---------|---------------|------|
-| React Components | `pluto.third.react` | React 组件插件 |
-| Templater | `pluto.third.templater` | 模板插件 |
-| Dataview | `pluto.third.dv` | 数据视图插件 |
-| DVA | `pluto.third.dva` | DVA 插件 |
-| QA | `pluto.third.qa` | QA 插件 |
-| Simple Component | `pluto.third.simple` | 简单组件 |
-
-## 开发指南
-
-### 环境准备
-- Node.js 16 或更高版本
-- npm 或 yarn
-
-### 构建流程
-1. 克隆仓库：`git clone https://github.com/your-username/obsidian-pluto-hub.git`
-2. 安装依赖：`npm install`
-3. 开发模式：`npm run dev`（自动编译）
-4. 生产构建：`npm run build`
-5. 代码检查：`npm run lint`
-
-### 项目结构
 ```
 src/
-├── main.ts             # 插件主入口
-├── pluto.ts            # Pluto 核心功能
-├── settings.ts         # 插件设置
-├── storage.ts          # 存储管理
-├── core/               # 核心模块
-│   ├── BoardRenderer.ts   # 看板渲染器
-│   ├── EditorRenderer.ts  # 编辑器渲染器
-│   ├── ImageConverter.ts  # 图片转换器
-│   ├── MirrorRenderer.ts  # 镜像渲染器
-│   ├── ModuleAction.ts    # 模块操作管理器
-│   ├── PluginContext.ts   # 插件上下文
-│   └── ViewResolver.ts    # 视图解析器
-├── manager/            # 管理器
-│   ├── ConfigManager.ts   # 配置管理器
-│   ├── CoreManager.ts     # 核心管理器
-│   ├── FormManager.ts     # 表单管理器
-│   ├── ThemeManager.ts    # 主题管理器
-│   └── ViewManager.ts     # 视图管理器
-├── exec/               # 执行器
-│   ├── CssExecutor.ts     # CSS 执行器
-│   ├── GlbExecutor.ts     # GLB 执行器
-│   ├── ImageExecutor.ts   # 图片执行器
-│   ├── JsonExecutor.ts    # JSON 执行器
-│   ├── MarkdownExecutor.ts # Markdown 执行器
-│   ├── PageExecutor.ts    # Page 执行器
-│   ├── SandboxExecutor.ts # 沙箱执行器
-│   ├── SimpleExecutor.ts  # 简单执行器
-│   └── YamlExecutor.ts    # YAML 执行器
-├── modal/              # 模态框组件
-│   ├── FormField.tsx      # 表单字段组件
-│   ├── FormJson.ts        # 表单 JSON 处理
-│   ├── FormModal.tsx      # React 表单模态框
-│   └── PlutoFormModal.tsx # Pluto 表单模态框
-├── i18n/               # 国际化
-│   ├── en.ts             # 英文翻译
-│   └── zh-cn.ts          # 中文翻译
-├── third/              # 第三方组件
-│   ├── DvaComponent.ts    # DVA 组件
-│   ├── QaComponent.ts     # QA 组件
-│   ├── ReactComponent.ts  # React 组件
-│   ├── SimpleComponent.ts # 简单组件
-│   ├── TemplaterComponent.ts # Templater 组件
-│   └── ThirdFactory.ts    # 第三方组件工厂
-├── types/              # TypeScript 类型定义
-│   ├── form.d.ts          # 表单类型
-│   ├── global.d.ts        # 全局类型
-│   └── obsidian.d.ts      # Obsidian 类型
-├── utils/              # 工具函数
-│   ├── array.ts           # 数组工具
-│   ├── const.ts           # 常量定义
-│   ├── helper.ts          # 辅助函数
-│   └── translation.ts     # 翻译工具
-└── view/               # 视图组件
-    ├── PlutoBoardView.ts  # 看板视图
-    ├── PlutoFileView.ts   # 文件视图
-    └── PlutoTextView.ts   # 文本视图
+├── main.ts                # Plugin main entry
+├── pluto.ts               # Pluto core functionality
+├── settings.ts             # Plugin settings
+├── storage.ts              # Storage management
+├── core/                  # Core modules
+│   ├── BoardRenderer.ts   # Board renderer
+│   ├── EditorRenderer.ts  # Editor renderer
+│   ├── ImageConverter.ts  # Image converter
+│   ├── MirrorRenderer.ts  # Mirror renderer
+│   ├── ModuleAction.ts    # Module action manager
+│   ├── PluginContext.ts   # Plugin context
+│   └── ViewResolver.ts    # View resolver
+├── manager/               # Managers
+│   ├── ConfigManager.ts   # Configuration manager
+│   ├── CoreManager.ts     # Core manager
+│   ├── FormManager.ts     # Form manager
+│   ├── ThemeManager.ts    # Theme manager
+│   └── ViewManager.ts     # View manager
+├── exec/                   # Executors
+│   ├── CssExecutor.ts     # CSS executor
+│   ├── GlbExecutor.ts     # GLB executor
+│   ├── ImageExecutor.ts   # Image executor
+│   ├── JsonExecutor.ts    # JSON executor
+│   ├── MarkdownExecutor.ts # Markdown executor
+│   ├── PageExecutor.ts    # Page executor
+│   ├── SandboxExecutor.ts # Sandbox executor
+│   ├── SimpleExecutor.ts  # Simple executor
+│   └── YamlExecutor.ts    # YAML executor
+├── modal/                 # Modal components
+│   ├── FormField.tsx      # Form field component
+│   ├── FormJson.ts        # Form JSON handler
+│   ├── FormModal.tsx      # React form modal
+│   └── PlutoFormModal.tsx # Pluto form modal
+├── i18n/                  # Internationalization
+│   ├── en.ts              # English translations
+│   └── zh-cn.ts           # Chinese translations
+├── third/                 # Third-party components
+│   ├── DvaComponent.ts    # DVA component
+│   ├── QaComponent.ts     # QA component
+│   ├── ReactComponent.ts  # React component
+│   ├── SimpleComponent.ts # Simple component
+│   ├── TemplaterComponent.ts # Templater component
+│   └── ThirdFactory.ts    # Third-party component factory
+├── types/                 # TypeScript type definitions
+│   ├── form.d.ts          # Form types
+│   ├── global.d.ts        # Global types
+│   └── obsidian.d.ts      # Obsidian types
+├── utils/                 # Utility functions
+│   ├── array.ts           # Array utilities
+│   ├── const.ts           # Constants
+│   ├── helper.ts          # Helper functions
+│   └── translation.ts     # Translation utilities
+└── view/                  # View components
+    ├── PlutoBoardView.ts  # Board view
+    ├── PlutoFileView.ts   # File view
+    └── PlutoTextView.ts   # Text view
 ```
 
-## 高级用法
+## Development Guide
 
-### 模块间通信
-模块可以通过 `window.pluto` 互相通信：
+### Environment Setup
+
+- Node.js 16+
+- npm or yarn
+
+### Build Process
+
+```bash
+# Clone repository
+git clone https://github.com/xiajianduan/obsidian-pluto-hub.git
+
+# Install dependencies
+npm install
+
+# Development mode
+npm run dev
+
+# Production build
+npm run build
+
+# Code linting
+npm run lint
+```
+
+## Advanced Usage
+
+### Module Communication
 
 ```javascript
 // Module A
-export const sharedData = {
-    value: 42
-};
+export const sharedData = { value: 42 };
 
 // Module B
-console.log(pluto["Module A"].sharedData.value); // 输出 42
+console.log(pluto["Module A"].sharedData.value);
 pluto["Module A"].sharedData.value = 100;
 ```
 
-### 动态加载资源
+### Dynamic Resource Loading
+
 ```javascript
-// 加载外部脚本
+// Load external script
 const script = document.createElement('script');
 script.src = 'https://cdn.example.com/library.js';
 document.head.appendChild(script);
 
-// 加载外部样式
+// Load external stylesheet
 const link = document.createElement('link');
 link.rel = 'stylesheet';
 link.href = 'https://cdn.example.com/styles.css';
 document.head.appendChild(link);
 ```
 
-### 使用表单
+### Using Forms
+
 ```javascript
-// 打开表单
 const result = await pluto.formManager.openForm({
-    title: "用户信息",
+    title: "User Info",
     fields: [
-        { id: "username", type: "text", label: "用户名", required: true },
-        { id: "email", type: "text", label: "邮箱" },
-        { id: "age", type: "number", label: "年龄" },
-        { id: "newsletter", type: "checkbox", label: "订阅新闻通讯" }
+        { id: "username", type: "text", label: "Username", required: true },
+        { id: "email", type: "text", label: "Email" },
+        { id: "age", type: "number", label: "Age" },
+        { id: "newsletter", type: "checkbox", label: "Subscribe to newsletter" }
     ]
 });
 
 if (result) {
-    console.log("用户信息:", result);
+    console.log("User info:", result);
 }
 ```
 
-### 使用 YAML 配置
-```yaml
-# config.yaml
-settings:
-  theme: dark
-  fontSize: 16
-features:
-  - name: "语法高亮"
-    enabled: true
-  - name: "自动保存"
-    enabled: true
-```
+## Troubleshooting
 
-## 故障排除
+### Module Not Running
+1. Check if the module is enabled
+2. Check browser console for error messages
+3. Ensure code syntax is correct
+4. Check if third-party plugin dependencies are correctly installed
 
-### 模块无法运行
-1. 检查模块是否已启用
-2. 查看浏览器控制台是否有错误信息
-3. 确保代码语法正确
-4. 检查第三方插件依赖是否正确安装
+### Import Failed
+1. Check if file format is correct
+2. Ensure files are not corrupted
+3. Check browser console for error messages
 
-### 导入失败
-1. 检查文件格式是否正确
-2. 确保文件没有损坏
-3. 查看浏览器控制台的错误信息
+### Performance Issues
+1. Disable unused modules
+2. Optimize code, avoid long-running functions
+3. Reduce number of modules
 
-### 性能问题
-1. 禁用不需要的模块
-2. 优化代码，避免长时间运行的函数
-3. 减少模块数量
+## Version History
 
-### 第三方插件绑定失败
-1. 确保第三方插件已正确安装和启用
-2. 检查插件 ID 是否正确
-3. 查看控制台日志了解绑定状态
+For detailed changelog, please see [CHANGES.md](./CHANGES.md).
 
-## 版本历史
+## Contributing
 
-请查看 [CHANGES.md](./CHANGES.md) 了解详细的版本更新历史。
+Issues and Pull Requests are welcome!
 
-## 贡献指南
+## Support the Author
 
-欢迎提交 Issue 和 Pull Request！
+If you find this plugin helpful, you can buy the author a coffee:
 
-### 提交规范
-- 使用清晰的提交信息
-- 确保代码风格一致
-- 更新相关文档
+Support @mzs:
+<a href="https://buymeacoffee.com/1553599299u" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 175px !important;" ></a>
 
-### 开发环境设置
-1. 安装依赖：`npm install`
-2. 开发模式：`npm run dev`
-3. 代码检查：`npm run lint`
+### Alipay Donation
 
-## 许可证
+<img src="assets/fund1.png" alt="Alipay" width="200"/>
 
-MIT License
+### WeChat Donation
 
-## 联系方式
+<img src="assets/fund2.png" alt="WeChat" width="200"/>
 
-如有问题或建议，欢迎通过以下方式联系：
+### Other Methods
 
-- GitHub Issues: [https://github.com/your-username/obsidian-pluto-hub/issues](https://github.com/your-username/obsidian-pluto-hub/issues)
+- Email: xiajianduan@outlook.com
+- Email: xiajianduan@qq.com
 
 ---
 
-**享受 Pluto Hub 带来的强大扩展能力！** 🚀
+## License
+
+[0-BSD License](./LICENSE)
+
+## Contact
+
+- GitHub Issues: [https://github.com/xiajianduan/obsidian-pluto-hub/issues](https://github.com/xiajianduan/obsidian-pluto-hub/issues)
+
+---
+
+**Enjoy the powerful extensibility of Pluto Hub!** 🚀

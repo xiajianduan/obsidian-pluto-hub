@@ -45,7 +45,6 @@ export class Pluto implements IPluto {
             stringifyYaml: obsidian.stringifyYaml.bind(obsidian),
             parseYaml: parseYaml.bind(obsidian),
             getAvailablePlugins: getAvailablePlugins.bind(this),
-            flushComponents: this.third?.react?.requestComponentUpdate.bind(this.third.react),
             obsidian,
         };
         this.third = ThirdFactory.createThirdComponent(settings.configPath);

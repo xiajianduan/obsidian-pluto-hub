@@ -1,5 +1,30 @@
 # Changes Log
 
+## [1.1.8] - 2026-05-15
+
+### Added
+- `README_zh.md` - 新增了中文版 README 文档
+- `docs/默认皮肤.md` - 新增了默认皮肤文档
+- `assets/` - 新增了大量模块图标、预览图和皮肤资源文件
+
+### Improved
+- 重构了 README.md，全面更新为英文版本
+- 优化了文档结构，添加中英文切换导航链接
+- 优化了 SandboxExecutor、YamlExecutor、ConfigManager、CoreManager 等核心模块
+- 更新了第三方组件（ReactComponent、SimpleComponent）实现
+- 优化了 pluto.ts 核心类
+
+### Files Modified
+- `README.md` - 重构为英文版本，添加 GitHub 徽章和中英文切换链接
+- `README_zh.md` - 新增中文版文档，添加中英文切换链接
+- `src/exec/SandboxExecutor.ts` - 优化了沙箱执行器
+- `src/exec/YamlExecutor.ts` - 优化了 YAML 执行器
+- `src/manager/ConfigManager.ts` - 优化了配置管理器
+- `src/manager/CoreManager.ts` - 优化了核心管理器
+- `src/pluto.ts` - 优化了 Pluto 核心类
+- `src/third/ReactComponent.ts` - 优化了 React 组件
+- `src/third/SimpleComponent.ts` - 优化了 Simple 组件
+
 ## [1.1.7] - 2026-05-14
 
 ### Added

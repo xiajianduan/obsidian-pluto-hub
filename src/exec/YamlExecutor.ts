@@ -63,7 +63,7 @@ export class YamlExecutor extends SimpleExecutor {
             pluto.third.assets[name][name] = yaml;
         } else {
             const configFile = `${pluto.self.settings.configPath}/${name}.yaml`;
-            content = await app.vault.adapter.read(configFile);
+            content = await app.vault.readRaw(configFile);
             let yaml = parseYaml(content);
             pluto.third.assets[name][name] = yaml;
         }

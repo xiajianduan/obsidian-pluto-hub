@@ -52,7 +52,7 @@ export class SimpleComponent implements ThirdComponent {
     async executeAll(): Promise<void> {
         for (const blocks of this.codes.values()) {
             for (const block of blocks) {
-                await this.execute(block);
+                this.execute(block);
             }
         }
     }

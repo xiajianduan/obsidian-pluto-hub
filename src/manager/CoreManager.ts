@@ -41,10 +41,10 @@ export class CoreManager {
                 const files = filesByType[key];
                 if (files && files.length > 0) {
                     const executor = this.create(key);
+                    await executor.install({ ...module, files });
                     module.tmpFiles = files;
                     await executor.execute(module);
                     delete module.tmpFiles;
-                    await executor.install({ ...module, files });
                 }
             }
             delete pluto.third.modules?.[module.name];

@@ -6,20 +6,28 @@ export class ConfigManager {
     async getLive(name: string, id: string) {
         const module = await ModStorage.loadModule(name);
         if(module.position === "Z") {
-            return this.getConfigOps(name, id);
+            return this.getConfigOps(module, id);
         }
         return await this.getConfigLocal(name, id);
     }
 
     getCached(name: string, id: string) {
-        return this.getConfigOps(name, id);
-    }
-
-    getConfigOps(name: string, id: string) {
         if(id) return pluto.third.assets[name][`${id}.json`];
         const config = pluto.third.assets[name][name];
         if(config) return config;
         return pluto.third.assets[name]["data.json"];
+    }
+
+    getConfigOps(module: MiniModule, id: string) {
+        if(id) {
+            const config = module.files.find(t=> t.name === `${id}.json`);
+            if(config) return JSON.parse(config.content);
+        }
+        const config = module.files.find(t=> t.name === "config.yaml");
+        if(config) return parseYaml(config.content);
+        const data = module.files.find(t=> t.name === "data.json");
+        if(data) return JSON.parse(data.content);
+        return [];
     }
 
     async getConfigLocal(name: string, id: string) {

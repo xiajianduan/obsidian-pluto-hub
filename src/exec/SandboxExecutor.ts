@@ -86,9 +86,14 @@ export class SandboxExecutor extends SimpleExecutor {
     }
 
     async install(context: BatchContext): Promise<void> {
-        const boot = SandboxExecutor.instances.get(context.id);
-        if (boot) {
-            boot.install?.(context);
+        const bootJs = context.files!.find(f => f.name === 'boot.js');
+        if (bootJs) {
+            const def = this.load({ ...context, file: bootJs });
+            if (def) {
+                const boot = new def.Boot();
+                SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
+                boot.install?.(context);
+            }
         }
     }
 

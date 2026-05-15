@@ -1,9 +1,9 @@
 {
 	"id": "obsidian-pluto-hub",
 	"name": "Pluto Hub",
-	"version": "1.1.7",
+	"version": "1.1.8",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
+	"description": "A powerful Obsidian plugin that allows users to manage, edit, and run local code modules, providing rich extensibility for Obsidian.",
 	"author": "mzs",
 	"authorUrl": "https://obsidian.md",
 	"fundingUrl": "https://obsidian.md/pricing",

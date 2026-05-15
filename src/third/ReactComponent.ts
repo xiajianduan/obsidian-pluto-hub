@@ -59,7 +59,8 @@ export class ReactComponent extends SimpleComponent {
 
     async execute(block: any): Promise<void> {
         this.check();
-        await sleep(1000);
+        await sleep(800);
         this.self.registerComponent(block.code, block.name, block.namespace, block.suppressRefresh);
+        pluto.third.react.self.requestComponentUpdate();
     }
 }

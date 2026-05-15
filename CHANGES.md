@@ -1,5 +1,19 @@
 # Changes Log
 
+## [2.0.0] - 2026-05-15
+
+### Added
+- 添加了扩展模块使用文档说明
+
+### Improved
+- 插件 ID 从 obsidian-pluto-hub 更改为 pluto-hub，符合官方命名规范
+
+### Files Modified
+- `manifest.json` - 更新插件 ID 和版本号
+- `README.md` - 添加外部模块使用说明
+- `README_zh.md` - 添加扩展模块使用说明
+
+
 ## [1.1.8] - 2026-05-15
 
 ### Added

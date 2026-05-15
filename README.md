@@ -377,6 +377,17 @@ if (result) {
 }
 ```
 
+## Using External Modules
+
+Pluto Hub supports extending functionality by importing external modules.
+
+1. Obtain module files from trusted sources (with `.ops` extension)
+2. In plugin settings, **customize the storage path** (default is `.obsidian/cache/modules`)
+3. Place `.ops` module files in that directory
+4. Return to the plugin interface, modules will be automatically loaded and take effect
+
+> ⚠️ Please only import modules from trusted sources. This plugin is not responsible for the security of third-party modules, and users assume their own risk.
+
 ## Troubleshooting
 
 ### Module Not Running

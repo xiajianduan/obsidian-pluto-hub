@@ -1,5 +1,15 @@
 import { SimpleExecutor } from "./SimpleExecutor";
 
+export type JsFunc = (...args: unknown[]) => Promise<unknown>;
+type AsyncFunctionConstructor = new (...args: string[]) => JsFunc;
+const AsyncFunction = async function (): Promise<void> {}.constructor as AsyncFunctionConstructor;
+
+export function buildJsFunc(code: string, globalNames: string[], expression: boolean, sourceUrl: string): JsFunc {
+    const functionBody = expression ? `return (\n${code}\n);` : code;
+    const func: JsFunc = new AsyncFunction(...globalNames, `${functionBody}\n//# sourceURL=${encodeURIComponent(sourceUrl)}`);
+    return func;
+}
+
 export class SandboxExecutor extends SimpleExecutor {
 
     private static instances = new Map<string, any>();
@@ -11,32 +21,33 @@ export class SandboxExecutor extends SimpleExecutor {
     async execute(module: MiniModule) {
         const bootJs = module.tmpFiles!.find(f => f.name === 'boot.js');
         if (bootJs) {
-            const def = this.load({ ...module, file: bootJs });
+            const def = await this.load({ ...module, file: bootJs });
             if (def) {
                 const boot = new def.Boot();
                 SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
                 boot.start();
-                this.execModule(module);
+                await this.execModule(module);
                 boot.finish?.();
             }
         } else {
-            this.execModule(module);
+            await this.execModule(module);
         }
     }
 
-    private execModule(module: MiniModule) {
+    private async execModule(module: MiniModule) {
         const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
-        const object = jsFiles.reduce((prev: any, file) => {
-            const result = this.load({ ...module, tmpFiles: module.tmpFiles!, file });
-            return Object.assign(prev, result);
-        }, {});
+        const object: Record<string, any> = {};
+        for (const file of jsFiles) {
+            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file });
+            Object.assign(object, result);
+        }
         // 如果有模块导出结果，将其挂载到 pluto.modules
         if (Object.keys(object).length > 0) {
             pluto.third.modules[module.name] = object;
         }
     }
 
-    load(params: ModParams): any {
+    async load(params: ModParams): Promise<any> {
         const { id, name, tmpFiles, file } = params;
         // 创建模块导出对象
         const moduleExports: Record<string, any> = {};
@@ -71,9 +82,9 @@ export class SandboxExecutor extends SimpleExecutor {
             return `class ${className} ${classBody}\nmodule.exports.${className} = ${className};`;
         });
 
-        // 使用 new Function 执行处理后的代码
-        const runner = new Function('ctx', `with(ctx) { ${content} }`);
-        const result = runner(context);
+        // 使用沙箱 AsyncFunction 执行处理后的代码
+        const runner = buildJsFunc(`with(ctx) { ${content} }`, ['ctx'], false, `sandbox:${name}/${file.name}`);
+        const result = await runner(context);
 
         // 处理模块导出
         if (result) {
@@ -85,10 +96,10 @@ export class SandboxExecutor extends SimpleExecutor {
         }
     }
 
-    async install(context: BatchContext): Promise<void> {
+    async install(context: BatchContext) {
         const bootJs = context.files!.find(f => f.name === 'boot.js');
         if (bootJs) {
-            const def = this.load({ ...context, file: bootJs });
+            const def = await this.load({ ...context, file: bootJs });
             if (def) {
                 const boot = new def.Boot();
                 SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
@@ -97,11 +108,11 @@ export class SandboxExecutor extends SimpleExecutor {
         }
     }
 
-    async uninstall(context: BatchContext): Promise<void> {
+    async uninstall(context: BatchContext) {
         const boot = SandboxExecutor.instances.get(context.id);
         if (boot) {
             boot.uninstall?.(context);
-            SandboxExecutor.instances.delete(context.id);  // 清理实例实例
+            SandboxExecutor.instances.delete(context.id); // 清理实例实例
         }
     }
 }

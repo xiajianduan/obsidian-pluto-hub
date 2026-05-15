@@ -104,6 +104,6 @@ export function find_tfile(app: App, name: string): TFile | null {
 }
 export function getAvailablePlugins(): any[] {
     const manifests = app.plugins.manifests;
-    delete manifests['obsidian-pluto-hub'];
+    delete manifests['pluto-hub'];
     return Object.values(app.plugins.manifests);
 }

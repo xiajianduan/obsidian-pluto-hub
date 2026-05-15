@@ -2,7 +2,7 @@ import { Notice } from "obsidian";
 
 export default class ThemeManager {
 
-    private styleEl: HTMLStyleElement;
+    private styleSheet: CSSStyleSheet | null = null;
     private DEFAULT_THEME = "sky-custom";
 
     private static themes = {
@@ -44,10 +44,13 @@ export default class ThemeManager {
         document.body.classList.add(newTheme);
     }
     setCustomTheme(styles: string) {
-        if (this.styleEl) document.head.removeChild(this.styleEl);
-        this.styleEl = document.createElement("style");
-        this.styleEl.textContent = `body.sky-custom { ${styles} }`;
-        document.head.appendChild(this.styleEl);
+        if (this.styleSheet) {
+            this.styleSheet.replaceSync(`body.sky-custom { ${styles} }`);
+        } else {
+            this.styleSheet = new CSSStyleSheet();
+            this.styleSheet.replaceSync(`body.sky-custom { ${styles} }`);
+            document.adoptedStyleSheets = [...document.adoptedStyleSheets, this.styleSheet];
+        }
     }
     static setVariable(variable: string, value: string) {
         document.body.style.setProperty(variable, value);

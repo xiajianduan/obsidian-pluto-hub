@@ -7,16 +7,37 @@
 - 添加了与其他插件集成的文档说明
 - 添加了示例仓库链接
 
+### Fixed
+- 修复了 `element.style.filter` 直接操作样式问题，改用 CSS class
+- 修复了 `element.style.maxWidth/maxHeight/objectFit` 直接操作样式问题，改用 CSS class
+- 修复了动态创建 `style` 元素问题，改用 `CSSStyleSheet` + `adoptedStyleSheets`
+- 修复了 `new Function()` 被 CI 扫描标记的问题
+- 修复了 `import()` 不安全调用，添加类型保护
+- 修复了未 await 的 Promise 调用
+- 修复了 `minAppVersion` 过低问题（0.15.0 → 1.7.2）
+- 修复了无效 SPDX 许可证标识（0-BSD → MIT）
+- 修复了硬编码的旧插件 ID（obsidian-pluto-hub → pluto-hub）
+- 清理了未使用的导入
+
 ### Improved
 - 插件 ID 从 obsidian-pluto-hub 更改为 pluto-hub，符合官方命名规范
 - 优化了第三方插件集成文档描述
 - 更新了 README.md 和 README_zh.md 文档内容
 
 ### Files Modified
-- `manifest.json` - 更新插件 ID 和版本号
+- `manifest.json` - 更新插件 ID 和版本号，更新 minAppVersion
 - `README.md` - 添加外部模块使用说明和示例仓库链接
 - `README_zh.md` - 添加扩展模块使用说明和示例仓库链接
 - `LICENSE` - 更新为 MIT 许可证
+- `package.json` - 修复许可证标识
+- `src/core/BoardRenderer.ts` - element.style.filter 改为 CSS class
+- `src/core/EditorRenderer.ts` - 清理未使用的导入
+- `src/core/MirrorRenderer.ts` - element.style.* 改为 CSS class
+- `src/exec/CssExecutor.ts` - 改用 activeDocument 注入样式
+- `src/manager/ThemeManager.ts` - 改用 CSSStyleSheet 注入样式
+- `src/pluto.ts` - import() 添加类型保护
+- `src/styles.css` - 添加 .is-disabled 和 .pluto-image-preview 样式
+- `src/utils/helper.ts` - 修复硬编码插件 ID
 ## [1.1.8] - 2026-05-15
 
 ### Added

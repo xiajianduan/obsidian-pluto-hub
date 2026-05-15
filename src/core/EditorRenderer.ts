@@ -1,7 +1,7 @@
 import { MirrorRenderer } from "core/MirrorRenderer";
 import { ModuleAction } from "core/ModuleAction";
 import { ButtonComponent, Notice } from "obsidian";
-import { base64ToBlob, isImageFile, promptMessage, readFileAsBase64, readFileAsText } from "utils/helper";
+import { promptMessage } from "utils/helper";
 import { t } from "utils/translation";
 import PlutoHubPlugin from "main";
 import { ViewResolver } from "./ViewResolver";

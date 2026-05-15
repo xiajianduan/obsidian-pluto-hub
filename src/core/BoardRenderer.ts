@@ -120,7 +120,7 @@ export class BoardRenderer {
             const cardHeader = card.createDiv({ cls: 'card-header' });
             // 根据启用状态添加灰度滤镜样式
             if (!mod.enabled) {
-                card.style.filter = 'grayscale(1)';
+                card.classList.add('is-disabled');
             }
 
             // 启用/禁用开关
@@ -139,11 +139,11 @@ export class BoardRenderer {
                 await ModStorage.saveModule(mod);
                 if (mod.enabled) {
                     pluto.coreManager.installBundle(mod);
-                    card.style.filter = '';
+                    card.classList.remove('is-disabled');
                 } else {
                     // 如果模块被禁用，移除该模块的所有样式
                     pluto.coreManager.uninstallBundle(mod);
-                    card.style.filter = 'grayscale(1)';
+                    card.classList.add('is-disabled');
                 }
             };
             // 删除按钮

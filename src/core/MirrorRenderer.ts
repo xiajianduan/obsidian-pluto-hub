@@ -34,9 +34,7 @@ export class MirrorRenderer {
                     },
                     cls: 'pluto-image-preview'
                 });
-                imgEl.style.maxWidth = '100%';
-                imgEl.style.maxHeight = '100%';
-                imgEl.style.objectFit = 'contain';
+                imgEl.classList.add('pluto-image-preview');
 
                 // 当组件销毁时释放 Blob URL
                 imgEl.onload = () => {

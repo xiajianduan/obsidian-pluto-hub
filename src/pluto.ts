@@ -86,12 +86,6 @@ export class Pluto implements IPluto {
         setTimeout(() => clearInterval(timer), 30000);
     }
 
-    async importJs(path: string) {
-        let resourcePath = this.app.vault.adapter.getResourcePath(path);
-        const file = resourcePath.split("?")[0]!;
-        return import(file);
-    }
-
     getModule(name: string) {
         return this.third.modules[name];
     }

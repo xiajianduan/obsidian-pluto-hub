@@ -96,8 +96,8 @@ export class CoreManager {
     }
 
     async runBundles(modules: MiniModule[]) {
-        const sorted = modules.filter(mod => mod.enabled).sort((a, b) => a.order - b.order);
-        for (const mod of sorted) {
+        const availableModules = modules.filter(mod => mod.enabled);
+        for (const mod of availableModules) {
             if (mod.type === 'I') {
                 await this.runBundle(mod);
             } else {
@@ -106,8 +106,8 @@ export class CoreManager {
         }
     }
     async installBundles(modules: MiniModule[]) {
-        const sorted = modules.filter(mod => mod.enabled).sort((a, b) => a.order - b.order);
-        for (const mod of sorted) {
+        const availableModules = modules.filter(mod => mod.enabled);
+        for (const mod of availableModules) {
             await this.installBundle(mod);
         }
     }

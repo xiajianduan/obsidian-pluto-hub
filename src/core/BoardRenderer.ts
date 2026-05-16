@@ -96,8 +96,6 @@ export class BoardRenderer {
                 mod.name.toLowerCase().includes(lowerFilter)
             );
         }
-        // 按 order 排序
-        filteredModules.sort((a, b) => a.order - b.order);
         grid.empty();
         filteredModules.forEach((mod: MiniModule, index: number) => {
             const card = grid.createDiv({ cls: 'pluto-card' });

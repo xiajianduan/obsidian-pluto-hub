@@ -130,8 +130,7 @@ export class ModStorage {
             const module = await this.loadModule(fileName);
             loadedModules.push(module);
         }
-        
-        // 不要在加载模块时保存modules属性，modules属性只在用户更改模块启用状态时更新
+        loadedModules.sort((a, b) => a.order - b.order);
         return loadedModules;
     }
 

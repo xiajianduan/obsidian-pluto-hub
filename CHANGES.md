@@ -1,5 +1,20 @@
 # Changes Log
 
+## [2.0.1] - 2026-05-16
+
+### Improved
+- 重构模块排序逻辑，统一在 `storage.ts` 的 `loadModules` 方法中进行排序
+- 移除了 `BoardRenderer.ts` 和 `CoreManager.ts` 中的重复排序代码
+
+### Files Modified
+- `src/storage.ts` - 添加模块排序逻辑到 loadModules 方法
+- `src/core/BoardRenderer.ts` - 移除重复的排序代码
+- `src/manager/CoreManager.ts` - 移除 runBundles 和 installBundles 中的排序逻辑
+
+### Files Deleted
+- `assets/module.webp` - 删除未使用的资源文件
+- `assets/sample/主题小猫.webp` - 删除示例资源文件
+
 ## [2.0.0] - 2026-05-15
 
 ### Added
@@ -38,6 +53,7 @@
 - `src/pluto.ts` - import() 添加类型保护
 - `src/styles.css` - 添加 .is-disabled 和 .pluto-image-preview 样式
 - `src/utils/helper.ts` - 修复硬编码插件 ID
+
 ## [1.1.8] - 2026-05-15
 
 ### Added

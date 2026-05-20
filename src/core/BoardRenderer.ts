@@ -9,7 +9,7 @@ import { ViewResolver } from "./ViewResolver";
 export class BoardRenderer {
 
     plugin: PlutoHubPlugin;
-    contentEl: HTMLElement;
+    containerEl: HTMLElement;
     resolver: ViewResolver;
     moduleAction: ModuleAction;
     private draggedModId: string | null = null;
@@ -17,7 +17,7 @@ export class BoardRenderer {
     constructor(resolver: ViewResolver) {
         this.resolver = resolver;
         this.plugin = resolver.plugin;
-        this.contentEl = resolver.contentEl;
+        this.containerEl = resolver.containerEl;
         this.moduleAction = resolver.moduleAction;
     }
 
@@ -26,9 +26,12 @@ export class BoardRenderer {
      * @param el 渲染仪表盘的容器元素
      */
     render() {
-        const header = this.contentEl.createDiv({ cls: 'pluto-header' });
+        const nav = this.containerEl.createDiv({ cls: 'view-header pluto-header' });
+        const leftNav = nav.createDiv({ cls: 'view-header-left' });
+        const titleNav = nav.createDiv({ cls: 'view-header-title-container' });
+        const actionsNav = nav.createDiv({ cls: 'view-actions' });
         // 添加模块按钮
-        new ButtonComponent(header)
+        new ButtonComponent(leftNav)
             .setButtonText(t('pluto.hub.dashboard.add-module'))
             .setClass('btn_nob')
             .onClick(async () => {
@@ -44,13 +47,13 @@ export class BoardRenderer {
             });
 
         // 导入导出按钮
-        new ButtonComponent(header)
+        new ButtonComponent(leftNav)
             .setButtonText(t('pluto.hub.dashboard.import'))
             .setClass('btn_nob')
             .onClick(() => this.showImportDialog());
 
         // 导出所有按钮
-        new ButtonComponent(header)
+        new ButtonComponent(leftNav)
             .setButtonText(t('pluto.hub.dashboard.export-all'))
             .setClass('btn_nob')
             .onClick(async () => {
@@ -63,14 +66,15 @@ export class BoardRenderer {
             });
 
         // 搜索框 - 放在最右侧
-        const searchContainer = header.createDiv({ cls: 'pluto-search-container' });
+        const searchContainer = actionsNav.createDiv({ cls: 'pluto-search-container' });
         const searchInput = searchContainer.createEl('input', {
             type: 'text',
             placeholder: t('pluto.hub.dashboard.search-placeholder'),
             cls: 'pluto-search-input'
         });
 
-        const grid = this.contentEl.createDiv({ cls: 'pluto-grid' });
+        const contentEl = this.containerEl.createDiv({ cls: 'view-content' });
+        const grid = contentEl.createDiv({ cls: 'pluto-grid' });
 
         // 初始渲染所有模块
         this.renderModules(grid);

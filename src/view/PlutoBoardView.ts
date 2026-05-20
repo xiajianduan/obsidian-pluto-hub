@@ -15,7 +15,7 @@ export class PlutoBoardView extends ItemView {
         super(leaf);
         this.plugin = plugin;
         this.headerEl.remove();
-        this.resolver = new ViewResolver(plugin, this.contentEl);
+        this.resolver = new ViewResolver(plugin, this.containerEl);
     }
 
     getViewType() { return VIEW_TYPE_BOARD; }

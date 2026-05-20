@@ -1,17 +1,33 @@
 # Changes Log
 
-## [2.0.1] - 2026-05-16
+## [2.0.1] - 2026-05-20
 
 ### Improved
+- 重构 README.md，精简文档结构
+- 新增 README_en.md 英文文档，与中文版保持同步
+- 删除旧版 README_zh.md
+- 优化 ViewResolver 挂载点，修复视图渲染问题
+- 优化第三方组件执行逻辑，提升稳定性
 - 重构模块排序逻辑，统一在 `storage.ts` 的 `loadModules` 方法中进行排序
 - 移除了 `BoardRenderer.ts` 和 `CoreManager.ts` 中的重复排序代码
 
 ### Files Modified
-- `src/storage.ts` - 添加模块排序逻辑到 loadModules 方法
+- `README.md` - 精简重构文档内容
+- `README_en.md` - 新增英文文档，与中文版一致
+- `src/view/PlutoBoardView.ts` - ViewResolver 挂载点改为 containerEl
+- `src/view/PlutoTextView.ts` - 优化 assets 加载等待时间
+- `src/third/SimpleComponent.ts` - executeAll 改为串行执行
+- `src/third/ReactComponent.ts` - 移除多余 sleep
+- `src/third/TemplaterComponent.ts` - 优化 parser 检测逻辑
+- `src/styles.css` - 简化样式代码
 - `src/core/BoardRenderer.ts` - 移除重复的排序代码
 - `src/manager/CoreManager.ts` - 移除 runBundles 和 installBundles 中的排序逻辑
 
+### Files Added
+- `README_en.md` - 英文文档
+
 ### Files Deleted
+- `README_zh.md` - 旧版中文文档
 - `assets/module.webp` - 删除未使用的资源文件
 - `assets/sample/主题小猫.webp` - 删除示例资源文件
 

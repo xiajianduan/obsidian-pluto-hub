@@ -35,6 +35,7 @@ export class CoreManager {
         return new ComponentClass();
     }
     async installBundle(module: MiniModule): Promise<void> {
+        pluto.third.assets[module.name] = {};
         try {
             const filesByType = module.files.groupBy(file => file.type);
             for (const key of Object.keys(this.componentMap)) {
@@ -50,8 +51,7 @@ export class CoreManager {
             delete pluto.third.modules?.[module.name];
         } catch (e: any) {
             new Notice(e.message);
-            navigator.clipboard.writeText(e.stack);
-            console.info(`%c[Pluto Hub] ${e}`, 'color: red');
+            console.info(`%c[Pluto Hub] ${e.stack}`, 'color: red');
         }
     }
 
@@ -70,11 +70,11 @@ export class CoreManager {
             }
         } catch (e: any) {
             new Notice(e.message);
-            navigator.clipboard.writeText(e.stack);
-            console.info(`%c[Pluto Hub] ${e}`, 'color: red');
+            console.info(`%c[Pluto Hub] ${e.stack}`, 'color: red');
         }
     }
     async uninstallBundle(module: MiniModule): Promise<void> {
+        pluto.third.assets[module.name] = {};
         try {
             const filesByType = module.files.groupBy(file => file.type);
             for (const key of Object.keys(this.componentMap)) {
@@ -90,8 +90,7 @@ export class CoreManager {
             delete pluto.third.modules?.[module.name];
         } catch (e: any) {
             new Notice(e.message);
-            navigator.clipboard.writeText(e.stack);
-            console.info(`%c[Pluto Hub] ${e}`, 'color: red');
+            console.info(`%c[Pluto Hub] ${e.stack}`, 'color: red');
         }
     }
 

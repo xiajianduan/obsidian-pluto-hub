@@ -9,17 +9,17 @@ export class ViewResolver {
     moduleAction: ModuleAction;
     boardRenderer: BoardRenderer;
     editorRenderer: EditorRenderer;
-    contentEl: HTMLElement;
+    containerEl: HTMLElement;
     
-    constructor(plugin: PlutoHubPlugin, contentEl: HTMLElement) {
+    constructor(plugin: PlutoHubPlugin, containerEl: HTMLElement) {
         this.plugin = plugin;
-        this.contentEl = contentEl;
+        this.containerEl = containerEl;
         this.moduleAction = new ModuleAction(plugin);
         this.editorRenderer = new EditorRenderer(this);
         this.boardRenderer = new BoardRenderer(this);
     }
     private render() {
-        const container = this.contentEl;
+        const container = this.containerEl;
         container.empty();
         container.addClass('pluto-main-container');
     }

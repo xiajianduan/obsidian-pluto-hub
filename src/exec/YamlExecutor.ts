@@ -32,8 +32,8 @@ export class YamlExecutor extends SimpleExecutor {
                 }
                 return;
             }
-            file.content = parseYaml(file.content);
-            pluto.third.assets[module.name][file.name] = file.content;
+            const data = parseYaml(file.content);
+            pluto.third.assets[module.name][file.name] = data;
             return;
         };
     }

@@ -35,8 +35,9 @@ export class TemplaterComponent extends SimpleComponent {
         };
         const templater = this.self.templater;
         if (templater) {
-            const current = templater.functions_generator.internal_functions.generate_params(mod);
-            if(!templater.parser) await sleep(3000);
+            const internalFunctions = templater.functions_generator.internal_functions;
+            if(!templater.parser || !internalFunctions) await sleep(2000);
+            const current = internalFunctions.generate_params(mod);
             await templater.parser.parse_commands(block.code, current);
         }
     }

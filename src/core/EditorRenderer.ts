@@ -15,7 +15,7 @@ export class EditorRenderer {
     plugin: PlutoHubPlugin;
     resolver: ViewResolver;
     moduleAction: ModuleAction;
-    contentEl: HTMLElement;
+    containerEl: HTMLElement;
     currentFileIndex: number = 0;
     currentModId: string;
 
@@ -24,7 +24,7 @@ export class EditorRenderer {
         this.mirrorRenderer = new MirrorRenderer();
         this.plugin = resolver.plugin;
         this.moduleAction = resolver.moduleAction;
-        this.contentEl = resolver.contentEl;
+        this.containerEl = resolver.containerEl;
     }
 
     // --- 2. 编辑器界面 (基于 ModuleBundle 内容) ---
@@ -40,10 +40,13 @@ export class EditorRenderer {
         if (!module) return;
 
         // 1. 创建导航栏
-        const nav = this.contentEl.createDiv({ cls: 'pluto-editor-nav' });
+        const nav = this.containerEl.createDiv({ cls: 'view-header pluto-editor-nav' });
+        const leftNav = nav.createDiv({ cls: 'view-header-left' });
+        const titleNav = nav.createDiv({ cls: 'view-header-title-container' });
+        const actionsNav = nav.createDiv({ cls: 'view-actions' });
 
         // 返回按钮
-        new ButtonComponent(nav)
+        new ButtonComponent(leftNav)
             .setIcon("arrow-left")
             .setTooltip(t('pluto.hub.editor.back-to-dashboard'))
             .onClick(() => {
@@ -52,10 +55,10 @@ export class EditorRenderer {
             });
 
         // 模块名称（居中）
-        nav.createEl('h3', { text: module.name, cls: 'editor-title centered-title' });
+        titleNav.createEl('h3', { text: module.name, cls: 'editor-title centered-title' });
 
         // 3. 渲染编辑器布局
-        const editorLayout = this.contentEl.createDiv({ cls: 'pluto-editor-layout' });
+        const editorLayout = this.containerEl.createDiv({ cls: 'view-content pluto-editor-layout' });
 
         // 文件侧边栏
         const fileSidebar = editorLayout.createDiv({ cls: 'pluto-file-sidebar' });
@@ -64,7 +67,7 @@ export class EditorRenderer {
         const editorContainer = editorLayout.createDiv({ cls: 'pluto-cm-editor markdown-source-view cm-s-obsidian mod-cm6 node-insert-event' });
 
         // 新建文件按钮（移到导航栏）
-        const addFileBtn = new ButtonComponent(nav)
+        const addFileBtn = new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.add-file'))
             .setClass("btn_nob")
             .onClick(async () => {
@@ -100,19 +103,19 @@ export class EditorRenderer {
             });
 
         // 导入文件按钮（移到导航栏）
-        new ButtonComponent(nav)
+        new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.import-file'))
             .setClass("btn_nob")
-            .onClick(() => this.importFile(module, editorContainer, this.contentEl));
+            .onClick(() => this.importFile(module, editorContainer, this.containerEl));
 
         // 导出文件按钮（移到导航栏）
-        new ButtonComponent(nav)
+        new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.export-files'))
             .setClass("btn_nob")
             .onClick(() => this.exportFilesToFolder(module));
 
         // 保存按钮（移到导航栏）
-        const saveBtn = new ButtonComponent(nav)
+        const saveBtn = new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.save-changes'))
             .setClass("btn_nob")
             .setCta()
@@ -126,7 +129,7 @@ export class EditorRenderer {
             });
 
         // 删除按钮（移到导航栏）
-        new ButtonComponent(nav)
+        new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.delete-module'))
             .setClass("btn_nob")
             .setWarning()

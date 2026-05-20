@@ -50,9 +50,10 @@ export class SimpleComponent implements ThirdComponent {
     }
 
     async executeAll(): Promise<void> {
+        await sleep(800);
         for (const blocks of this.codes.values()) {
             for (const block of blocks) {
-                this.execute(block);
+                await this.execute(block);
             }
         }
     }

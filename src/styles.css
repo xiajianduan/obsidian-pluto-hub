@@ -1,6 +1,5 @@
 /* 主容器 */
 .pluto-main-container {
-    padding: 20px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -13,10 +12,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    border-bottom: 1px solid var(--background-modifier-border);
-    margin-bottom: 20px;
-    /* 添加半透明背景，让背景图片更明显 */
-    background: rgba(var(--background-primary-rgb), 0.85);
+    margin-bottom: 10px;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-radius: 8px 8px 0 0;
@@ -254,17 +250,12 @@
 .pluto-editor-nav {
     display: flex;
     align-items: center;
-    padding-bottom: 15px;
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
 /* 编辑器布局：左右分布 */
 .pluto-editor-layout {
     display: flex;
-    flex: 1;
-    gap: 10px;
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 8px;
 }
 
 /* 侧边文件列表 */
@@ -272,7 +263,7 @@
     width: 200px;
     background: var(--background-secondary);
     border-right: 1px solid var(--background-modifier-border);
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     padding: 8px;
     overflow-y: auto;

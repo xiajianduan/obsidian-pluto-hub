@@ -12,9 +12,7 @@ export class YamlExecutor extends SimpleExecutor {
             // 将配置挂载到 pluto.assets[模块名]
             if (file.name === 'config.yaml' || file.name === 'nav.yaml') {
                 await this.readConfigFile(module.name, module.position, file.content);
-                return;
-            }
-            if (file.name === 'css.yaml') {
+            } else if (file.name === 'css.yaml') {
                 const css = parseYaml(file.content);
                 pluto.third.assets[module.name][file.name] = css;
                 for (const key of Object.keys(css)) {
@@ -24,17 +22,19 @@ export class YamlExecutor extends SimpleExecutor {
                     const target = pluto.third.assets[module.name][vars[0]!];
                     const object = target.settings.find((t: any) => t.id === vars[1]!);
                     //格式为 {id: 'bg-work', title: 'Activate Image Background', title.zh: '开启背景', type: 'class-toggle', default: false}
-                    if (object.type === 'class-toggle' && css[key]) {
+                    if(!css[key]) continue;
+                    if (object.type === 'class-toggle') {
                         document.body.classList.add(object.id);
                     } else if (object.type === 'variable-text') {
                         document.body.style.setProperty(`--${vars[1]}`, css[key]);
+                    }else if (object.type === 'class-select') {
+                        document.body.classList.add(css[key]);
                     }
                 }
-                return;
+            }else {
+                const data = parseYaml(file.content);
+                pluto.third.assets[module.name][file.name] = data;
             }
-            const data = parseYaml(file.content);
-            pluto.third.assets[module.name][file.name] = data;
-            return;
         };
     }
     async install(context: BatchContext): Promise<void> {

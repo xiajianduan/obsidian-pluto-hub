@@ -36,19 +36,21 @@ export class SandboxExecutor extends SimpleExecutor {
 
     private async execModule(module: MiniModule) {
         const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
-        const object: Record<string, any> = {};
+        const api: Record<string, any> = {};
         for (const file of jsFiles) {
-            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file });
-            Object.assign(object, result);
+            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file , api});
+            if(result) {
+                Object.assign(api, result);
+            }
         }
         // 如果有模块导出结果，将其挂载到 pluto.modules
-        if (Object.keys(object).length > 0) {
-            pluto.third.modules[module.name] = object;
+        if (Object.keys(api).length > 0) {
+            pluto.third.modules[module.name] = api;
         }
     }
 
     async load(params: ModParams): Promise<any> {
-        const { id, name, tmpFiles, file } = params;
+        const { id, name, tmpFiles, file, api } = params;
         // 创建模块导出对象
         const moduleExports: Record<string, any> = {};
         const exports = moduleExports;
@@ -63,6 +65,7 @@ export class SandboxExecutor extends SimpleExecutor {
                 configPath,
                 configFile: `${configPath}/${name}.yaml`
             },
+            api,
             // 允许 JS 访问同模块下的其他文件
             getFile: (name: string) => tmpFiles!.find(f => f.name === name)?.content,
             // 添加 CommonJS 模块导出支持

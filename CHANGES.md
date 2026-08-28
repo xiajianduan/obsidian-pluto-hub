@@ -1,5 +1,20 @@
 # Changes Log
 
+## [2.0.1] - 2026-08-28
+
+### Improved
+- 重构 SandboxExecutor 模块执行逻辑，各 JS 文件共享同一个 api 对象并透传给沙箱环境
+- 重构 YamlExecutor 配置处理逻辑，改为 if/else 分支结构，逻辑更清晰
+- css.yaml 新增支持 `class-select` 类型设置
+- css.yaml 中值为 falsy 的配置项跳过处理
+- CSS 变量由 `--sky-*` 统一重命名为 `--pluto-*`，并在 body 中定义默认值
+
+### Files Modified
+- `src/exec/SandboxExecutor.ts` - 引入共享 api 对象，模块导出结果统一挂载到 pluto.modules
+- `src/exec/YamlExecutor.ts` - 重构 YAML 分支处理，新增 class-select 支持
+- `src/styles.css` - 重命名 CSS 变量为 pluto 前缀并添加默认值定义
+- `src/types/global.d.ts` - ModParams 新增 api 可选字段
+
 ## [2.0.1] - 2026-05-20
 
 ### Improved

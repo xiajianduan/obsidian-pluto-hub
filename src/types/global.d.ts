@@ -165,6 +165,7 @@ declare global {
         tmpFiles?: ModFile[];
         file: ModFile;
         yaml?: any;
+        api?: any;
     }
 }
 

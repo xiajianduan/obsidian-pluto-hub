@@ -2,7 +2,7 @@ import { SimpleExecutor } from "./SimpleExecutor";
 
 export type JsFunc = (...args: unknown[]) => Promise<unknown>;
 type AsyncFunctionConstructor = new (...args: string[]) => JsFunc;
-const AsyncFunction = async function (): Promise<void> {}.constructor as AsyncFunctionConstructor;
+const AsyncFunction = async function (): Promise<void> { }.constructor as AsyncFunctionConstructor;
 
 export function buildJsFunc(code: string, globalNames: string[], expression: boolean, sourceUrl: string): JsFunc {
     const functionBody = expression ? `return (\n${code}\n);` : code;
@@ -27,7 +27,7 @@ export class SandboxExecutor extends SimpleExecutor {
                 const boot = new def.Boot();
                 SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
                 boot.start?.();
-                
+
                 boot.finish?.();
             }
         } else {
@@ -39,8 +39,8 @@ export class SandboxExecutor extends SimpleExecutor {
         const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
         const api: Record<string, any> = {};
         for (const file of jsFiles) {
-            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file, api});
-            if(result) {
+            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file, api });
+            if (result) {
                 Object.assign(api, result);
             }
         }
@@ -80,32 +80,36 @@ export class SandboxExecutor extends SimpleExecutor {
             }
         };
 
-        // 检测并处理 export class 语句
+        // 检测并处理 export class 语句，支持 export class Foo extends Bar { ... }
         let content = file.content;
-        const exportClassRegex = /export\s+class\s+(\w+)\s*(\{[\s\S]*?\})(?![\s\S]*\})/g;
-        content = content.replace(exportClassRegex, (_match, className, classBody) => {
+        const exportClassRegex = /export\s+class\s+(\w+)(\s+extends\s+[\w$.]+)?\s*(\{[\s\S]*?\})(?![\s\S]*\})/g;
+        content = content.replace(exportClassRegex, (_match, className, extendsClause = "", classBody) => {
             // 将 export class 转换为普通 class 定义，并将其导出到 module.exports
-            return `class ${className} ${classBody}\nmodule.exports.${className} = ${className};`;
+            return `class ${className}${extendsClause} ${classBody}\nmodule.exports.${className} = ${className};`;
         });
 
         // 使用沙箱 AsyncFunction 执行处理后的代码
-        const runner = buildJsFunc(`with(ctx) { ${content} }`, ['ctx'], false, `sandbox:${name}/${file.name}`);
-        const result = await runner(context);
-
-        // 处理模块导出
-        if (result) {
-            // 优先使用 return 的结果
-            return result;
-        } else if (Object.keys(moduleExports).length > 0) {
-            // 其次使用 module.exports 或 exports
-            return moduleExports;
+        try {
+            const runner = buildJsFunc(`with(ctx) { ${content} }`, ['ctx'], false, `sandbox:${name}/${file.name}`);
+            const result = await runner(context);
+            // 处理模块导出
+            if (result) {
+                // 优先使用 return 的结果
+                return result;
+            } else if (Object.keys(moduleExports).length > 0) {
+                // 其次使用 module.exports 或 exports
+                return moduleExports;
+            }
+        } catch (error) {
+            console.error(`Error executing module ${name}, file ${file.name}:`, error);
+            throw error;
         }
     }
 
     async install(context: BatchContext) {
         const bootJs = context.files!.find(f => f.name === 'boot.js');
         if (bootJs) {
-            const def = await this.load({ ...context, file: bootJs , api: pluto.third.modules[context.name] || {} });
+            const def = await this.load({ ...context, file: bootJs, api: pluto.third.modules[context.name] || {} });
             if (def) {
                 const boot = new def.Boot();
                 await boot.install?.(context);

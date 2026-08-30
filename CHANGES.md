@@ -1,5 +1,14 @@
 # Changes Log
 
+## [2.0.2] - 2026-08-31
+
+### Fixed
+- 修正 SandboxExecutor 的 export class 正则表达式，支持 `export class Foo extends Bar` 继承语法，兼容包含 require 和变量声明的模块代码格式
+- 为 SandboxExecutor 模块加载添加 try/catch 错误处理，异常时输出模块名和文件名便于调试
+
+### Files Modified
+- `src/exec/SandboxExecutor.ts` - 扩展 export class 正则支持 extends 继承，新增 try/catch 错误捕获
+
 ## [2.0.1] - 2026-08-31
 
 ### Fixed

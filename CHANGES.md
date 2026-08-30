@@ -1,5 +1,19 @@
 # Changes Log
 
+## [2.0.1] - 2026-08-31
+
+### Fixed
+- 修正 SandboxExecutor 沙箱生命周期：先执行非 boot.js 文件构建 api，再加载并执行 boot.js，boot.start() / boot.finish() 改为可选调用
+- 修正 SandboxExecutor 模块间引用，新增 `imports: (clazz) => api[clazz]`，供模块内部互相引用导出结果
+- 修正 SandboxExecutor.install 中缓存 key 错误（使用 module.id → context.id），并将 boot.install 改为 await 执行
+- 修正 CoreManager 模块卸载流程，移除了不必要的 execute 调用，仅执行 uninstall 清理
+- 调整 PlutoTextView 资源等待时间由 10s 增加至 20s，提升页面渲染稳定性
+
+### Files Modified
+- `src/exec/SandboxExecutor.ts` - 修正沙箱生命周期时序，新增模块间 imports 支持，修复 install 缓存 key
+- `src/manager/CoreManager.ts` - 注释掉模块卸载前多余的 execute 调用
+- `src/view/PlutoTextView.ts` - 资源等待时间由 10000ms 调整为 20000ms
+
 ## [2.0.1] - 2026-08-28
 
 ### Improved

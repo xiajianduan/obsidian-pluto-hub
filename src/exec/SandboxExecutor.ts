@@ -19,14 +19,15 @@ export class SandboxExecutor extends SimpleExecutor {
     }
 
     async execute(module: MiniModule) {
+        const api = await this.execModule(module);
         const bootJs = module.tmpFiles!.find(f => f.name === 'boot.js');
         if (bootJs) {
-            const def = await this.load({ ...module, file: bootJs });
+            const def = await this.load({ ...module, file: bootJs, api });
             if (def) {
                 const boot = new def.Boot();
                 SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
-                boot.start();
-                await this.execModule(module);
+                boot.start?.();
+                
                 boot.finish?.();
             }
         } else {
@@ -38,7 +39,7 @@ export class SandboxExecutor extends SimpleExecutor {
         const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
         const api: Record<string, any> = {};
         for (const file of jsFiles) {
-            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file , api});
+            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file, api});
             if(result) {
                 Object.assign(api, result);
             }
@@ -47,6 +48,7 @@ export class SandboxExecutor extends SimpleExecutor {
         if (Object.keys(api).length > 0) {
             pluto.third.modules[module.name] = api;
         }
+        return api;
     }
 
     async load(params: ModParams): Promise<any> {
@@ -65,6 +67,7 @@ export class SandboxExecutor extends SimpleExecutor {
                 configPath,
                 configFile: `${configPath}/${name}.yaml`
             },
+            imports: (clazz: string) => api[clazz],
             api,
             // 允许 JS 访问同模块下的其他文件
             getFile: (name: string) => tmpFiles!.find(f => f.name === name)?.content,
@@ -102,11 +105,11 @@ export class SandboxExecutor extends SimpleExecutor {
     async install(context: BatchContext) {
         const bootJs = context.files!.find(f => f.name === 'boot.js');
         if (bootJs) {
-            const def = await this.load({ ...context, file: bootJs });
+            const def = await this.load({ ...context, file: bootJs , api: pluto.third.modules[context.name] || {} });
             if (def) {
                 const boot = new def.Boot();
-                SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
-                boot.install?.(context);
+                await boot.install?.(context);
+                SandboxExecutor.instances.set(context.id, boot);// 缓存实例实例
             }
         }
     }

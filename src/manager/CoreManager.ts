@@ -81,9 +81,9 @@ export class CoreManager {
                 const files = filesByType[key];
                 if (files && files.length > 0) {
                     const executor = this.create(key);
-                    module.tmpFiles = files;
-                    await executor.execute(module);
-                    delete module.tmpFiles;
+                    // module.tmpFiles = files;
+                    // await executor.execute(module);
+                    // delete module.tmpFiles;
                     await executor.uninstall({ ...module, files });
                 }
             }

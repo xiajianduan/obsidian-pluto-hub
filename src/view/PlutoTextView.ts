@@ -39,7 +39,7 @@ export class PlutoTextView extends ItemView {
     async render() {
         const { app, file } = this.state;
         if(!pluto.third.assets[app]) {
-            await sleep(10000);
+            await sleep(20000);
         }
         const markdown = pluto.third.assets[app][file];
         this.content = this.containerEl.querySelector(".view-content")!;

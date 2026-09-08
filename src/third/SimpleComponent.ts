@@ -1,11 +1,10 @@
-import { Notice } from "obsidian";
-
 // 创建一个简单的ThirdComponent实现，用于其他插件
 export class SimpleComponent implements ThirdComponent {
     
     self: any;
     configPath: string;
     codes: Map<string, any[]> = new Map();
+    private boundOperator: any;
 
     constructor(configPath: string) {
         this.configPath = configPath;
@@ -27,7 +26,10 @@ export class SimpleComponent implements ThirdComponent {
     }
     
     bind(op: any, prop: PlutoProps): ThirdComponent {
+        if (this.boundOperator === op && pluto.third[prop] === this) return this;
+
         this.self = op;
+        this.boundOperator = op;
         pluto.third[prop] = this;
         this.patch();
         console.log(`[Pluto Hub] ${prop} successfully bound to pluto.third.${prop}`);
@@ -50,7 +52,6 @@ export class SimpleComponent implements ThirdComponent {
     }
 
     async executeAll(): Promise<void> {
-        await sleep(800);
         for (const blocks of this.codes.values()) {
             for (const block of blocks) {
                 await this.execute(block);

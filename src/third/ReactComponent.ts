@@ -25,7 +25,7 @@ export class ReactComponent extends SimpleComponent {
 
     async load(params: ModParams): Promise<void> {
         const { name, file, yaml } = params;
-        const suppressComponentRefresh = yaml['suppress-component-refresh'] || true;
+        const suppressComponentRefresh = yaml['suppress-component-refresh'] ?? true;
         const prefix = `const name = "${name}";\n`;
         const matches = this.getMatches(/^\s*?```jsx:component:(.*)\n((.|\n)*?)\n^\s*?```$/gm, file.content);
         for (const match of matches) {

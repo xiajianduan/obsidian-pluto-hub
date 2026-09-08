@@ -8,16 +8,24 @@
 - 新增 FormManager.ai 表单方法与 FormJson.ai 表单配置，支持提示词、快速生成开关和附件选择
 - SandboxExecutor 沙箱环境新增 `asset(fileName)` 方法，模块 JS 可直接读取挂载到 pluto.third.assets 的资源
 
+### Fixed
+- 修复第三方插件绑定重复执行和重复输出日志的问题
+- 修复 Templater 初始化竞态导致 `generate_params is not a function` 的问题
+- 修复第三方组件异步执行未等待，导致模块资源和 React 组件渲染时序不稳定的问题
+
 ### Improved
 - 简化 FormManager.prompt 签名，移除 required 参数（默认必填），更新 BoardRenderer 和 helper 中的调用
 - 全局 app 类型由 `App` 扩展为 `PlutoApp`，新增 autoManager、prompt 及 AI 生成结果相关类型定义
 - CoreManager 模块安装流程在 install 后补充 execute 调用，模块激活即生效
 - 调整 SandboxExecutor.install 生命周期顺序，start/finish 交由 execute 阶段执行
+- 第三方插件绑定改用 `${pluginId}-loaded` 事件，移除轮询等待
 
 ### Files Modified
 - `src/core/EditorRenderer.ts` - 新增智能生成按钮与 generateFiles 方法
 - `src/core/BoardRenderer.ts` - 适配 prompt 方法新签名
 - `src/exec/SandboxExecutor.ts` - 沙箱环境新增 asset 方法，调整 boot 生命周期顺序
+- `src/exec/MarkdownExecutor.ts` - 等待 Markdown 第三方组件加载完成
+- `src/exec/SimpleExecutor.ts` - 等待所有第三方组件执行完成
 - `src/manager/CoreManager.ts` - install 后补充 execute 调用
 - `src/manager/FormManager.ts` - 新增 ai 表单方法，简化 prompt 签名
 - `src/modal/FormField.tsx` - 新增 multiselect 多选组件
@@ -27,6 +35,10 @@
 - `src/styles.css` - 新增 form-multiselect 多选组件样式
 - `src/types/form.d.ts` - InputType 新增 multiselect，字段配置新增 multi_select_* 属性
 - `src/types/global.d.ts` - 新增 PlutoApp、GeneratedFilesResult、AiFormResult 等类型
+- `src/pluto.ts` - 增加第三方插件事件绑定和重复绑定保护
+- `src/third/ReactComponent.ts` - 修复 suppress-component-refresh 的 false 配置
+- `src/third/SimpleComponent.ts` - 增加组件绑定幂等保护
+- `src/third/TemplaterComponent.ts` - 修复 Templater 参数生成初始化时序
 - `src/utils/helper.ts` - 适配 prompt 方法新签名
 
 ## [2.0.3] - 2026-08-31

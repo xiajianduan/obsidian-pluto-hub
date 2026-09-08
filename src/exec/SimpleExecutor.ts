@@ -18,10 +18,11 @@ export class SimpleExecutor implements CoreExecutor {
     async execute(context: BatchContext): Promise<void> { }
 
     async executeAll(): Promise<void> {
+        const executions: Promise<void>[] = [];
         ThirdFactory.loop((prop: PlutoProps) => {
-            const component = pluto.third[prop];
-            component.executeAll();
-        })
+            executions.push(pluto.third[prop].executeAll());
+        });
+        await Promise.all(executions);
     }
     
 

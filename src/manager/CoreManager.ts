@@ -98,7 +98,7 @@ export class CoreManager {
             if (mod.type === 'I') {
                 await this.runBundle(mod);
             } else {
-                this.runBundle(mod);
+                await this.runBundle(mod);
             }
         }
     }
@@ -116,7 +116,7 @@ export class CoreManager {
 
         // 从存储中加载所有模块
         const modules = await this.getAllModules();
-        this.runBundles(modules);
+        await this.runBundles(modules);
     }
 
     async getAllModules() {

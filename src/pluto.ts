@@ -12,6 +12,8 @@ import ThemeManager from "manager/ThemeManager";
 import { ConfigManager } from "manager/ConfigManager";
 import { PluginContext } from "core/PluginContext";
 
+const PLUGIN_BIND_TIMEOUT = 30000;
+
 export class Pluto implements IPluto {
     app: App;
     web: any;
@@ -25,6 +27,8 @@ export class Pluto implements IPluto {
     coreManager: CoreManager;
     formManager: FormManager;
     configManager: ConfigManager;
+    private bindingPromises = new Map<PlutoProps, Promise<boolean>>();
+    private boundPlugins = new Set<PlutoProps>();
 
     constructor() {
         this.app = PluginContext.plugin.app;
@@ -61,6 +65,26 @@ export class Pluto implements IPluto {
 
     // 绑定单个插件依赖
     async bindPlugin(prop: PlutoProps) {
+        if (this.boundPlugins.has(prop)) return;
+
+        const existingBinding = this.bindingPromises.get(prop);
+        if (existingBinding) {
+            await existingBinding;
+            return;
+        }
+
+        const binding = this.bindPluginWhenAvailable(prop);
+        this.bindingPromises.set(prop, binding);
+        try {
+            if (await binding) this.boundPlugins.add(prop);
+        } finally {
+            if (this.bindingPromises.get(prop) === binding) {
+                this.bindingPromises.delete(prop);
+            }
+        }
+    }
+
+    private async bindPluginWhenAvailable(prop: PlutoProps): Promise<boolean> {
         // 尝试绑定的函数
         const tryBind = async () => {
             const component: ThirdComponent = this.third[prop];
@@ -73,17 +97,33 @@ export class Pluto implements IPluto {
         };
 
         // 如果已经加载了，直接绑定
-        if (await tryBind()) return;
+        if (await tryBind()) return true;
 
-        // 如果没加载，利用 Obsidian 的事件钩子轮询
-        const timer = setInterval(async () => {
-            if (await tryBind()) {
-                clearInterval(timer); // 绑定成功后停止轮询
-            }
-        }, 1000);
-
-        // 设置一个超时保护，防止无限轮询（30 秒后停止）
-        setTimeout(() => clearInterval(timer), 30000);
+        // 如果没加载，等待依赖插件发出的 loaded 事件
+        return await new Promise<boolean>((resolve) => {
+            let settled = false;
+            let inFlight = false;
+            const component = this.third[prop];
+            const eventName = `${component.pluginId}-loaded`;
+            const finish = (bound: boolean) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeout);
+                window.removeEventListener(eventName, onLoaded, false);
+                resolve(bound);
+            };
+            const onLoaded = () => {
+                if (inFlight) return;
+                inFlight = true;
+                void tryBind().then((bound) => {
+                    if (bound) finish(true);
+                }).finally(() => {
+                    inFlight = false;
+                });
+            };
+            window.addEventListener(eventName, onLoaded, false);
+            const timeout = setTimeout(() => finish(false), PLUGIN_BIND_TIMEOUT);
+        });
     }
 
     getModule(name: string) {

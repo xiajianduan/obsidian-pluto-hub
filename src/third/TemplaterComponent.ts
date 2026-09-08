@@ -1,4 +1,3 @@
-import { Notice } from "obsidian";
 import { SimpleComponent } from "./SimpleComponent";
 
 export class TemplaterComponent extends SimpleComponent {
@@ -8,15 +7,15 @@ export class TemplaterComponent extends SimpleComponent {
     }
 
     patch(): void {
-        if (this.self.templater) {
-            this.self.templater.functions_generator.internal_functions.generate_params = function (params: any) {
-                let t: any = {};
-                for (let r of this.modules_array) {
-                    t[r.getName()] = r.static_object;
-                }
-                return { ...t, params };
-            };
-        }
+        const internalFunctions = this.self.templater?.functions_generator?.internal_functions;
+        if (!internalFunctions || typeof internalFunctions.generate_params === 'function') return;
+        internalFunctions.generate_params = function (params: any) {
+            const values: any = {};
+            for (const module of this.modules_array) {
+                values[module.getName()] = module.static_object;
+            }
+            return { ...values, params };
+        };
     }
     async load(params: ModParams): Promise<void> {
         const { name, file } = params;
@@ -34,11 +33,8 @@ export class TemplaterComponent extends SimpleComponent {
             configFile: `${this.configPath}/${block.name}.yaml`
         };
         const templater = this.self.templater;
-        if (templater) {
-            const internalFunctions = templater.functions_generator.internal_functions;
-            if(!templater.parser || !internalFunctions) await sleep(2000);
-            const current = internalFunctions.generate_params(mod);
-            await templater.parser.parse_commands(block.code, current);
-        }
+        const internalFunctions = templater.functions_generator.internal_functions;
+        const current = internalFunctions.generate_params(mod);
+        await templater.parser.parse_commands(block.code, current);
     }
 }

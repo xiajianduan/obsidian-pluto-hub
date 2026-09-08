@@ -25,10 +25,10 @@ export class MarkdownExecutor extends SimpleExecutor {
         for (const prop of this.codes.keys()) {
             pluto.third.assets[context.name].component[prop] = ThirdFactory.getInstance(prop);
         }
-        this.codes.forEach(async (params, prop) => {
+        await Promise.all(Array.from(this.codes.entries()).map(async ([prop, params]) => {
             const component = pluto.third.assets[context.name].component as Record<string, ThirdComponent>;
             await component[prop]!.load(params);
-        });
+        }));
     }
 
     async install(context: BatchContext): Promise<void> {

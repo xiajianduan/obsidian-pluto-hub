@@ -25,10 +25,10 @@ export class CoreManager {
         'gif': ImageExecutor,
         'webp': ImageExecutor,
         'md': MarkdownExecutor,
-        'js': SandboxExecutor,
         'page': PageExecutor,
         'glb': GlbExecutor,
         'form': FormExecutor,
+        'js': SandboxExecutor,
     };
 
     create(prop: string): CoreExecutor {
@@ -45,6 +45,7 @@ export class CoreManager {
                 if (files && files.length > 0) {
                     const executor = this.create(key);
                     await executor.install({ ...module, files });
+                    await executor.execute({...module, files});
                 }
             }
             delete pluto.third.modules?.[module.name];

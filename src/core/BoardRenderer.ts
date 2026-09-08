@@ -57,7 +57,7 @@ export class BoardRenderer {
             .setButtonText(t('pluto.hub.dashboard.export-all'))
             .setClass('btn_nob')
             .onClick(async () => {
-                pluto.formManager.prompt(t('pluto.hub.export.all-label'), true).then(async (name) => {
+                pluto.formManager.prompt(t('pluto.hub.export.all-label')).then(async (name) => {
                     await this.showExportAllDialog(name);
                 }).catch(e => {
                     new Notice(e.message);

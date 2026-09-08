@@ -1,5 +1,34 @@
 # Changes Log
 
+## [2.1.0] - 2026-09-09
+
+### Added
+- 新增编辑器「智能生成」按钮，调用 autoManager AI 根据提示词和附件文件批量生成模块文件
+- 新增 FormField `multiselect` 多选组件，支持复选框卡片网格布局与已选数量摘要
+- 新增 FormManager.ai 表单方法与 FormJson.ai 表单配置，支持提示词、快速生成开关和附件选择
+- SandboxExecutor 沙箱环境新增 `asset(fileName)` 方法，模块 JS 可直接读取挂载到 pluto.third.assets 的资源
+
+### Improved
+- 简化 FormManager.prompt 签名，移除 required 参数（默认必填），更新 BoardRenderer 和 helper 中的调用
+- 全局 app 类型由 `App` 扩展为 `PlutoApp`，新增 autoManager、prompt 及 AI 生成结果相关类型定义
+- CoreManager 模块安装流程在 install 后补充 execute 调用，模块激活即生效
+- 调整 SandboxExecutor.install 生命周期顺序，start/finish 交由 execute 阶段执行
+
+### Files Modified
+- `src/core/EditorRenderer.ts` - 新增智能生成按钮与 generateFiles 方法
+- `src/core/BoardRenderer.ts` - 适配 prompt 方法新签名
+- `src/exec/SandboxExecutor.ts` - 沙箱环境新增 asset 方法，调整 boot 生命周期顺序
+- `src/manager/CoreManager.ts` - install 后补充 execute 调用
+- `src/manager/FormManager.ts` - 新增 ai 表单方法，简化 prompt 签名
+- `src/modal/FormField.tsx` - 新增 multiselect 多选组件
+- `src/modal/FormJson.ts` - 新增 ai 表单配置，简化 input 签名
+- `src/i18n/en.ts` - 新增 AI 生成相关英文文案
+- `src/i18n/zh-cn.ts` - 新增 AI 生成相关中文文案
+- `src/styles.css` - 新增 form-multiselect 多选组件样式
+- `src/types/form.d.ts` - InputType 新增 multiselect，字段配置新增 multi_select_* 属性
+- `src/types/global.d.ts` - 新增 PlutoApp、GeneratedFilesResult、AiFormResult 等类型
+- `src/utils/helper.ts` - 适配 prompt 方法新签名
+
 ## [2.0.3] - 2026-08-31
 
 ### Improved

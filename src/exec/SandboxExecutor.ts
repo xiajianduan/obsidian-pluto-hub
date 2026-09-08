@@ -62,6 +62,9 @@ export class SandboxExecutor extends SimpleExecutor {
             },
             imports: (clazz: string) => api[clazz],
             api,
+            asset: function(fileName: string) {
+                return pluto.third.assets[name][fileName];
+            },
             // 允许 JS 访问同模块下的其他文件
             getFile: (name: string) => tmpFiles!.find(f => f.name === name)?.content,
             // 添加 CommonJS 模块导出支持
@@ -107,8 +110,6 @@ export class SandboxExecutor extends SimpleExecutor {
             if (def) {
                 const boot = new def.Boot();
                 await boot.install?.(context);
-                await boot.start?.();
-                await boot.finish?.();
                 SandboxExecutor.instances.set(context.id, boot);// 缓存实例实例
             }
         }

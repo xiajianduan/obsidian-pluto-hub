@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-pluto-hub",
-	"version": "2.0.3",
+	"version": "2.1.0",
 	"description": "A powerful plugin that allows users to manage, edit, and run local code modules, providing rich extensibility.",
 	"main": "main.js",
 	"type": "module",

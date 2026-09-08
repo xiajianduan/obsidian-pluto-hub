@@ -82,6 +82,44 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
             ))}
           </select>
         );
+      case 'multiselect':
+        {
+          const selectedValues = Array.isArray(localValue) ? localValue : [];
+          const options = input.multi_select_options ?? [];
+
+          const toggleOption = (value: string) => {
+            const nextValues = selectedValues.includes(value)
+              ? selectedValues.filter((selectedValue) => selectedValue !== value)
+              : [...selectedValues, value];
+            setLocalValue(nextValues);
+            onChange(name, nextValues);
+          };
+
+          return (
+            <div className="form-multiselect">
+              <div className="form-multiselect-options">
+                {options.map((option) => {
+                  const value = String(option.value);
+                  const isSelected = selectedValues.includes(value);
+                  return (
+                    <label className={`form-multiselect-option ${isSelected ? 'is-selected' : ''}`} key={value}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleOption(value)}
+                      />
+                      <span className="form-multiselect-file-icon">{String(option.label).split('.').pop()?.toUpperCase()}</span>
+                      <span className="form-multiselect-file-name" title={option.label}>{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              <div className="form-multiselect-summary">
+                {(input.multi_select_summary ?? '').replace('{count}', String(selectedValues.length))}
+              </div>
+            </div>
+          );
+        }
       case 'button':
         return (
           <button

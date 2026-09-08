@@ -2,14 +2,42 @@ import { FormModalConfig } from "types/form";
 import { t } from "utils/translation";
 export class FormJson {
 
-    static input(title: string, name: string, required: boolean): FormModalConfig {
+    static input(title: string, name: string): FormModalConfig {
         return {
             title,
             fields: [{
                 input: { type: 'text', hidden: false },
                 name: "name",
                 label: name,
-                required
+                required: true
+            }]
+        }
+    }
+    static ai(files: ModFile[]): FormModalConfig {
+        return {
+            title: t('pluto.hub.editor.ai.title'),
+            fields: [{
+                input: { type: 'textarea', hidden: false, placeholder: t('pluto.hub.editor.ai.prompt-placeholder') },
+                name: "prompt",
+                label: t('pluto.hub.editor.ai.prompt-label'),
+                required: true
+            },{
+                input: {
+                    type: 'toggle',
+                    hidden: false,
+                },
+                name: "fast",
+                label: t('pluto.hub.editor.ai.fast-label'),
+                required: true
+            }, {
+                input: {
+                    type: 'multiselect',
+                    hidden: false,
+                    multi_select_options: files.map(file => ({ value: file.name, label: file.name })),
+                    multi_select_summary: t('pluto.hub.editor.ai.attachments-summary'),
+                },
+                name: "attachments",
+                label: t('pluto.hub.editor.ai.attachments-label'),
             }]
         }
     }

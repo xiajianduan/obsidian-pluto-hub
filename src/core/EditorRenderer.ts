@@ -66,6 +66,19 @@ export class EditorRenderer {
         // CodeMirror 编辑器容器
         const editorContainer = editorLayout.createDiv({ cls: 'pluto-cm-editor markdown-source-view cm-s-obsidian mod-cm6 node-insert-event' });
 
+        // 智能生成
+        const generateBtn = new ButtonComponent(actionsNav)
+            .setButtonText(t('pluto.hub.editor.ai.generate'))
+            .setClass("btn_nob")
+            .onClick(async () => {
+                generateBtn.setDisabled(true);
+                try {
+                    await this.generateFiles(module, fileSidebar, editorContainer);
+                } finally {
+                    generateBtn.setDisabled(false);
+                }
+            });
+
         // 新建文件按钮（移到导航栏）
         const addFileBtn = new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.add-file'))
@@ -147,6 +160,50 @@ export class EditorRenderer {
         const currentFile = this.getCurrentFile(module);
         if (currentFile) {
             this.mirrorRenderer.render(editorContainer, currentFile);
+        }
+    }
+
+    private async generateFiles(module: MiniModule, fileSidebar: HTMLElement, editorContainer: HTMLElement): Promise<void> {
+        try {
+            const result = await pluto.formManager.ai(module.files);
+            const autoManager = pluto.app.autoManager;
+            if (!autoManager) {
+                new Notice(t('pluto.hub.editor.ai.unavailable'));
+                return;
+            }
+
+            const systemPrompt = pluto.prompt?.plutoModule ?? '';
+            const attachments = module.files
+                .filter(file => result.attachments.includes(file.name))
+                .map(file => `\n--- ${file.name} ---\n${file.content}`)
+                .join('');
+            const prompt = [systemPrompt, result.prompt, attachments].filter(Boolean).join('\n');
+            const data = await autoManager.json(prompt, { fast: result.fast });
+            const files = data?.files;
+            if (!Array.isArray(files) || files.length === 0) {
+                new Notice(t('pluto.hub.editor.ai.empty-result'));
+                return;
+            }
+
+            for (const file of files) {
+                if (!file?.name || typeof file.content !== 'string') continue;
+                const type = file.name.split('.').pop() || 'txt';
+                const existingIndex = module.files.findIndex(
+                    existingFile => existingFile.name.toLowerCase() === file.name.toLowerCase()
+                );
+                if (existingIndex >= 0) {
+                    module.files.splice(existingIndex, 1);
+                }
+                module.files.push({ name: file.name, type, content: file.content });
+            }
+            await this.moduleAction.save(module);
+            this.renderFileSidebar(fileSidebar, module, editorContainer);
+            new Notice(t('pluto.hub.editor.ai.success').replace('{count}', String(files.length)));
+        } catch (error) {
+            if ((error as { type?: string })?.type !== 'cancel') {
+                console.error('AI generation failed:', error);
+                new Notice(t('pluto.hub.editor.ai.failure'));
+            }
         }
     }
 

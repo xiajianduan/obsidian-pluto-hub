@@ -21,7 +21,7 @@ declare global {
         pluto: IPluto;
     }
     export const pluto: IPluto;
-    export const app: App;
+    export const app: PlutoApp;
 
     type PlutoProps = "dva" | "react" | "qa" | "templater";
 
@@ -34,7 +34,7 @@ declare global {
         quality: number;
     }
     export interface IPluto {
-        app: App;
+        app: PlutoApp;
         web: any;
         images: any;
         third: Third;
@@ -45,6 +45,26 @@ declare global {
         formManager: FormManager;
         viewManager: ViewManager;
         themeManager: ThemeManager;
+        prompt?: {
+            plutoModule?: string;
+        };
+    }
+    export interface PlutoApp extends App {
+        autoManager?: {
+            json(prompt: string, options: { fast: boolean | string }): Promise<GeneratedFilesResult>;
+        };
+    }
+    export interface GeneratedFilesResult {
+        files: GeneratedFile[];
+    }
+    export interface GeneratedFile {
+        name: string;
+        content: string;
+    }
+    export interface AiFormResult {
+        prompt: string;
+        fast: boolean | string;
+        attachments: string[];
     }
     export interface Third {
         assets: any;

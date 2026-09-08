@@ -224,7 +224,7 @@ body {
     caret-color: var(--interactive-accent); /* 光标使用主题色 */
     border: none;
     padding: 20px;
-    selection-background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 /* 模拟关键字颜色的简单伪装（针对特定文件） */
 .pluto-textarea[data-type="js"] {
@@ -339,33 +339,6 @@ body {
     justify-content: flex-end;
     gap: 8px;
     margin-top: 16px;
-}
-/* CTA 按钮 */
-button.mod-cta {
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
-    font-weight: 500;
-    padding: 8px 16px;
-}
-
-button.mod-cta:hover {
-    background-color: var(--interactive-accent-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* 警告按钮 */
-button.mod-warning {
-    background-color: var(--background-danger);
-    color: var(--text-on-accent);
-    font-weight: 500;
-    padding: 8px 16px;
-}
-
-button.mod-warning:hover {
-    background-color: var(--background-danger-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 82, 82, 0.2);
 }
 
 /* 图标按钮 */

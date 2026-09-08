@@ -7,19 +7,19 @@ export class YamlExecutor extends SimpleExecutor {
         return type === 'yaml';
     }
 
-    async execute(module: MiniModule): Promise<void> {
-        for (const file of module.tmpFiles!) {
+    async execute(context: BatchContext): Promise<void> {
+        for (const file of context.files) {
             // 将配置挂载到 pluto.assets[模块名]
             if (file.name === 'config.yaml' || file.name === 'nav.yaml') {
-                await this.readConfigFile(module.name, module.position, file.content);
+                await this.readConfigFile(context.name, context.position, file.content);
             } else if (file.name === 'css.yaml') {
                 const css = parseYaml(file.content);
-                pluto.third.assets[module.name][file.name] = css;
+                pluto.third.assets[context.name][file.name] = css;
                 for (const key of Object.keys(css)) {
                     //key值格式为 pluto-background@@bg-work
                     //取值方法 pluto.third.assets['默认皮肤']['pluto-background'].settings.find(t=> t.id==='bg-work')
                     const vars = key.split('@@');
-                    const target = pluto.third.assets[module.name][vars[0]!];
+                    const target = pluto.third.assets[context.name][vars[0]!];
                     const object = target.settings.find((t: any) => t.id === vars[1]!);
                     //格式为 {id: 'bg-work', title: 'Activate Image Background', title.zh: '开启背景', type: 'class-toggle', default: false}
                     if(!css[key]) continue;
@@ -33,7 +33,7 @@ export class YamlExecutor extends SimpleExecutor {
                 }
             }else {
                 const data = parseYaml(file.content);
-                pluto.third.assets[module.name][file.name] = data;
+                pluto.third.assets[context.name][file.name] = data;
             }
         };
     }
@@ -55,6 +55,7 @@ export class YamlExecutor extends SimpleExecutor {
 
             }
         }
+        await this.execute(context);
     }
 
     async readConfigFile(name: string, position: string, content: string): Promise<void> {

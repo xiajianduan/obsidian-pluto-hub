@@ -15,7 +15,7 @@ export class SimpleExecutor implements CoreExecutor {
         return false;
     }
 
-    async execute(block: any): Promise<void> { }
+    async execute(context: BatchContext): Promise<void> { }
 
     async executeAll(): Promise<void> {
         ThirdFactory.loop((prop: PlutoProps) => {

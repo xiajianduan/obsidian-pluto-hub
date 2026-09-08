@@ -37,11 +37,11 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
       case 'toggle':
         return (
           <div className={`checkbox-container ${!!localValue ? 'is-enabled' : ''}`}
-          onClick={() => {
-            const newValue = !localValue;
-            setLocalValue(newValue);
-            onChange(name, newValue);
-          }}>
+            onClick={() => {
+              const newValue = !localValue;
+              setLocalValue(newValue);
+              onChange(name, newValue);
+            }}>
             <input
               type="checkbox"
               tabIndex={0}
@@ -53,7 +53,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
         return (
           <textarea
             className="form-input"
-            rows={ 10 }
+            rows={10}
             placeholder={input.placeholder}
             value={localValue as string}
             onChange={(e) => {
@@ -93,6 +93,59 @@ export const FormField: React.FC<FormFieldProps> = ({ field, value, onChange }) 
           >
             {input.buttonText || field.label}
           </button>
+        );
+      case 'hotkey':
+        function normalizeKey(event: React.KeyboardEvent<HTMLInputElement>) {
+          const key = event.key.toUpperCase();
+
+          if (key === " ") return "SPACE";
+          if (key === "CONTROL") return "CTRL";
+          if (key === "META") return "CMD";
+          if (key === "ALT") return "ALT";
+          if (key === "SHIFT") return "SHIFT";
+          if (key === "TAB") return "TAB";
+          if (key === "ESCAPE") return "ESC";
+          if (key === "ENTER") return "ENTER";
+          if (key === "BACKSPACE") return "BACKSPACE";
+
+          return key;
+        }
+
+        return (
+          <input
+            className="form-input"
+            value={
+              Array.isArray(localValue)
+                ? localValue.join(' + ')
+                : ''
+            }
+            placeholder={input.placeholder}
+            readOnly
+            required={field.required}
+            onKeyDown={(e) => {
+              e.preventDefault();
+
+              const keys = [];
+
+              if (e.ctrlKey) keys.push('CTRL');
+              if (e.altKey) keys.push('ALT');
+              if (e.shiftKey) keys.push('SHIFT');
+              if (e.metaKey) keys.push('CMD');
+
+              const key = normalizeKey(e);
+
+              if (
+                !['CTRL', 'ALT', 'SHIFT', 'CMD'].includes(key)
+              ) {
+                keys.push(key);
+              }
+
+              if (keys.length) {
+                setLocalValue(keys);
+                onChange(name, keys);
+              }
+            }}
+          />
         );
       default:
         return <div>不支持的组件类型：{input.type}</div>;

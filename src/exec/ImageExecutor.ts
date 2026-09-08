@@ -7,12 +7,12 @@ export class ImageExecutor extends SimpleExecutor {
         return isImageFile(type);
     }
 
-    async execute(module: MiniModule): Promise<void> {
-        for (const file of module.tmpFiles!) {
+    async execute(context: BatchContext): Promise<void> {
+        for (const file of context.files) {
             // 将配置挂载到 pluto.assets[模块名]
             const blobUrl = base64ToBlobUrl(file.content, file.type);
             file.blobUrl = blobUrl;
-            pluto.third.assets[module.name][file.name] = blobUrl;
+            pluto.third.assets[context.name][file.name] = blobUrl;
         };
     }
 

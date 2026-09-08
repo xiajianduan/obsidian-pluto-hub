@@ -8,8 +8,8 @@ export class MarkdownExecutor extends SimpleExecutor {
         return type === 'md';
     }
 
-    async execute(module: MiniModule): Promise<void> {
-        for (const file of module.tmpFiles!) {
+    async execute(context: BatchContext): Promise<void> {
+        for (const file of context.files) {
             const info = getFrontMatterInfo(file.content);
             const frontmatter = info.frontmatter;
             if (!frontmatter) continue;
@@ -17,16 +17,16 @@ export class MarkdownExecutor extends SimpleExecutor {
             const plutoLanguage = yaml['pluto-language'];
             if (plutoLanguage) {
                 const prop = plutoLanguage as PlutoProps;
-                this.codes.set(prop, { ...module, file, yaml });
+                this.codes.set(prop, { ...context, file, yaml });
             }
         };
         if (this.codes.size === 0) return;
-        pluto.third.assets[module.name].component = {};
+        pluto.third.assets[context.name].component = {};
         for (const prop of this.codes.keys()) {
-            pluto.third.assets[module.name].component[prop] = ThirdFactory.getInstance(prop);
+            pluto.third.assets[context.name].component[prop] = ThirdFactory.getInstance(prop);
         }
         this.codes.forEach(async (params, prop) => {
-            const component = pluto.third.assets[module.name].component as Record<string, ThirdComponent>;
+            const component = pluto.third.assets[context.name].component as Record<string, ThirdComponent>;
             await component[prop]!.load(params);
         });
     }

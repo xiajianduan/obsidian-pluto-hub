@@ -123,7 +123,7 @@ declare global {
          * 执行组件注册
          * @param block 组件代码块对象
          */
-        execute(module: MiniModule): Promise<void>;
+        execute(context: BatchContext): Promise<void>;
         /**
          * 执行所有注册的组件
          */
@@ -144,7 +144,6 @@ declare global {
         enabled: boolean;
         bgColor?: string; // 用于存储随机渐变色
         files: ModFile[]; // 直接在MiniModule中包含文件数组
-        tmpFiles?: ModFile[]; // 临时存储文件数组，用于执行
         bgUrl?: string | null; // 用于存储图片 URL
     }
     export interface ModFile {

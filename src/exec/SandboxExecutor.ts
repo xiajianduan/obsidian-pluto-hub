@@ -19,34 +19,27 @@ export class SandboxExecutor extends SimpleExecutor {
     }
 
     async execute(module: MiniModule) {
-        const api = await this.execModule(module);
-        const bootJs = module.tmpFiles!.find(f => f.name === 'boot.js');
-        if (bootJs) {
-            const def = await this.load({ ...module, file: bootJs, api });
-            if (def) {
-                const boot = new def.Boot();
-                SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
-                boot.start?.();
-
-                boot.finish?.();
-            }
-        } else {
-            await this.execModule(module);
+        const api = await this.loadModules(module);
+        if (api.Boot) {
+            const boot = new api.Boot();
+            SandboxExecutor.instances.set(module.id, boot);// 缓存实例实例
+            boot.start?.();
+            boot.finish?.();
         }
     }
 
-    private async execModule(module: MiniModule) {
-        const jsFiles = module.tmpFiles!.filter(f => f.name !== 'boot.js');
+    private async loadModules(context: BatchContext) {
+        const tmpFiles = context.files;
         const api: Record<string, any> = {};
-        for (const file of jsFiles) {
-            const result = await this.load({ ...module, tmpFiles: module.tmpFiles!, file, api });
+        for (const file of tmpFiles) {
+            const result = await this.load({ ...context, tmpFiles: context.files, file, api });
             if (result) {
                 Object.assign(api, result);
             }
         }
         // 如果有模块导出结果，将其挂载到 pluto.modules
         if (Object.keys(api).length > 0) {
-            pluto.third.modules[module.name] = api;
+            pluto.third.modules[context.name] = api;
         }
         return api;
     }
@@ -107,12 +100,15 @@ export class SandboxExecutor extends SimpleExecutor {
     }
 
     async install(context: BatchContext) {
+        const api = await this.loadModules(context);
         const bootJs = context.files!.find(f => f.name === 'boot.js');
         if (bootJs) {
             const def = await this.load({ ...context, file: bootJs, api: pluto.third.modules[context.name] || {} });
             if (def) {
                 const boot = new def.Boot();
                 await boot.install?.(context);
+                await boot.start?.();
+                await boot.finish?.();
                 SandboxExecutor.instances.set(context.id, boot);// 缓存实例实例
             }
         }
@@ -121,7 +117,7 @@ export class SandboxExecutor extends SimpleExecutor {
     async uninstall(context: BatchContext) {
         const boot = SandboxExecutor.instances.get(context.id);
         if (boot) {
-            boot.uninstall?.(context);
+            await boot.uninstall?.(context);
             SandboxExecutor.instances.delete(context.id); // 清理实例实例
         }
     }

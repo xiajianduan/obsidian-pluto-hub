@@ -8,6 +8,7 @@ import { Notice } from "obsidian";
 import { YamlExecutor } from "../exec/YamlExecutor";
 import { PageExecutor } from "exec/PageExecutor";
 import { GlbExecutor } from "exec/GlbExecutor";
+import { FormExecutor } from "exec/FormExecutor";
 import { t } from "utils/translation";
 
 
@@ -27,6 +28,7 @@ export class CoreManager {
         'js': SandboxExecutor,
         'page': PageExecutor,
         'glb': GlbExecutor,
+        'form': FormExecutor,
     };
 
     create(prop: string): CoreExecutor {
@@ -43,9 +45,6 @@ export class CoreManager {
                 if (files && files.length > 0) {
                     const executor = this.create(key);
                     await executor.install({ ...module, files });
-                    module.tmpFiles = files;
-                    await executor.execute(module);
-                    delete module.tmpFiles;
                 }
             }
             delete pluto.third.modules?.[module.name];
@@ -63,9 +62,7 @@ export class CoreManager {
                 const files = filesByType[key];
                 if (files && files.length > 0) {
                     const executor = this.create(key);
-                    module.tmpFiles = files;
-                    await executor.execute(module);
-                    delete module.tmpFiles;
+                    await executor.execute({...module, files});
                 }
             }
         } catch (e: any) {

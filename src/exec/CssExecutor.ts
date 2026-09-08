@@ -7,10 +7,10 @@ export class CssExecutor extends SimpleExecutor {
         return type === 'css';
     }
         
-    async execute(module: MiniModule): Promise<void> {
-        for (const file of module.tmpFiles!) {  
-            this.injectStyle(`${module.id}-${file.name}`, file.content);
-            this.setSettings(module.name, file.content);
+    async execute(context: BatchContext): Promise<void> {
+        for (const file of context.files) {  
+            this.injectStyle(`${context.id}-${file.name}`, file.content);
+            this.setSettings(context.name, file.content);
         };
     }
 
@@ -31,6 +31,11 @@ export class CssExecutor extends SimpleExecutor {
         if (!matches) return;
         const settings = parseYaml(matches[1]!);
         pluto.third.assets[name][settings.id] = settings;
+    }
+
+    async install(context: BatchContext): Promise<void> {
+        await this.uninstall(context);
+        await this.execute(context);
     }
 
     async uninstall(context: BatchContext): Promise<void> {

@@ -1,16 +1,15 @@
 import { SimpleExecutor } from "./SimpleExecutor";
 
-export class JsonExecutor extends SimpleExecutor {
+export class FormExecutor extends SimpleExecutor {
 
     excutable(type: string): boolean {
-        return type === 'json';
+        return type === 'form';
     }
         
     async execute(context: BatchContext): Promise<void> {
         for (const file of context.files) {
-            const config = JSON.parse(file.content);
             // 将配置挂载到 pluto.assets[模块名]
-            pluto.third.assets[context.name][file.name] = config;
+            pluto.third.assets[context.name][file.name] = JSON.parse(file.content);
         };
     }
 }

@@ -29,6 +29,7 @@ export class PlutoTextView extends ItemView {
     }
 
     async setState(state: any, result: ViewStateResult): Promise<void> {
+        this.containerEl.dataset.scope = state.app;
         super.setState(state, result);
         if (result.layout) {
             this.state = state;

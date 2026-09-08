@@ -1,5 +1,43 @@
 # Changes Log
 
+## [2.0.3] - 2026-08-31
+
+### Improved
+- 重构所有执行器接口，统一使用 `BatchContext` 替代 `MiniModule` 作为 execute 方法参数，移除 `tmpFiles` 临时字段
+- 重构 SandboxExecutor 模块加载逻辑，`execModule` 重命名为 `loadModules`，install 时先加载模块再执行 boot 生命周期（install → start → finish）
+- 重构 CoreManager 模块安装与运行流程，直接传递 `files` 字段，不再通过 `tmpFiles` 中转
+- 重构 FormManager 表单管理器，统一 `openJson` 为 `openForm`，新增 `FormSubmitResult` 返回类型
+- 新增 FormExecutor 处理 `form` 类型文件
+- 新增 FormField `hotkey` 热键输入组件，支持组合键录制
+
+### Fixed
+- 修正 CssExecutor.install 中 `uninstall` 未 await 的 Promise 调用
+- 修正 YamlExecutor.install 中 `execute` 未 await 的 Promise 调用
+- 修正 styles.css 中 `selection-background-color` 无效属性为 `background-color`
+- 移除 EditorRenderer 中不必要的 `setCta()` / `setWarning()` 按钮样式
+
+### Files Modified
+- `src/exec/SandboxExecutor.ts` - 重构模块加载逻辑，install 增加完整 boot 生命周期
+- `src/exec/CssExecutor.ts` - 新增 install 方法，修复未 await 的 Promise
+- `src/exec/YamlExecutor.ts` - 新增 install 方法，修复未 await 的 Promise
+- `src/exec/SimpleExecutor.ts` - execute 参数改为 BatchContext
+- `src/exec/GlbExecutor.ts` - execute 参数改为 BatchContext
+- `src/exec/ImageExecutor.ts` - execute 参数改为 BatchContext
+- `src/exec/JsonExecutor.ts` - execute 参数改为 BatchContext
+- `src/exec/MarkdownExecutor.ts` - execute 参数改为 BatchContext
+- `src/exec/PageExecutor.ts` - execute 参数改为 BatchContext
+- `src/manager/CoreManager.ts` - 简化安装运行流程，新增 FormExecutor 注册
+- `src/manager/FormManager.ts` - 重构为 openForm，返回 FormSubmitResult
+- `src/modal/FormField.tsx` - 新增 hotkey 组件，格式化修正
+- `src/core/EditorRenderer.ts` - 移除按钮 setCta/setWarning
+- `src/view/PlutoTextView.ts` - 新增 scope dataset
+- `src/styles.css` - 移除 mod-cta/mod-warning 样式，修正无效 CSS 属性
+- `src/types/global.d.ts` - execute 参数改为 BatchContext，移除 tmpFiles 字段
+- `src/types/form.d.ts` - 新增 hotkey 类型、FormSubmitResult 接口
+
+### Files Added
+- `src/exec/FormExecutor.ts` - 新增 form 类型文件执行器
+
 ## [2.0.2] - 2026-08-31
 
 ### Fixed

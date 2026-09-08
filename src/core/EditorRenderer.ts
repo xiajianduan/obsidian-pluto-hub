@@ -118,7 +118,6 @@ export class EditorRenderer {
         const saveBtn = new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.save-changes'))
             .setClass("btn_nob")
-            .setCta()
             .onClick(async () => {
                 // 保存当前文件内容
                 this.saveCurrentEditorContent(module);
@@ -132,7 +131,6 @@ export class EditorRenderer {
         new ButtonComponent(actionsNav)
             .setButtonText(t('pluto.hub.editor.delete-module'))
             .setClass("btn_nob")
-            .setWarning()
             .onClick(async () => {
                 if (confirm(`Delete ${module.name}? This cannot be undone.`)) {
                     await this.moduleAction.delete(module.id);

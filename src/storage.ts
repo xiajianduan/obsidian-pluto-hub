@@ -2,10 +2,13 @@ import { PluginContext } from 'core/PluginContext';
 import PlutoHubPlugin from 'main';
 import { PlutoPlugin } from 'obsidian';
 import * as pako from 'pako';
-import { MODULE_ORDER } from 'utils/const';
 import { base64ToBlobUrl } from 'utils/helper';
 
+const DEFAULT_ORDER_KEY = 'a0';
+
 export class ModStorage {
+    private static modulesCache: MiniModule[] | null = null;
+
     // 获取模块存储目录路径
     static getModulesDir(): string {
         const plugin = PluginContext.plugin;
@@ -44,13 +47,35 @@ export class ModStorage {
         const plugin = PluginContext.plugin;
         const dir = plugin.settings.moduleStoragePath;
         const path = this.getModulePath(module.name);
-        // 移除bgUrl字段，因为它不应该被序列化
-        delete module.bgUrl;
-        // 移除files数组中的blobUrl字段，因为它不应该被序列化
-        module.files.filter(f => f.blobUrl).forEach(file => delete file.blobUrl);
-        const jsonStr = JSON.stringify(module);
+        const serializableModule = {
+            ...module,
+            files: module.files.map(file => {
+                const { blobUrl, ...serializableFile } = file;
+                return serializableFile;
+            }),
+        };
+        delete serializableModule.bgUrl;
+        const jsonStr = JSON.stringify(serializableModule);
         const binary = pako.deflate(jsonStr);
         await plugin.app.vault.adapter.writeBinary(path, binary.buffer);
+        this.updateModulesCache(module);
+    }
+
+    private static updateModulesCache(module: MiniModule): void {
+        if (!this.modulesCache) return;
+
+        const moduleIndex = this.modulesCache.findIndex(item => item.id === module.id);
+        if (moduleIndex >= 0) {
+            this.modulesCache[moduleIndex] = module;
+        } else {
+            this.modulesCache.push(module);
+        }
+        this.modulesCache.sort((a, b) => a.order.localeCompare(b.order));
+    }
+
+    static removeFromCache(moduleId: string): void {
+        if (!this.modulesCache) return;
+        this.modulesCache = this.modulesCache.filter(module => module.id !== moduleId);
     }
 
     // 加载单个模块
@@ -87,7 +112,7 @@ export class ModStorage {
             name: fileName,
             type: '',
             position: '',
-            order: MODULE_ORDER,
+            order: DEFAULT_ORDER_KEY,
             enabled: false,
             files: [{ name: 'main.js', type: 'js', content: 'new Notice(params.name);' }]
         };
@@ -115,6 +140,8 @@ export class ModStorage {
 
     // 从存储路径读取所有模块
     static async loadAllFromStorage(): Promise<MiniModule[]> {
+        if (this.modulesCache) return this.modulesCache;
+
         const plugin = PluginContext.plugin;
         const modulesDir = plugin.settings.moduleStoragePath;
         const adapter = plugin.app.vault.adapter;
@@ -130,8 +157,9 @@ export class ModStorage {
             const module = await this.loadModule(fileName);
             loadedModules.push(module);
         }
-        loadedModules.sort((a, b) => a.order - b.order);
-        return loadedModules;
+        loadedModules.sort((a, b) => a.order.localeCompare(b.order));
+        this.modulesCache = loadedModules;
+        return this.modulesCache;
     }
 
     // 导入功能：支持单个模块或全量导入

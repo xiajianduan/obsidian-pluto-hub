@@ -1,7 +1,7 @@
 import PlutoHubPlugin from "main";
+import { generateKeyBetween } from "fractional-indexing";
 import { Notice } from "obsidian";
 import { ModStorage } from "storage";
-import { MODULE_ORDER } from "utils/const";
 import { downloadImageToBase64 } from "utils/helper";
 import { t } from "utils/translation";
 
@@ -48,7 +48,7 @@ export class ModuleAction {
             name: name,
             type: 'G',
             position: "Z",
-            order: MODULE_ORDER,
+            order: generateKeyBetween(allModules.at(-1)?.order ?? null, null),
             enabled: true,
             bgColor: bgColor,
             files: moduleFiles,
@@ -69,6 +69,7 @@ export class ModuleAction {
             if (await this.plugin.app.vault.adapter.exists(path)) {
                 await this.plugin.app.vault.adapter.remove(path);
             }
+            ModStorage.removeFromCache(mod.id);
         }
     }
 

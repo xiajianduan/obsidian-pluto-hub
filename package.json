@@ -29,6 +29,7 @@
 		"typescript": "^5.8.3"
 	},
 	"dependencies": {
+		"fractional-indexing": "^4.0.0",
 		"monkey-around": "^3.0.0",
 		"obsidian": "latest",
 		"pako": "^2.1.0"

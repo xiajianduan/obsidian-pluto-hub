@@ -19,6 +19,8 @@
 - CoreManager 模块安装流程在 install 后补充 execute 调用，模块激活即生效
 - 调整 SandboxExecutor.install 生命周期顺序，start/finish 交由 execute 阶段执行
 - 第三方插件绑定改用 `${pluginId}-loaded` 事件，移除轮询等待
+- 模块排序改用 Fractional Indexing，拖拽排序只保存被移动的模块
+- 模块存储增加缓存，AI 生成文件支持覆盖已有文件并即时刷新编辑器
 
 ### Files Modified
 - `src/core/EditorRenderer.ts` - 新增智能生成按钮与 generateFiles 方法
@@ -40,6 +42,18 @@
 - `src/third/SimpleComponent.ts` - 增加组件绑定幂等保护
 - `src/third/TemplaterComponent.ts` - 修复 Templater 参数生成初始化时序
 - `src/utils/helper.ts` - 适配 prompt 方法新签名
+- `src/core/BoardRenderer.ts` - 使用 Fractional Indexing 保存拖拽排序
+- `src/core/EditorRenderer.ts` - AI 生成文件覆盖已有文件并刷新预览
+- `src/core/ModuleAction.ts` - 使用排序键创建模块并清理缓存
+- `src/storage.ts` - 增加模块缓存和排序键兼容处理
+- `src/types/global.d.ts` - 更新模块排序字段类型
+- `package.json` - 添加 fractional-indexing 依赖
+
+### Files Added
+- `docs/tasks.md` - 记录模块排序改造任务
+
+### Files Deleted
+- `src/utils/const.ts` - 移除旧的数字排序常量
 
 ## [2.0.3] - 2026-08-31
 

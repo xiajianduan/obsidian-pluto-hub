@@ -192,12 +192,22 @@ export class EditorRenderer {
                     existingFile => existingFile.name.toLowerCase() === file.name.toLowerCase()
                 );
                 if (existingIndex >= 0) {
-                    module.files.splice(existingIndex, 1);
+                    module.files[existingIndex] = {
+                        name: file.name,
+                        type,
+                        content: file.content,
+                    };
+                    continue;
                 }
                 module.files.push({ name: file.name, type, content: file.content });
             }
             await this.moduleAction.save(module);
             this.renderFileSidebar(fileSidebar, module, editorContainer);
+            const currentFile = this.getCurrentFile(module);
+            if (currentFile) {
+                this.mirrorRenderer.destroy();
+                this.mirrorRenderer.render(editorContainer, currentFile);
+            }
             new Notice(t('pluto.hub.editor.ai.success').replace('{count}', String(files.length)));
         } catch (error) {
             if ((error as { type?: string })?.type !== 'cancel') {

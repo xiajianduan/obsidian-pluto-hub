@@ -1,4 +1,5 @@
 import { ButtonComponent, Notice } from "obsidian";
+import { generateKeyBetween } from "fractional-indexing";
 import { ModStorage } from "storage";
 import { readFileAsArrayBuffer } from "utils/helper";
 import { t } from "utils/translation";
@@ -331,26 +332,19 @@ export class BoardRenderer {
                 return;
             }
 
-            // 使用所有模块（按 order 排序）来计算新的顺序
-            const sortedAllModules = [...allModules].sort((a, b) => a.order - b.order);
-            const targetIndex = sortedAllModules.findIndex(m => m.id === mod.id);
-            const draggedIndex = sortedAllModules.findIndex(m => m.id === this.draggedModId);
+            // 使用所有模块的排序键计算被拖动模块的新位置
+            const sortedAllModules = [...allModules].sort((a, b) => a.order.localeCompare(b.order));
+            const modulesWithoutDragged = sortedAllModules.filter(m => m.id !== this.draggedModId);
+            const targetIndex = modulesWithoutDragged.findIndex(m => m.id === mod.id);
 
-            if (draggedIndex === -1 || targetIndex === -1) {
+            if (targetIndex === -1) {
                 return;
             }
 
-            // 重新计算所有模块的 order
-            // 从 sortedAllModules 中移除被拖拽的模块
-            const modulesWithoutDragged = sortedAllModules.filter(m => m.id !== this.draggedModId);
-
-            // 在目标位置插入被拖拽的模块
+            const previousModule = modulesWithoutDragged[targetIndex - 1];
+            const nextModule = modulesWithoutDragged[targetIndex];
+            draggedMod.order = generateKeyBetween(previousModule?.order ?? null, nextModule?.order ?? null);
             modulesWithoutDragged.splice(targetIndex, 0, draggedMod);
-
-            // 更新所有模块的 order
-            modulesWithoutDragged.forEach((m, idx) => {
-                m.order = idx;
-            });
 
             // 获取当前显示的卡片（过滤后的模块）
             // 按照新的 order 重新排序过滤后的模块
@@ -362,18 +356,17 @@ export class BoardRenderer {
                 .sort((a, b) => {
                     const aOrder = modulesWithoutDragged.find(m => m.id === a.id)?.order ?? a.order;
                     const bOrder = modulesWithoutDragged.find(m => m.id === b.id)?.order ?? b.order;
-                    return aOrder - bOrder;
+                    return aOrder.localeCompare(bOrder);
                 });
 
             // 直接重新排列 DOM 元素，不重新渲染
             this.reorderCards(grid, filteredNewOrder);
 
-            // 异步保存所有受影响的模块（不阻塞 UI）
-            setTimeout(async () => {
-                for (const moduleToSave of modulesWithoutDragged) {
-                    await ModStorage.saveModule(moduleToSave);
-                }
-            }, 0);
+            try {
+                await ModStorage.saveModule(draggedMod);
+            } catch (error) {
+                new Notice(error instanceof Error ? error.message : String(error));
+            }
         });
     }
 

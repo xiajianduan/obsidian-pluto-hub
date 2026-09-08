@@ -160,7 +160,7 @@ declare global {
         name: string;
         type: string;
         position: string;
-        order: number;
+        order: string;
         enabled: boolean;
         bgColor?: string; // 用于存储随机渐变色
         files: ModFile[]; // 直接在MiniModule中包含文件数组

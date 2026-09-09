@@ -1,4 +1,5 @@
 import { App, Notice, TFile } from "obsidian";
+import { bufferToBlobUrl } from "utils/helper";
 
 export class ImageConverter {
     private app: App;
@@ -15,8 +16,7 @@ export class ImageConverter {
     async convertJpgToWebp(jpgBuffer: ArrayBuffer, quality: number): Promise<Blob> {
         return new Promise((resolve, reject) => {
             // 将 ArrayBuffer 转换为 Blob
-            const jpgBlob = new Blob([jpgBuffer], { type: 'image/jpeg' });
-            const imageUrl = URL.createObjectURL(jpgBlob);
+            const imageUrl = bufferToBlobUrl(jpgBuffer);
 
             // 创建图像对象加载 JPG
             const img = new Image();

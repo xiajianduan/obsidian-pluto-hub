@@ -64,6 +64,8 @@ export class ModStorage {
     private static updateModulesCache(module: MiniModule): void {
         if (!this.modulesCache) return;
 
+        this.updateModulePreview(module);
+
         const moduleIndex = this.modulesCache.findIndex(item => item.id === module.id);
         if (moduleIndex >= 0) {
             this.modulesCache[moduleIndex] = module;
@@ -71,6 +73,18 @@ export class ModStorage {
             this.modulesCache.push(module);
         }
         this.modulesCache.sort((a, b) => a.order.localeCompare(b.order));
+    }
+
+    private static updateModulePreview(module: MiniModule): void {
+        // 只有当enableIcon为true时才检查logo.webp文件
+        const plugin = PluginContext.plugin;
+        if (plugin.settings.enableIcon) {
+            // 检查模块中是否有logo.webp文件，如果有则将其转换为blob URL并设置到bgColor属性
+            const logoFile = module.files.find((file: any) => file.name === 'logo.webp' && file.type === 'webp');
+            if (logoFile && logoFile.content) {
+                module.bgUrl = base64ToBlobUrl(logoFile.content, 'webp');
+            }
+        }
     }
 
     static removeFromCache(moduleId: string): void {
@@ -92,14 +106,7 @@ export class ModStorage {
             const jsonStr = pako.inflate(uint8, { to: 'string' });
             const module = JSON.parse(jsonStr);
             
-            // 只有当enableIcon为true时才检查logo.webp文件
-            if (plugin.settings.enableIcon) {
-                // 检查模块中是否有logo.webp文件，如果有则将其转换为blob URL并设置到bgColor属性
-                const logoFile = module.files.find((file: any) => file.name === 'logo.webp' && file.type === 'webp');
-                if (logoFile && logoFile.content) {
-                    module.bgUrl = base64ToBlobUrl(logoFile.content, 'webp');
-                }
-            }
+            this.updateModulePreview(module);
             
             return module;
         } catch (e) {

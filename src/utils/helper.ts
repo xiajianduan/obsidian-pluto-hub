@@ -36,6 +36,11 @@ export function base64ToBlobUrl(base64: string, fileType: string): string {
     return URL.createObjectURL(blob);
 }
 
+export function bufferToBlobUrl(jpgBuffer: ArrayBuffer): string {
+    const jpgBlob = new Blob([jpgBuffer], { type: 'image/jpeg' });
+    return URL.createObjectURL(jpgBlob);
+}
+
 // 下载图片并转换为base64
 export async function downloadImageToBase64(url: string, quality: number): Promise<string | null> {
     try {
@@ -59,6 +64,29 @@ export async function downloadImageToBase64(url: string, quality: number): Promi
         return null;
     }
 }
+export async function blobUrlToBase64(url: string, quality: number): Promise<string | null> {
+    try {
+        const response = await fetch(url);
+        if (response.status !== 200) {
+            throw new Error(`Failed to download image: ${response.status}`);
+        }
+        const buffer = await response.arrayBuffer();
+        const blob = await pluto.images.convertJpgToWebp(buffer, quality);
+        return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result as string;
+                resolve(result);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error('Error downloading image:', error);
+        return null;
+    }
+}
+
 export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

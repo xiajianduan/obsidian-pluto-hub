@@ -2,7 +2,7 @@ import PlutoHubPlugin from "main";
 import { generateKeyBetween } from "fractional-indexing";
 import { Notice } from "obsidian";
 import { ModStorage } from "storage";
-import { downloadImageToBase64 } from "utils/helper";
+import { blobUrlToBase64 } from "utils/helper";
 import { t } from "utils/translation";
 
 export class ModuleAction {
@@ -36,7 +36,7 @@ export class ModuleAction {
         if (this.plugin.settings.enableIcon && pluto.skin?.path) {
             const skinPath = pluto.skin.path;
             // 下载图片并转换为base64
-            const imageBase64 = await downloadImageToBase64(skinPath, this.plugin.settings.quality);
+            const imageBase64 = await blobUrlToBase64(skinPath, this.plugin.settings.quality);
             if (imageBase64) {
                 const base64Parts = imageBase64.split(',');
                 moduleFiles = [{ name: 'logo.webp', type: 'webp', content: base64Parts[1]! }];

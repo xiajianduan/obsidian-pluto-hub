@@ -12,6 +12,7 @@
 - 修复第三方插件绑定重复执行和重复输出日志的问题
 - 修复 Templater 初始化竞态导致 `generate_params is not a function` 的问题
 - 修复第三方组件异步执行未等待，导致模块资源和 React 组件渲染时序不稳定的问题
+- 修复模块图片转换与缓存预览更新，确保图片资源可在模块变更后即时生效
 
 ### Improved
 - 简化 FormManager.prompt 签名，移除 required 参数（默认必填），更新 BoardRenderer 和 helper 中的调用
@@ -44,6 +45,7 @@
 - `src/utils/helper.ts` - 适配 prompt 方法新签名
 - `src/core/BoardRenderer.ts` - 使用 Fractional Indexing 保存拖拽排序
 - `src/core/EditorRenderer.ts` - AI 生成文件覆盖已有文件并刷新预览
+- `src/core/ImageConverter.ts` - 复用 Blob URL 工具完成图片转换
 - `src/core/ModuleAction.ts` - 使用排序键创建模块并清理缓存
 - `src/storage.ts` - 增加模块缓存和排序键兼容处理
 - `src/types/global.d.ts` - 更新模块排序字段类型

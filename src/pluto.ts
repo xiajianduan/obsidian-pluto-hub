@@ -3,9 +3,8 @@ import { App, parseYaml } from "obsidian";
 import { ThirdFactory } from "third/ThirdFactory";
 import * as obsidian from "obsidian";
 import { ImageConverter } from "core/ImageConverter";
-import PlutoHubPlugin from "main";
 import { VIEW_TYPE_BOARD } from "view/PlutoBoardView";
-import { find_tfile, getAvailablePlugins } from "utils/helper";
+import { bufferToBlobUrl, find_tfile, getAvailablePlugins } from "utils/helper";
 import { ViewManager } from "manager/ViewManager";
 import { FormManager } from "manager/FormManager";
 import ThemeManager from "manager/ThemeManager";
@@ -48,7 +47,8 @@ export class Pluto implements IPluto {
             find_tfile: find_tfile.bind(this, this.app),
             stringifyYaml: obsidian.stringifyYaml.bind(obsidian),
             parseYaml: parseYaml.bind(obsidian),
-            getAvailablePlugins: getAvailablePlugins.bind(this),
+            getAvailablePlugins,
+            bufferToBlobUrl,
             obsidian,
         };
         this.third = ThirdFactory.createThirdComponent(settings.configPath);
